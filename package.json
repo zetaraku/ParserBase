@@ -1,0 +1,27 @@
+{
+  "name": "parser_base",
+  "version": "0.0.0",
+  "description": "A library with webpage user interface for demonstration of parser concept.",
+  "main": "index.js",
+  "author": "Raku Zeta <ztrk1600@gmail.com>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-amd": "^6.24.1",
+    "babel-plugin-transform-strict-mode": "^6.24.1",
+    "babel-preset-es2016": "^6.24.1",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-pug": "^3.3.0",
+    "gulp-sass": "^3.1.0",
+    "mocha": "^3.2.0",
+    "pug": "^2.0.0-beta11"
+  },
+  "dependencies": {},
+  "bugs": {
+    "url": "https://github.com/ztrk1600/ParserBase/issues"
+  },
+  "homepage": "https://github.com/ztrk1600/ParserBase#readme",
+  "private": true
+}

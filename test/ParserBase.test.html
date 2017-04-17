@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+		<script type="text/javascript" src="../js/lib/require.js"></script>
+		<script type="text/javascript">
+			requirejs.config({
+				"baseUrl": "../js/lib",
+				"paths": {
+					"root": "../..",
+					"app": "../../js/app",
+					"test": "../../test",
+					"node_modules": "../../node_modules",
+					"jquery": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
+				},
+				shim: {
+					"viz": {
+						exports: 'Viz'
+					}
+				}
+			});
+			requirejs(['node_modules/mocha/mocha',"app/helpers"], function() {
+				mocha.setup('bdd');
+				requirejs(['test/ParserBase.test'], function() {
+					mocha.run();
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="mocha"></div>
+	</body>
+</html>

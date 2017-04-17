@@ -1,0 +1,146 @@
+* {
+	box-sizing: border-box; /* final rescue */
+}
+
+code {
+	font-family: consolas;
+}
+
+.big {
+	font-size: 32px;
+}
+.lambda {
+	color: gray;
+	font-style: italic;
+}
+.highlighted {
+	background-color: yellow;
+}
+
+span {
+	&.gsymbol {
+		font-weight: bold;
+		&.terminal {
+			&.end-symbol {
+				color: red;
+			}
+		}
+		&.non-terminal {
+			color: blue;
+			&.augmenting-symbol {
+				color: orange;
+			}
+			&.start-symbol {
+				color: skyblue;
+			}
+			&.nullable {
+				font-style: italic;
+			}
+		}
+		&.unknown {
+			font-weight: normal;
+			font-style: italic;
+			color: gray;
+		}
+	}
+	&.comma {
+		color: gray;
+		font-style: italic;
+	}
+}
+
+table {
+	border: 1px solid black;
+	border-collapse: collapse;
+	overflow: hidden;
+	&.compact-table {
+		th, td {
+			padding: 2px 6px;
+			text-align: left;
+		}
+	}
+	&.hoverable {
+		tr:hover {
+			background-color: lightgray;
+		}
+	}
+	th {
+		border: 1px solid black;
+		padding: 10px 10px;
+		text-align: left;
+		background-color: #4CAF50;
+		color: white;
+	}
+	td {
+		border: 1px solid black;
+		padding: 10px 10px;
+		text-align: left;
+		&.b {
+			background-color: blue;
+			color: white;
+			*, .non-terminal {
+				color: white;
+			}
+		}
+		&.conflict {
+			background-color: orange;
+		}
+		&.diagonalFalling {
+			background-image: linear-gradient(
+				to right top,
+				blue calc(50% - 1px),
+				black,
+				#4CAF50 calc(50% + 1px)
+			);
+		}
+		&.unfinished {
+			background-image: linear-gradient(
+				to right bottom,
+				white calc(50% - 1px),
+				black,
+				white calc(50% + 1px)
+			);
+		}
+	}
+}
+
+/* Style the list */
+ul.tab {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+	/* Float the list items side by side */
+	li {
+		float: left;
+		/* Style the links inside the list items */
+		a {
+			display: inline-block;
+			color: black;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+			transition: 0.3s;
+			font-size: 17px;
+			/* Change background color of links on hover */
+			&:hover {
+				background-color: #ddd;
+			}
+			/* Create an active/current tablink class */
+			&:focus, &.active {
+				background-color: #ccc;
+			}
+		}
+	}
+}
+/* Style the tab content */
+div.tabcontent {
+	width: 100%;
+	/*overflow: scroll;*/
+	display: none;
+	padding: 12px 12px;
+	border: 1px solid #ccc;
+	border-top: none;
+}

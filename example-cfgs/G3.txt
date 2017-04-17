@@ -1,0 +1,11 @@
+# this is a non-LL(1) grammar
+# parse it with LR(1)
+#!start-symbol: E
+#!parse-example: ID * ( ID + ID )
+
+E -> E + T
+E -> T
+T -> T * P
+T -> P
+P -> ID
+P -> ( E )

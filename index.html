@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="js/lib/require.js" data-main="js/app"></script>
+		<script>
+			function openTab(tabname) {
+				$('.tabcontent').css('display', 'none');
+				$('.tablinks').removeClass('active');
+				$('#'+tabname).css('display', 'block');
+				$('#tab_ul').find('[name='+tabname+']').addClass('active');
+			}
+		</script>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<title>ParserBase</title>
+	</head>
+	<body>
+		<form id="grammar_form">
+			<div id="editor">
+				<div class="big">Grammar Input: <a href="example-cfgs">[Example]</a></div>
+				<textarea id="grammar_input" rows="16" style="width: 100%; font-size: 24px;"></textarea>
+				<div style="padding: 10px 5px;">
+					<u>LHS of the first production</u> will be treated as the <b>Start Symbol</b> 
+					(or you can use the directive <code style="background: lightgray;">#!start-symbol: your_start_symbol</code> to override)
+				</div>
+			</div>
+			<input class="big" id="generate" type="submit" value="Generate">
+		</form><br><br>
+		<div id="info" style="display: none;">
+			<ul class="tab" id="tab_ul"></ul>
+			<div class="tabcontent" id="grammar_tab">
+				<div id="grammar"></div>
+			</div>
+			<div class="tabcontent" id="lambda_tab">
+				<div id="lambda"></div>
+			</div>
+			<div class="tabcontent" id="first_tab">
+				<div id="first"></div>
+			</div>
+			<div class="tabcontent" id="follow_tab">
+				<div id="follow"></div>
+			</div>
+			<div class="tabcontent" id="predict_tab">
+				<div id="predict"></div>
+			</div>
+			<div class="tabcontent" id="ll1table_tab">
+				<div id="ll1table"></div>
+			</div>
+			<div class="tabcontent" id="ll1parse_tab">
+				<div id="ll1parse">
+					<div class="big">Source Token Input:</div>
+					<textarea class="source_input" rows="4" style="width: 100%; font-size: 24px;"></textarea>
+					<button class="start_parse big">(re)Start Parsing</button>
+					<button class="parse_next_btn big">Next Step</button>
+					<button class="skip_all_btn big">Skip All</button>
+					<button class="view_parse_tree big">View ParseTree</button><br><br>
+					<table>
+						<tr>
+							<th>Step Info</th>
+							<td>
+								<div class="parse_step_info"></div>
+							</td>
+						</tr>
+						<tr>
+							<th>Parse Stack</th>
+							<td>
+								<table>
+									<tr class="parse_stack"></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Input Token Stream</th>
+							<td>
+								<table>
+									<tr class="itoken_stream"></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Semantic Stack<br>(Parse Branch)</th>
+							<td class="semantic_stack"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="tabcontent" id="lr0fsm_tab">
+				<button id="lr0fsm_gen">Generate</button>
+				<div id="lr0fsm"></div><a class="downloadLink" href="javascript:void(0);" download="lr0fsm.png" style="display: none;">Click to download</a>
+			</div>
+			<div class="tabcontent" id="lr1fsm_tab">
+				<button id="lr1fsm_gen">Generate</button>
+				<div id="lr1fsm"></div><a class="downloadLink" href="javascript:void(0);" download="lr1fsm.png" style="display: none;">Click to download</a>
+			</div>
+			<div class="tabcontent" id="lr1table_tab">
+				<div id="lr1table"></div>
+			</div>
+			<div class="tabcontent" id="lr1parse_tab">
+				<div id="lr1parse">
+					<div class="big">Source Token Input:</div>
+					<textarea class="source_input" rows="4" style="width: 100%; font-size: 24px;"></textarea>
+					<button class="start_parse big">(re)Start Parsing</button>
+					<button class="parse_next_btn big">Next Step</button>
+					<button class="skip_all_btn big">Skip All</button>
+					<button class="view_parse_tree big">View ParseTree</button><br><br>
+					<table>
+						<tr>
+							<th>Step Info</th>
+							<td>
+								<div class="parse_step_info"></div>
+							</td>
+						</tr>
+						<tr>
+							<th>State Stack</th>
+							<td>
+								<table>
+									<tr class="state_stack"></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Parse Stack</th>
+							<td class="parse_stack"></td>
+						</tr>
+						<tr>
+							<th>Input Token Stream</th>
+							<td>
+								<table>
+									<tr class="itoken_stream"></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<th>Semantic Stack</th>
+							<td class="semantic_stack">(same as Parse Stack)</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<canvas id="tmpCanvas" style="display: none;"></canvas>
+		<div style="position: fixed; bottom: 0; right: 0; padding: 5px;">developed by <a href='https://github.com/ztrk1600'>Raku Zeta</a></div>
+	</body>
+</html>

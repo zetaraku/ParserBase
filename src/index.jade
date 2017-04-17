@@ -1,0 +1,121 @@
+doctype html
+html
+	head
+		meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+		script(src='js/lib/require.js', data-main='js/app')
+		script.
+			function openTab(tabname) {
+				$('.tabcontent').css('display', 'none');
+				$('.tablinks').removeClass('active');
+				$('#'+tabname).css('display', 'block');
+				$('#tab_ul').find('[name='+tabname+']').addClass('active');
+			}
+		link(rel='stylesheet', type='text/css', href='css/style.css')
+		title ParserBase
+	body
+		form#grammar_form
+			#editor
+				.big
+					| Grammar Input: 
+					a(href='example-cfgs') [Example]
+				textarea#grammar_input(rows='16', style='width: 100%; font-size: 24px;')
+				div(style='padding: 10px 5px;')
+					| <u>LHS of the first production</u> will be treated as the <b>Start Symbol</b> 
+					| (or you can use the directive 
+					code(style='background: lightgray;')
+						| #!start-symbol: your_start_symbol
+					|  to override)
+			input#generate.big(type='submit', value='Generate')
+		br
+		br
+		#info(style='display: none;')
+			ul#tab_ul.tab
+			#grammar_tab.tabcontent
+				#grammar
+			#lambda_tab.tabcontent
+				#lambda
+			#first_tab.tabcontent
+				#first
+			#follow_tab.tabcontent
+				#follow
+			#predict_tab.tabcontent
+				#predict
+			#ll1table_tab.tabcontent
+				#ll1table
+			#ll1parse_tab.tabcontent
+				#ll1parse
+					.big Source Token Input:
+					textarea.source_input(rows='4', style='width: 100%; font-size: 24px;')
+					button.start_parse.big (re)Start Parsing
+					button.parse_next_btn.big Next Step
+					button.skip_all_btn.big Skip All
+					button.view_parse_tree.big View ParseTree
+					br
+					br
+					table
+						tr
+							th Step Info
+							td
+								.parse_step_info
+						tr
+							th Parse Stack
+							td
+								table
+									tr.parse_stack
+						tr
+							th Input Token Stream
+							td
+								table
+									tr.itoken_stream
+						tr
+							th
+								| Semantic Stack
+								br
+								| (Parse Branch)
+							td.semantic_stack
+			#lr0fsm_tab.tabcontent
+				button#lr0fsm_gen Generate
+				#lr0fsm
+				a.downloadLink(href='javascript:void(0);', download='lr0fsm.png', style='display: none;') Click to download
+			#lr1fsm_tab.tabcontent
+				button#lr1fsm_gen Generate
+				#lr1fsm
+				a.downloadLink(href='javascript:void(0);', download='lr1fsm.png', style='display: none;') Click to download
+			#lr1table_tab.tabcontent
+				#lr1table
+			#lr1parse_tab.tabcontent
+				#lr1parse
+					.big Source Token Input:
+					textarea.source_input(rows='4', style='width: 100%; font-size: 24px;')
+					button.start_parse.big (re)Start Parsing
+					button.parse_next_btn.big Next Step
+					button.skip_all_btn.big Skip All
+					button.view_parse_tree.big View ParseTree
+					br
+					br
+					table
+						tr
+							th Step Info
+							td
+								.parse_step_info
+						tr
+							th State Stack
+							td
+								table
+									tr.state_stack
+						tr
+							th Parse Stack
+							td.parse_stack
+						tr
+							th Input Token Stream
+							td
+								table
+									tr.itoken_stream
+						tr
+							th
+								| Semantic Stack
+							td.semantic_stack
+								| (same as Parse Stack)
+		canvas(id='tmpCanvas', style='display: none;')
+		div(style='position: fixed; bottom: 0; right: 0; padding: 5px;')
+			| developed by <a href='https://github.com/ztrk1600'>Raku Zeta</a>

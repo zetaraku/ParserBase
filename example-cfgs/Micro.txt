@@ -1,0 +1,26 @@
+# this is a LL(1) grammar
+# you can parse it with LL(1) or LR(1)
+#!start-symbol: program
+#!parse-example: begin ID := INTLIT ; read ( ID ) ; end
+
+program -> begin statement_list end
+statement_list -> statement statement_tail
+statement_tail -> statement statement_tail
+statement_tail -> 
+statement -> ID := expression ;
+statement -> read ( id_list ) ;
+statement -> write ( expr_list ) ;
+id_list -> ID id_tail
+id_tail -> , ID id_tail
+id_tail -> 
+expr_list -> expression expr_tail
+expr_tail -> , expression expr_tail
+expr_tail -> 
+expression -> primary primary_tail
+primary_tail -> add_op primary primary_tail
+primary_tail -> 
+primary -> ( expression )
+primary -> ID
+primary -> INTLIT
+add_op -> +
+add_op -> -
