@@ -1,7 +1,7 @@
 {
   "name": "parser_base",
   "version": "0.0.0",
-  "description": "A library with webpage user interface for demonstration of parser concept.",
+  "description": "A demonstrative parser with a webpage user interface.",
   "main": "index.js",
   "author": "Raku Zeta <ztrk1600@gmail.com>",
   "license": "MIT",

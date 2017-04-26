@@ -1,7 +1,7 @@
 Parser Base
 ===========
 
-This is a **demonstrative parser library** with a **webpage user interface**.
+This is a **demonstrative parser** with a **webpage user interface**.
 
 It can:
 
