@@ -4,7 +4,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.LR1Parse = exports.LL1Parse = exports.LR1FSM = exports.LR0FSM = exports.LR1Configuration = exports.Configuration = exports.Grammar = exports.Production = exports.ActionSymbol = exports.NonTerminal = exports.Terminal = exports.GSymbol = exports.Lambda = undefined;
+	exports.LR1Parse = exports.LL1Parse = exports.LR1FSM = exports.LR0FSM = exports.LR1Configuration = exports.LR0Configuration = exports.Grammar = exports.Production = exports.ActionSymbol = exports.NonTerminal = exports.Terminal = exports.GSymbol = exports.Lambda = undefined;
 	exports.buildGrammar = buildGrammar;
 	exports.computeUnreachableSymbols = computeUnreachableSymbols;
 	exports.computeUnreducibleSymbols = computeUnreducibleSymbols;
@@ -134,9 +134,9 @@ define(['exports', 'viz'], function (exports, _viz) {
 		}
 	}exports.Grammar = Grammar;
 	{}
-	class Configuration {
+	class LR0Configuration {
 		constructor(production, dotPos) {
-			this.id = Configuration.serialNo++;
+			this.id = LR0Configuration.serialNo++;
 			this.production = production;
 			this.dotPos = dotPos;
 		}
@@ -146,18 +146,18 @@ define(['exports', 'viz'], function (exports, _viz) {
 		}
 		toString() {
 			let r = this.production.rhs.slice();
-			r.splice(this.dotPos, 0, Configuration.DOT);
+			r.splice(this.dotPos, 0, LR0Configuration.DOT);
 			return this.production.lhs + ' ' + Production.ARROW + ' ' + r.join(' ');
 		}
 		toRawString() {
 			let r = this.production.rhs.slice();
-			r.splice(this.dotPos, 0, Configuration.DOT);
+			r.splice(this.dotPos, 0, LR0Configuration.DOT);
 			return this.production.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + r.map(e => e.toRawString()).join(' ');
 		}
-	}exports.Configuration = Configuration;
+	}exports.LR0Configuration = LR0Configuration;
 	{
-		Configuration.serialNo = 1;
-		Configuration.DOT = {
+		LR0Configuration.serialNo = 1;
+		LR0Configuration.DOT = {
 			toString: function () {
 				return '●';
 			},
@@ -167,9 +167,9 @@ define(['exports', 'viz'], function (exports, _viz) {
 		};
 	}
 	class LR1Configuration {
-		constructor(baseConfiguration, lookahead) {
+		constructor(baseLR0Configuration, lookahead) {
 			this.id = LR1Configuration.serialNo++;
-			this.baseConfiguration = baseConfiguration;
+			this.baseLR0Configuration = baseLR0Configuration;
 			this.lookahead = lookahead;
 		}
 	}exports.LR1Configuration = LR1Configuration;
@@ -179,14 +179,14 @@ define(['exports', 'viz'], function (exports, _viz) {
 	class LR0FSM {
 		constructor(startState) {
 			this.startState = startState;
-			this.states = new Set();
+			this.states = new Set([startState]);
 		}
 	}exports.LR0FSM = LR0FSM;
 	{
 		LR0FSM.State = class {
-			constructor(configurationSet) {
+			constructor(lr0ConfigurationSet) {
 				this.id = LR0FSM.State.serialNo++;
-				this.configurationSet = configurationSet;
+				this.configurationSet = lr0ConfigurationSet;
 				this.transitionMap = new Map();
 			}
 			linkTo(toState, symbol) {
@@ -204,22 +204,22 @@ define(['exports', 'viz'], function (exports, _viz) {
 	class LR1FSM {
 		constructor(startState) {
 			this.startState = startState;
-			this.states = new Set();
+			this.states = new Set([startState]);
 		}
 	}exports.LR1FSM = LR1FSM;
 	{
 		LR1FSM.State = class {
-			constructor(lr1configurationSet) {
+			constructor(lr1ConfigurationSet) {
 				this.id = LR1FSM.State.serialNo++;
-				this.lr1configurationSet = lr1configurationSet;
+				this.configurationSet = lr1ConfigurationSet;
 				this.transitionMap = new Map();
 			}
 			linkTo(toState, symbol) {
 				this.transitionMap.set(symbol, toState);
 			}
 			subContentReprensentation() {
-				return Array.from(this.lr1configurationSet.groupBy(e => e.baseConfiguration).entries()).map(function ([conf, lr1confs]) {
-					return conf.toRawString() + ' ' + '{' + lr1confs.toArray().map(e => (e.lookahead || Lambda).toRawString()).join(' ') + '}' + '\\l';
+				return Array.from(this.configurationSet.groupBy(e => e.baseLR0Configuration).entries()).map(function ([lr0conf, lr1confs]) {
+					return lr0conf.toRawString() + ' ' + '{' + lr1confs.toArray().map(e => (e.lookahead || Lambda).toRawString()).join(' ') + '}' + '\\l';
 				}).join('');
 			}
 		};{
@@ -229,9 +229,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 	class LL1Parse {
 		constructor(grammar, ll1PredictTable, inputTokens) {
 			LL1Parse.TreeNode.serialNo = 1;
-			const rootNode = new LL1Parse.TreeNode(GSymbol.SYSTEM_GOAL);
+			const rootNode = this.parseTree = new LL1Parse.TreeNode(GSymbol.SYSTEM_GOAL);
 			const parseStack = this.parseStack = [GSymbol.SYSTEM_GOAL];
-			const parseTree = this.parseTree = rootNode;
 			const rhsStack = this.rhsStack = [];
 			inputTokens.push({ terminalType: GSymbol.EOI });
 			[this.currentRHS, this.currentRHSIndex] = [[rootNode], 0];
@@ -366,6 +365,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 							parseForest.push(new LR1Parse.TreeNode(nextInput.terminalType));
 
 							inputTokens.shift();
+
 							yield {
 								type: LR1Parse.Action.shift
 							};
@@ -468,7 +468,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		ActionSymbol: ActionSymbol,
 		Production: Production,
 		Grammar: Grammar,
-		Configuration: Configuration,
+		LR0Configuration: LR0Configuration,
 		LR1Configuration: LR1Configuration,
 		LR0FSM: LR0FSM,
 		LR1FSM: LR1FSM,
@@ -525,9 +525,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		while (processingQueue.isNotEmpty()) {
 			let processingNT = processingQueue.shift();
 			for (let production of grammar.productionsMap.get(processingNT)) {
-				let lhs = production.lhs,
-				    rhs = production.rhs;
-				for (let v of rhs) {
+				for (let v of production.rhs) {
 					if (reachableVocabularies.has(v)) continue;
 					reachableVocabularies.add(v);
 					if (v instanceof NonTerminal) processingQueue.push(v);
@@ -535,11 +533,12 @@ define(['exports', 'viz'], function (exports, _viz) {
 			}
 		}
 		let unreachableSymbols = [];
-		for (let s of [...grammar.terminals, ...grammar.nonTerminals]) {
-			if (!reachableVocabularies.has(s)) {
-				unreachableSymbols.push(s);
+		for (let symbol of [...grammar.terminals, ...grammar.nonTerminals]) {
+			if (!reachableVocabularies.has(symbol)) {
+				unreachableSymbols.push(symbol);
 			}
 		}
+
 		return unreachableSymbols;
 	}
 	function computeUnreducibleSymbols(grammar) {
@@ -570,11 +569,12 @@ define(['exports', 'viz'], function (exports, _viz) {
 			}
 		}
 		let unreducibleSymbols = [];
-		for (let s of grammar.nonTerminals) {
-			if (!reducibleVocabularies.has(s)) {
-				unreducibleSymbols.push(s);
+		for (let symbol of grammar.nonTerminals) {
+			if (!reducibleVocabularies.has(symbol)) {
+				unreducibleSymbols.push(symbol);
 			}
 		}
+
 		return unreducibleSymbols;
 	}
 	function computeNullableSymbols(grammar) {
@@ -604,6 +604,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 				}
 			}
 		}
+
 		return nullableSymbols;
 	}
 	function buildFirstSetTable(grammar, nullableSymbols) {
@@ -616,7 +617,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 		while (lastUpdatedVocabularies.isNotEmpty()) {
 			let newUpdatedVocabularies = new Set();
 			for (let production of grammar.productions) {
-				let [lhs, rhs] = [production.lhs, production.rhs];
+				let lhs = production.lhs,
+				    rhs = production.rhs;
 				let firstSetOfLHS = firstSetTable.get(lhs);
 				let lhsUpdated = false;
 				for (let rhsi of rhs) {
@@ -625,9 +627,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 						let added = firstSetOfLHS.addAll(firstSetOfRHSI);
 						lhsUpdated = lhsUpdated || added.isNotEmpty();
 					}
-					if (!nullableSymbols.has(rhsi)) {
-						break; // end of range, the non-nullable is the last
-					}
+					if (!nullableSymbols.has(rhsi)) break;
 				}
 				if (lhsUpdated) newUpdatedVocabularies.add(lhs);
 			}
@@ -637,6 +637,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		for (let nullableSymbol of nullableSymbols) {
 			firstSetTable.get(nullableSymbol).add(Lambda);
 		}
+
 		return firstSetTable;
 	}
 	function buildFollowSetTable(grammar, firstSetTable) {
@@ -649,25 +650,24 @@ define(['exports', 'viz'], function (exports, _viz) {
 
 		// stage 1: adding terminals from first set (one pass)
 		for (let production of grammar.productions) {
-			let [lhs, rhs] = [production.lhs, production.rhs];
+			let lhs = production.lhs,
+			    rhs = production.rhs;
 			for (let i = 0; i < rhs.length; i++) {
-				let rhsi = rhs[i];
-				if (!(rhsi instanceof NonTerminal)) continue; // only consider NonTerminals
-				let followSetOfRHSI = followSetTable.get(rhsi);
+				if (!(rhs[i] instanceof NonTerminal)) continue; // only consider NonTerminals
 
+				let followSetOfRHSI = followSetTable.get(rhs[i]);
 				let blocked = false;
 				for (let j = i + 1; j < rhs.length; j++) {
-					let rhsj = rhs[j];
-					for (let t of firstSetTable.get(rhsj)) {
+					for (let t of firstSetTable.get(rhs[j])) {
 						if (t !== Lambda) followSetOfRHSI.add(t);
 					}
-					if (!firstSetTable.get(rhsj).has(Lambda)) {
+					if (!firstSetTable.get(rhs[j]).has(Lambda)) {
 						blocked = true;
-						break; // end of range, the non-nullable is the last
+						break;
 					}
 				}
 				if (!blocked) {
-					seeThroughTable.get(rhsi).add(lhs); // rhsi can see through lhs
+					seeThroughTable.get(rhs[i]).add(lhs); // rhs[i] can see through lhs
 				}
 			}
 		}
@@ -690,7 +690,6 @@ define(['exports', 'viz'], function (exports, _viz) {
 			}
 			lastUpdatedVocabularies = newUpdatedVocabularies;
 		}
-
 		followSetTable.get(GSymbol.SYSTEM_GOAL).add(Lambda);
 
 		return followSetTable;
@@ -701,19 +700,21 @@ define(['exports', 'viz'], function (exports, _viz) {
 			let lhs = production.lhs,
 			    rhs = production.rhs;
 			let predictSetOfProduction = new Set();
-			let canSeeThrough = true;
-			for (let rhsi of rhs) {
-				for (let t of firstSetTable.get(rhsi)) predictSetOfProduction.add(t);
-				if (!firstSetTable.get(rhsi).has(Lambda)) {
-					canSeeThrough = false;
-					break; // end of range, the non-nullable is the last
+			let blocked = false;
+			for (let i = 0; i < rhs.length; i++) {
+				for (let t of firstSetTable.get(rhs[i])) predictSetOfProduction.add(t);
+				if (!firstSetTable.get(rhs[i]).has(Lambda)) {
+					blocked = true;
+					break;
 				}
 			}
-			if (canSeeThrough) {
+			if (!blocked) {
 				for (let t of followSetTable.get(lhs)) predictSetOfProduction.add(t);
 			}
+
 			predictSetTable.set(production, predictSetOfProduction);
 		}
+
 		return predictSetTable;
 	}
 	function buildLL1PredictTable(grammar, predictSetTable) {
@@ -728,40 +729,36 @@ define(['exports', 'viz'], function (exports, _viz) {
 			}
 			ll1PredictTable.set(nt, ntPredictSet);
 		}
+
 		return ll1PredictTable;
 	}
 	function buildLR0FSM(grammar) {
-		Configuration.serialNo = 1;
+		LR0Configuration.serialNo = 1;
 		LR0FSM.State.serialNo = 0;
 
-		let globalConfigurationMap = new Map();
-		for (let production of grammar.productions) {
-			let configurationsOfProd = [];
-			for (let i = 0; i <= production.rhs.length; i++) configurationsOfProd.push(new Configuration(production, i));
-			globalConfigurationMap.set(production, configurationsOfProd);
-		} // immutated after created
+		let getLR0Configuration = getLR0ConfigurationHelper();
 
-		let state0 = new LR0FSM.State(closureOf(new Set([getConfiguration(grammar.augmentingProduction, 0)])));
+		let state0 = new LR0FSM.State(closure0Of(new Set([getLR0Configuration(grammar.augmentingProduction, 0)])));
 		let lr0FSM = new LR0FSM(state0);
-		lr0FSM.states.add(state0);
+
 		let processingQueue = [state0];
 		while (processingQueue.isNotEmpty()) {
 			let processingState = processingQueue.shift();
 			let nextSymbolGroups = processingState.configurationSet.groupBy(e => e.getNextSymbol());
-			for (let [symbol, confSet] of nextSymbolGroups) {
+			for (let [symbol, lr0ConfSet] of nextSymbolGroups) {
 				if (symbol === null) continue;
-				let newConfSet = closureOf(new Set(confSet.toArray().map(function (conf) {
-					return getConfiguration(conf.production, conf.dotPos + 1);
+				let newLR0ConfSet = closure0Of(new Set(lr0ConfSet.toArray().map(function (lr0conf) {
+					return getLR0Configuration(lr0conf.production, lr0conf.dotPos + 1);
 				})));
 				let existedState = null;
-				for (let s of lr0FSM.states) {
-					if (s.configurationSet.equals(newConfSet)) {
-						existedState = s;
+				for (let state of lr0FSM.states) {
+					if (state.configurationSet.equals(newLR0ConfSet)) {
+						existedState = state;
 						break;
 					}
 				}
 				if (existedState === null) {
-					let newState = new LR0FSM.State(newConfSet);
+					let newState = new LR0FSM.State(newLR0ConfSet);
 					lr0FSM.states.add(newState);
 					processingState.linkTo(newState, symbol);
 					processingQueue.push(newState);
@@ -770,67 +767,71 @@ define(['exports', 'viz'], function (exports, _viz) {
 				}
 			}
 		}
+
 		return lr0FSM;
 
-		function getConfiguration(prod, pos) {
-			return globalConfigurationMap.get(prod)[pos];
+		function getLR0ConfigurationHelper() {
+			let globalLR0ConfMap = new Map();{
+				for (let production of grammar.productions) {
+					let lr0ConfsOfProd = [];
+					for (let i = 0; i <= production.rhs.length; i++) lr0ConfsOfProd.push(new LR0Configuration(production, i));
+					globalLR0ConfMap.set(production, lr0ConfsOfProd);
+				}
+			}
+
+			return function (prod, pos) {
+				return globalLR0ConfMap.get(prod)[pos];
+			};
 		}
-		function closureOf(configurationSet) {
-			let newConfigurationSet = new Set(configurationSet);
-			let processingQueue = configurationSet.toArray();
+		function closure0Of(lr0ConfSet) {
+			let newLR0ConfSet = new Set(lr0ConfSet);
+
+			let processingQueue = lr0ConfSet.toArray();
 			while (processingQueue.isNotEmpty()) {
-				let conf = processingQueue.shift();
-				let expandingNonterminal = conf.getNextSymbol();
-				let prod = conf.production;
+				let lr0conf = processingQueue.shift();
+
+				let expandingNonterminal = lr0conf.getNextSymbol();
 				if (!(expandingNonterminal instanceof NonTerminal)) continue;
-				for (let p of grammar.productionsMap.get(expandingNonterminal)) {
-					let newConf = getConfiguration(p, 0);
-					if (!newConfigurationSet.has(newConf)) {
-						newConfigurationSet.add(newConf);
-						processingQueue.push(newConf);
+
+				for (let prod of grammar.productionsMap.get(expandingNonterminal)) {
+					let newLR0Conf = getLR0Configuration(prod, 0);
+					if (!newLR0ConfSet.has(newLR0Conf)) {
+						newLR0ConfSet.add(newLR0Conf);
+						processingQueue.push(newLR0Conf);
 					}
 				}
 			}
-			return newConfigurationSet;
+
+			return newLR0ConfSet;
 		}
 	}
 	function buildLR1FSM(grammar, firstSetTable) {
-		Configuration.serialNo = LR1Configuration.serialNo = 1;
+		LR0Configuration.serialNo = LR1Configuration.serialNo = 1;
 		LR1FSM.State.serialNo = 0;
 
-		let globalConfigurationMap = new Map();
-		for (let production of grammar.productions) {
-			let configurationsOfProd = [];
-			for (let i = 0; i <= production.rhs.length; i++) configurationsOfProd.push(new Configuration(production, i));
-			globalConfigurationMap.set(production, configurationsOfProd);
-		} // immutated after created
-		let globalLR1configurationSet = new Map();
-		for (let production of grammar.productions) {
-			let configurationsOfProd = [];
-			for (let i = 0; i <= production.rhs.length; i++) configurationsOfProd.push(new Map());
-			globalLR1configurationSet.set(production, configurationsOfProd);
-		}
-		let state0 = new LR1FSM.State(closureOf(new Set([getLR1Configuration(grammar.augmentingProduction, 0, null)])));
+		let getLR1Configuration = getLR1ConfigurationHelper();
+
+		let state0 = new LR1FSM.State(closure1Of(new Set([getLR1Configuration(grammar.augmentingProduction, 0, null)])));
 		let lr1FSM = new LR1FSM(state0);
-		lr1FSM.states.add(state0);
+
 		let processingQueue = [state0];
 		while (processingQueue.isNotEmpty()) {
 			let processingState = processingQueue.shift();
-			let nextSymbolGroups = processingState.lr1configurationSet.groupBy(e => e.baseConfiguration.getNextSymbol());
-			for (let [symbol, confSet] of nextSymbolGroups) {
+			let nextSymbolGroups = processingState.configurationSet.groupBy(e => e.baseLR0Configuration.getNextSymbol());
+			for (let [symbol, lr1ConfSet] of nextSymbolGroups) {
 				if (symbol === null) continue;
-				let newConfSet = closureOf(new Set(confSet.toArray().map(function (lr1conf) {
-					return getLR1Configuration(lr1conf.baseConfiguration.production, lr1conf.baseConfiguration.dotPos + 1, lr1conf.lookahead);
+				let newLR1ConfSet = closure1Of(new Set(lr1ConfSet.toArray().map(function (lr1conf) {
+					return getLR1Configuration(lr1conf.baseLR0Configuration.production, lr1conf.baseLR0Configuration.dotPos + 1, lr1conf.lookahead);
 				})));
 				let existedState = null;
-				for (let s of lr1FSM.states) {
-					if (s.lr1configurationSet.equals(newConfSet)) {
-						existedState = s;
+				for (let state of lr1FSM.states) {
+					if (state.configurationSet.equals(newLR1ConfSet)) {
+						existedState = state;
 						break;
 					}
 				}
 				if (existedState === null) {
-					let newState = new LR1FSM.State(newConfSet);
+					let newState = new LR1FSM.State(newLR1ConfSet);
 					lr1FSM.states.add(newState);
 					processingState.linkTo(newState, symbol);
 					processingQueue.push(newState);
@@ -839,57 +840,80 @@ define(['exports', 'viz'], function (exports, _viz) {
 				}
 			}
 		}
+
 		return lr1FSM;
 
-		function getLR1Configuration(prod, pos, lookahead) {
-			let targetAbbr = globalLR1configurationSet.get(prod)[pos];
-			if (targetAbbr.has(lookahead)) {
-				return targetAbbr.get(lookahead);
-			} else {
-				let newLR1Conf = new LR1Configuration(globalConfigurationMap.get(prod)[pos], lookahead);
-				targetAbbr.set(lookahead, newLR1Conf);
-				return newLR1Conf;
+		function getLR1ConfigurationHelper() {
+			let globalLR0ConfMap = new Map();{
+				// Map<Production,LR0Configuration[]>
+				for (let production of grammar.productions) {
+					let lr0ConfsOfProd = [];
+					for (let i = 0; i <= production.rhs.length; i++) lr0ConfsOfProd.push(new LR0Configuration(production, i));
+					globalLR0ConfMap.set(production, lr0ConfsOfProd);
+				}
 			}
+			let globalLR1ConfSet = new Map();{
+				// Map<Production,Map<Terminal,LR1Configuration>[]>
+				for (let production of grammar.productions) {
+					let lr1ConfsOfProd = [];
+					for (let i = 0; i <= production.rhs.length; i++) lr1ConfsOfProd.push(new Map());
+					globalLR1ConfSet.set(production, lr1ConfsOfProd);
+				}
+			}
+
+			return function (prod, pos, lookahead) {
+				let targetAbbr = globalLR1ConfSet.get(prod)[pos];
+				if (targetAbbr.has(lookahead)) {
+					return targetAbbr.get(lookahead);
+				} else {
+					let newLR1Conf = new LR1Configuration(globalLR0ConfMap.get(prod)[pos], lookahead);
+					targetAbbr.set(lookahead, newLR1Conf);
+					return newLR1Conf;
+				}
+			};
 		}
-		function closureOf(lr1configurationSet) {
-			let newConfigurationSet = new Set(lr1configurationSet);
-			let processingQueue = lr1configurationSet.toArray();
+		function closure1Of(lr1ConfSet) {
+			let newLR1ConfSet = new Set(lr1ConfSet);
+
+			let processingQueue = lr1ConfSet.toArray();
 			while (processingQueue.isNotEmpty()) {
 				let lr1conf = processingQueue.shift();
-				let conf = lr1conf.baseConfiguration;
-				let expandingNonterminal = conf.getNextSymbol();
-				let prod = conf.production;
+				let lr0conf = lr1conf.baseLR0Configuration;
+
+				let expandingNonterminal = lr0conf.getNextSymbol();
 				if (!(expandingNonterminal instanceof NonTerminal)) continue;
+
 				let lookaheadSet = new Set();
-				let canSeeThrough = true;
-				for (let j = conf.dotPos + 1; j < prod.rhs.length; j++) {
-					let rhsi = prod.rhs[j];
-					for (let t of firstSetTable.get(rhsi)) {
+				let rhs = lr0conf.production.rhs;
+				let blocked = false;
+				for (let i = lr0conf.dotPos + 1; i < rhs.length; i++) {
+					for (let t of firstSetTable.get(rhs[i])) {
 						if (t !== Lambda) lookaheadSet.add(t);
 					}
-					if (!firstSetTable.get(rhsi).has(Lambda)) {
-						canSeeThrough = false;
-						break; // end of range, the non-nullable is the last
+					if (!firstSetTable.get(rhs[i]).has(Lambda)) {
+						blocked = true;
+						break;
 					}
 				}
-				if (canSeeThrough) {
+				if (!blocked) {
 					lookaheadSet.add(lr1conf.lookahead);
 				}
+
 				for (let lookahead of lookaheadSet) {
-					for (let p of grammar.productionsMap.get(expandingNonterminal)) {
-						let newLR1conf = getLR1Configuration(p, 0, lookahead);
-						if (!newConfigurationSet.has(newLR1conf)) {
-							newConfigurationSet.add(newLR1conf);
-							processingQueue.push(newLR1conf);
+					for (let prod of grammar.productionsMap.get(expandingNonterminal)) {
+						let newLR1Conf = getLR1Configuration(prod, 0, lookahead);
+						if (!newLR1ConfSet.has(newLR1Conf)) {
+							newLR1ConfSet.add(newLR1Conf);
+							processingQueue.push(newLR1Conf);
 						}
 					}
 				}
 			}
-			return newConfigurationSet;
+
+			return newLR1ConfSet;
 		}
 	}
 	function buildLR1GotoActionTable(grammar, lr1fsm) {
-		// let lr1ActionTable = new Map();
 		let lr1GotoActionTable = new Map();
 		let globalActionMap = {
 			shift: new Map(lr1fsm.states.toArray().map(s => [s, {
@@ -913,14 +937,15 @@ define(['exports', 'viz'], function (exports, _viz) {
 				if (symbol === GSymbol.EOI) gotoActionsMap.get(symbol).push(globalActionMap.accept);else gotoActionsMap.get(symbol).push(globalActionMap.shift.get(nextState));
 			}
 			// reduce
-			for (let [lookahead, confs] of Array.from(state.lr1configurationSet.values()).filter(lr1conf => lr1conf.baseConfiguration.getNextSymbol() === null).groupBy(lr1conf => lr1conf.lookahead)) {
+			for (let [lookahead, confs] of Array.from(state.configurationSet.values()).filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null).groupBy(lr1conf => lr1conf.lookahead)) {
 				for (let lr1conf of confs) {
 					if (!gotoActionsMap.has(lookahead)) gotoActionsMap.set(lookahead, []);
-					gotoActionsMap.get(lookahead).push(globalActionMap.reduce.get(lr1conf.baseConfiguration.production));
+					gotoActionsMap.get(lookahead).push(globalActionMap.reduce.get(lr1conf.baseLR0Configuration.production));
 				}
 			}
 			lr1GotoActionTable.set(state, gotoActionsMap);
 		}
+
 		return lr1GotoActionTable;
 	}
 	function generateDotImageOfCFSM(cfsm) {
@@ -941,7 +966,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 	}
 	function generateDotImageOfParseTrees(parseTrees) {
 		let dotFileSrc = "";
-		dotFileSrc += `digraph ParseTree { `;
+		dotFileSrc += "digraph ParseTree { ";
 		dotFileSrc += "rankdir=\"UD\"; ";
 		dotFileSrc += "node [shape=ellipse]; ";
 		for (let parseTree of parseTrees) traverseNode(parseTree);

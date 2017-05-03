@@ -22,6 +22,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 	};
 
 	(0, _jquery2.default)(document).ready(function () {
+
 		let editMode = true;
 
 		let tmpCanvas = document.getElementById('tmpCanvas');
