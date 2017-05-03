@@ -94,8 +94,8 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 			let ll1PredictTable = _ParserBase2.default.buildLL1PredictTable(grammar, predictSetTable);
 			let lr0FSM = _ParserBase2.default.buildLR0FSM(grammar, firstSetTable);
 			let lr1FSM = _ParserBase2.default.buildLR1FSM(grammar, firstSetTable);
-			// let lr0FSM_Viz = ParserBase.generateDotImageOfLR0FSM(lr0FSM);
-			// let lr1FSM_Viz = ParserBase.generateDotImageOfLR1FSM(lr1FSM);
+			// let lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(lr0FSM);
+			// let lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(lr1FSM);
 			let lr1GotoActionTable = _ParserBase2.default.buildLR1GotoActionTable(grammar, lr1FSM);
 
 			let terminalsList = Array.from(grammar.terminals);
@@ -192,7 +192,7 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 				// LR(0) FSM tab
 				(0, _jquery2.default)('#lr0fsm').html("Please click on the button above to generate the FSM diagram.");
 				(0, _jquery2.default)('#lr0fsm_gen').on('click', function () {
-					let lr0FSM_Viz = _ParserBase2.default.generateDotImageOfLR0FSM(lr0FSM);
+					let lr0FSM_Viz = _ParserBase2.default.generateDotImageOfCFSM(lr0FSM);
 					(0, _jquery2.default)('#lr0fsm').html(lr0FSM_Viz);
 					(0, _jquery2.default)('#lr0fsm_tab a.downloadLink').show().on('click', function (event) {
 						(0, _canvg2.default)(tmpCanvas, lr0FSM_Viz);
@@ -203,7 +203,7 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 				// LR(1) FSM tab
 				(0, _jquery2.default)('#lr1fsm').html("Please click on the button above to generate the FSM diagram.");
 				(0, _jquery2.default)('#lr1fsm_gen').on('click', function () {
-					let lr1FSM_Viz = _ParserBase2.default.generateDotImageOfLR0FSM(lr1FSM);
+					let lr1FSM_Viz = _ParserBase2.default.generateDotImageOfCFSM(lr1FSM);
 					(0, _jquery2.default)('#lr1fsm').html(lr1FSM_Viz);
 					(0, _jquery2.default)('#lr1fsm_tab a.downloadLink').show().on('click', function (event) {
 						(0, _canvg2.default)(tmpCanvas, lr1FSM_Viz);
@@ -281,7 +281,7 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 						(0, _jquery2.default)('#ll1parse .parse_step_info').html('');
 					}
 					function displayParseTree() {
-						let ll1parsetree_Viz = _ParserBase2.default.generateDotImageOfLL1ParseTree(parseTree);
+						let ll1parsetree_Viz = _ParserBase2.default.generateDotImageOfParseTrees([parseTree]);
 						var myWindow = window.open();
 						myWindow.document.write(`
 							<html>
@@ -378,7 +378,7 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 						(0, _jquery2.default)('#lr1parse .parse_step_info').html('');
 					}
 					function displayParseTree() {
-						let lr1parsetree_Viz = _ParserBase2.default.generateDotImageOfLR1ParseForest(parseForest);
+						let lr1parsetree_Viz = _ParserBase2.default.generateDotImageOfParseTrees(parseForest);
 						var myWindow = window.open();
 						myWindow.document.write(`
 							<html>

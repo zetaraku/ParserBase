@@ -463,10 +463,8 @@ export default {
 	buildLR1FSM: buildLR1FSM,
 	buildLR1GotoActionTable: buildLR1GotoActionTable,
 
-	generateDotImageOfLR0FSM: generateDotImageOfLR0FSM,
-	generateDotImageOfLR1FSM: generateDotImageOfLR1FSM,
-	generateDotImageOfLL1ParseTree: generateDotImageOfLL1ParseTree,
-	generateDotImageOfLR1ParseForest: generateDotImageOfLR1ParseForest,
+	generateDotImageOfCFSM: generateDotImageOfCFSM,
+	generateDotImageOfParseTrees: generateDotImageOfParseTrees,
 
 	newLL1Parse: (grammar, ll1PredictTable, inputTokens) => (new LL1Parse(grammar, ll1PredictTable, inputTokens)),
 	newLR1Parse: (grammar, lr1FSM, lr1GotoActionTable, inputTokens) => (new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens)),
@@ -951,13 +949,13 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 	}
 	return lr1GotoActionTable;
 }
-export function generateDotImageOfLR0FSM(lr0fsm) {
+export function generateDotImageOfCFSM(cfsm) {
 	let dotFileSrc = "";
-	dotFileSrc += ("digraph LR0FSM { ");
+	dotFileSrc += ("digraph CFSM { ");
 	dotFileSrc += ("rankdir=\"LR\"; ");
 	dotFileSrc += ("node [shape=rect]; ");
-	dotFileSrc += ("start -> " + lr0fsm.startState.id + "; ");
-	for(let state of lr0fsm.states) {
+	dotFileSrc += ("start -> " + cfsm.startState.id + "; ");
+	for(let state of cfsm.states) {
 		dotFileSrc += (state.id + " [" +
 			"label = \"" +
 				"State " + state.id + "\\n" +
@@ -975,56 +973,12 @@ export function generateDotImageOfLR0FSM(lr0fsm) {
 
 	return Viz(dotFileSrc);
 }
-export function generateDotImageOfLR1FSM(lr1fsm) {
+export function generateDotImageOfParseTrees(parseTrees) {
 	let dotFileSrc = "";
-	dotFileSrc += ("digraph LR1FSM { ");
-	dotFileSrc += ("rankdir=\"LR\"; ");
-	dotFileSrc += ("node [shape=rect]; ");
-	dotFileSrc += ("start -> " + lr1fsm.startState.id + "; ");
-	for(let state of lr1fsm.states) {
-		dotFileSrc += (state.id + " [" +
-			"label = \"" +
-				"State " + state.id + "\\n" +
-				state.subContentReprensentation() +
-			"\"" +
-		"]; ");
-		for(let [symbol, nextState] of state.transitionMap) {
-			dotFileSrc += (state.id + " -> " + nextState.id + " [" +
-				"label = \"" + symbol.toRawString() + "\" " +
-				"style = solid" +
-			"]; ");
-		}
-	}
-	dotFileSrc += ("}");
-
-	return Viz(dotFileSrc);
-}
-export function generateDotImageOfLL1ParseTree(parseTree) {
-	let dotFileSrc = "";
-	dotFileSrc += ("digraph LL1ParseTree { ");
+	dotFileSrc += (`digraph ParseTree { `);
 	dotFileSrc += ("rankdir=\"UD\"; ");
 	dotFileSrc += ("node [shape=ellipse]; ");
-		traverseNode(parseTree);
-	dotFileSrc += ("}");
-
-	return Viz(dotFileSrc);
-
-	function traverseNode(node) {
-		dotFileSrc += (node.id + " [label = \"" + node.toRawString() + "\"]; ");
-		if(node.childNodes !== undefined) {
-			for(let childNode of node.childNodes)
-				dotFileSrc += (node.id + " -> " + childNode.id + "; ");
-			for(let childNode of node.childNodes)
-				traverseNode(childNode);
-		}
-	}
-}
-export function generateDotImageOfLR1ParseForest(parseForest) {
-	let dotFileSrc = "";
-	dotFileSrc += ("digraph LR1ParseForest { ");
-	dotFileSrc += ("rankdir=\"UD\"; ");
-	dotFileSrc += ("node [shape=ellipse]; ");
-		for(let parseTree of parseForest)
+		for(let parseTree of parseTrees)
 			traverseNode(parseTree);
 	dotFileSrc += ("}");
 

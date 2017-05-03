@@ -130,13 +130,13 @@ define(['node_modules/chai/chai', 'app/ParserBase'], function(chai, module_Parse
 			it('should build lr0FSM_Viz', function() {
 				this.timeout(0);
 				expect(
-					result.lr0FSM_Viz = ParserBase.generateDotImageOfLR0FSM(result.lr0FSM)
+					result.lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr0FSM)
 				).to.exist;
 			});
 			it('should build lr1FSM_Viz', function() {
 				this.timeout(0);
 				expect(
-					result.lr1FSM_Viz = ParserBase.generateDotImageOfLR1FSM(result.lr1FSM)
+					result.lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr1FSM)
 				).to.exist;
 			});
 		});
