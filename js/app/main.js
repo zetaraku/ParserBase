@@ -53,7 +53,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			let followSetTable = _ParserBase2.default.buildFollowSetTable(grammar, firstSetTable);
 			let predictSetTable = _ParserBase2.default.buildPredictSetTable(grammar, firstSetTable, followSetTable);
 			let ll1PredictTable = _ParserBase2.default.buildLL1PredictTable(grammar, predictSetTable);
-			let lr0FSM = _ParserBase2.default.buildLR0FSM(grammar, firstSetTable);
+			let lr0FSM = _ParserBase2.default.buildLR0FSM(grammar);
 			let lr1FSM = _ParserBase2.default.buildLR1FSM(grammar, firstSetTable);
 			// let lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(lr0FSM);
 			// let lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(lr1FSM);

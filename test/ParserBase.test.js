@@ -97,7 +97,7 @@ define(['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions'], funct
 			});
 			it('should build lr0FSM', function() {
 				expect(
-					result.lr0FSM = ParserBase.buildLR0FSM(result.grammar, result.firstSetTable)
+					result.lr0FSM = ParserBase.buildLR0FSM(result.grammar)
 				).to.exist;
 			});
 			it('should build lr1FSM', function() {

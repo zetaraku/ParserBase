@@ -730,7 +730,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		}
 		return ll1PredictTable;
 	}
-	function buildLR0FSM(grammar, firstSetTable) {
+	function buildLR0FSM(grammar) {
 		Configuration.serialNo = 1;
 		LR0FSM.State.serialNo = 0;
 

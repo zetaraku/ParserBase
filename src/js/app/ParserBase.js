@@ -717,7 +717,7 @@ export function buildLL1PredictTable(grammar, predictSetTable) {
 	}
 	return ll1PredictTable;
 }
-export function buildLR0FSM(grammar, firstSetTable) {
+export function buildLR0FSM(grammar) {
 	Configuration.serialNo = 1;
 	LR0FSM.State.serialNo = 0;
 

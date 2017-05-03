@@ -46,7 +46,7 @@ $(document).ready(function() {
 		let followSetTable = ParserBase.buildFollowSetTable(grammar, firstSetTable);
 		let predictSetTable = ParserBase.buildPredictSetTable(grammar, firstSetTable, followSetTable);
 		let ll1PredictTable = ParserBase.buildLL1PredictTable(grammar, predictSetTable);
-		let lr0FSM = ParserBase.buildLR0FSM(grammar, firstSetTable);
+		let lr0FSM = ParserBase.buildLR0FSM(grammar);
 		let lr1FSM = ParserBase.buildLR1FSM(grammar, firstSetTable);
 		// let lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(lr0FSM);
 		// let lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(lr1FSM);
