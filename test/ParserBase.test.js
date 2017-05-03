@@ -1,7 +1,7 @@
 'use strict';
 
 var define;
-define(['node_modules/chai/chai', 'app/ParserBase'], function(chai, module_ParserBase) {
+define(['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions'], function(chai, module_ParserBase, module_main_functions) {
 	let expect = chai.expect;
 	let should = chai.should();
 	let assert = chai.assert;
@@ -15,57 +15,42 @@ define(['node_modules/chai/chai', 'app/ParserBase'], function(chai, module_Parse
 		});
 		describe('grammar check', function() {
 			it('should build grammar', function() {
-				let $startS = `program`;
-				let $inputGrammarText =
-					`program -> begin statement_list end
-					statement_list -> statement statement_tail
-					statement_tail -> statement statement_tail
-					statement_tail -> 
-					statement -> ID := expression ;
-					statement -> read ( id_list ) ;
-					statement -> write ( expr_list ) ;
-					id_list -> ID id_tail
-					id_tail -> , ID id_tail
-					id_tail -> 
-					expr_list -> expression expr_tail
-					expr_tail -> , expression expr_tail
-					expr_tail -> 
-					expression -> primary primary_tail
-					primary_tail -> add_op primary primary_tail
-					primary_tail -> 
-					primary -> ( expression )
-					primary -> ID
-					primary -> INTLIT
-					add_op -> +
-					add_op -> -`;
-				let terminals = new Set();
-				let nonTerminals = new Set();
-				let startSymbol = $startS;
-				let productions = [];
-				for(let line of $inputGrammarText.split('\n')) {
-					let [lhst, rhst] = line.split(/->|→/);
-					if(rhst === undefined) {
-						console.warn('invalid line: ' + line);
-						continue;
-					}
-					let prod = [];
-					let lhsv = lhst.trim();
-					prod.push(lhsv);
-					nonTerminals.add(lhsv);
-					let rhsvs = rhst.trim().split(/\s+/).filter(s => s !== '');
-					for(let rhsv of rhsvs) {
-						if(rhsv === 'λ')
-							continue;
-						prod.push(rhsv);
-						terminals.add(rhsv);
-					}
-					productions.push(prod);
-				}
-				for(var nt of nonTerminals) {
-					terminals.delete(nt);
-				}
+				let $inputGrammarText = (
+					"# this is a LL(1) grammar\n" +
+					"# you can parse it with LL(1) or LR(1)\n" +
+					"#!start-symbol: program\n" +
+					"#!parse-example: begin ID := INTLIT ; read ( ID ) ; end\n" +
+					"\n" +
+					"program -> begin statement_list end\n" +
+					"statement_list -> statement statement_tail\n" +
+					"statement_tail -> statement statement_tail\n" +
+					"statement_tail -> \n" +
+					"statement -> ID := expression ;\n" +
+					"statement -> read ( id_list ) ;\n" +
+					"statement -> write ( expr_list ) ;\n" +
+					"id_list -> ID id_tail\n" +
+					"id_tail -> , ID id_tail\n" +
+					"id_tail -> \n" +
+					"expr_list -> expression expr_tail\n" +
+					"expr_tail -> , expression expr_tail\n" +
+					"expr_tail -> \n" +
+					"expression -> primary primary_tail\n" +
+					"primary_tail -> add_op primary primary_tail\n" +
+					"primary_tail -> \n" +
+					"primary -> ( expression )\n" +
+					"primary -> ID\n" +
+					"primary -> INTLIT\n" +
+					"add_op -> +\n" +
+					"add_op -> -\n" +
+				"");
+				let rawGrammar = module_main_functions.processGrammarInput($inputGrammarText);
 				expect(
-					result.grammar = ParserBase.buildGrammar(Array.from(terminals), Array.from(nonTerminals), startSymbol, productions)
+					result.grammar = ParserBase.buildGrammar(
+						rawGrammar.terminals.toArray(),
+						rawGrammar.nonTerminals.toArray(),
+						rawGrammar.startSymbol,
+						rawGrammar.productions
+					)
 				).to.exist;
 			});
 			it('should build vocabularyNameMap', function() {

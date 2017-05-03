@@ -1,4 +1,4 @@
-define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _canvg) {
+define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_jquery, _ParserBase, _main_functions, _canvg) {
 	'use strict';
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -22,7 +22,6 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 	};
 
 	(0, _jquery2.default)(document).ready(function () {
-
 		let editMode = true;
 
 		let tmpCanvas = document.getElementById('tmpCanvas');
@@ -39,51 +38,13 @@ define(['jquery', 'app/ParserBase', 'canvg'], function (_jquery, _ParserBase, _c
 				return false;
 			}
 
-			let terminals = new Set();
-			let nonTerminals = new Set();
-			let startSymbol = null;
-			let productions = [];
+			let rawGrammar = (0, _main_functions.processGrammarInput)((0, _jquery2.default)('#grammar_input').val());
 
-			for (let line of (0, _jquery2.default)('#grammar_input').val().split('\n')) {
-				if (line.startsWith('#!')) {
-					let group = line.match(/^#!(.+?):(.+)$/);
-					if (group === null) {
-						window.alert("Wrong directive.");
-					} else if (group[1] === 'start-symbol') {
-						startSymbol = group[2].trim();
-					} else if (group[1] === 'parse-example') {
-						(0, _jquery2.default)('.source_input').val(group[2].trim());
-					}
-					continue;
-				}
-				if (line.startsWith('#') || /^\s*$/.test(line)) {
-					continue;
-				}
-				let [lhst, rhst] = line.split(/->|→/);
-				if (rhst === undefined) {
-					console.warn("Invalid line: " + line);
-					continue;
-				}
-				let prod = [];
-				let lhsv = lhst.trim();
-				prod.push(lhsv);
-				nonTerminals.add(lhsv);
-				let rhsvs = rhst.trim().split(/\s+/).filter(s => s !== '');
-				for (let rhsv of rhsvs) {
-					if (rhsv === 'λ') continue;
-					prod.push(rhsv);
-					terminals.add(rhsv);
-				}
-				productions.push(prod);
+			if (rawGrammar.extraResult.parseExample !== undefined) {
+				(0, _jquery2.default)('.source_input').val(rawGrammar.extraResult.parseExample);
 			}
-			for (let nt of nonTerminals) {
-				terminals.delete(nt);
-			}
-			if (productions.first() === undefined) throw new Error("No production.");
-			startSymbol = startSymbol || productions[0][0];
-			if (!nonTerminals.has(startSymbol)) throw new Error(`Invalid Start Symbol '${startSymbol}'.`);
 
-			let grammar = _ParserBase2.default.buildGrammar(Array.from(terminals), Array.from(nonTerminals), startSymbol, productions);
+			let grammar = _ParserBase2.default.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
 			let vocabularyNameMap = new Map([...grammar.terminals, ...grammar.nonTerminals].map(s => [s.name, s]));
 			let unreachableSymbols = _ParserBase2.default.computeUnreachableSymbols(grammar);
 			let unreducibleSymbols = _ParserBase2.default.computeUnreducibleSymbols(grammar);
