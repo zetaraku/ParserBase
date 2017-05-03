@@ -1,6 +1,6 @@
 'use strict';
 
-var define;
+var define, describe, it;
 define(['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions'], function(chai, module_ParserBase, module_main_functions) {
 	let expect = chai.expect;
 	let should = chai.should();

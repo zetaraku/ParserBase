@@ -11,7 +11,7 @@
   "strict": "global",
   "esnext": true,
   "undef": true,
-  "unused": false,
+  "unused": true,
   "eqeqeq": true,
   "browser": true,
   "jquery": true,
