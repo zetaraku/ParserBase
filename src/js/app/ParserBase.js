@@ -2,33 +2,24 @@
 
 import Viz from 'viz';
 
-export const Lambda = {
-	name: Symbol('λ'),
-	// the placeholder for lambda (nothing)
-	toString: function() {
-		return this.name.toString();
-	},
-	toRawString: function() {
-		return this.name.toString();
-	}
-};
 export class GSymbol {
 	// Do NOT use 'Symbol', that will confilct with 'Symbol' type in ES6
 	constructor(name) {
-		this.id = GSymbol.serialNo++;
-		this.name = name;
+		this.name = this.displayName = name;
 	}
 	toString() {
-		return this.name.toString();
+		return this.displayName;
 	}
 	toRawString() {
-		return this.name.toString();
+		return this.displayName;
 	}
 } {
-	// id = -2 for UNKNOWN, id = -1 for EOI ($), id = 0 for SYSTEM_GOAL
-	GSymbol.serialNo = -2;
 	// the placeholder for unknown terminal type
 	GSymbol.UNKNOWN = new GSymbol(Symbol('unknown'));
+	GSymbol.UNKNOWN.displayName = 'unknown';
+	// the placeholder for lambda (nothing)
+	GSymbol.LAMBDA = new GSymbol(Symbol('λ'));
+	GSymbol.LAMBDA.displayName = 'λ';
 }
 export class Terminal extends GSymbol {
 	constructor(name) {
@@ -37,6 +28,7 @@ export class Terminal extends GSymbol {
 } {
 	// the EndOfInput Terminal ($)
 	GSymbol.EOI = new Terminal(Symbol('$'));
+	GSymbol.EOI.displayName = '$';
 }
 export class NonTerminal extends GSymbol {
 	constructor(name) {
@@ -45,17 +37,12 @@ export class NonTerminal extends GSymbol {
 } {
 	// the augmenting NonTerminal
 	GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'));
+	GSymbol.SYSTEM_GOAL.displayName = 'system_goal';
 }
 export class ActionSymbol extends GSymbol {
 	// currently unused
 	constructor(name) {
 		super(name);
-	}
-	toString() {
-		return this.name;
-	}
-	toRawString() {
-		return this.name;
 	}
 } {
 	ActionSymbol.serialNo = 1;
@@ -68,15 +55,15 @@ export class Production {
 	}
 	toString() {
 		return (this.lhs + ' ' + Production.ARROW + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : Lambda));
+			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA));
 	}
 	toStringReversed() {
 		return (this.lhs + ' ' + Production.ARROW_R + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : Lambda));
+			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA));
 	}
 	toRawString() {
 		return (this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.map(e => e.toRawString()).join(' ') : Lambda.toRawString()));
+			(this.rhs.isNotEmpty() ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString()));
 	}
 } {
 	Production.serialNo = 0;
@@ -195,7 +182,7 @@ export class LR1FSM {
 			return Array.from(this.configurationSet.groupBy(e => e.baseLR0Configuration).entries())
 				.map(function([lr0conf, lr1confs]) {
 					return lr0conf.toRawString() + ' ' + '{' +
-						lr1confs.toArray().map(e => (e.lookahead || Lambda).toRawString()).join(' ') +
+						lr1confs.toArray().map(e => e.lookahead.toRawString()).join(' ') +
 					'}' + '\\l';
 				}).join('');
 		}
@@ -402,7 +389,7 @@ export class LR1Parse {
 					yield action;
 					return;
 				} else {
-					throw new Error('Unknown action.')
+					throw new Error('Unknown action.');
 				}
 			}
 		})();
@@ -470,7 +457,6 @@ export class LR1Parse {
 }
 
 export default {
-	Lambda: Lambda,
 	GSymbol: GSymbol,
 	Terminal: Terminal,
 	NonTerminal: NonTerminal,
@@ -651,7 +637,7 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 	}
 
 	for(let nullableSymbol of nullableSymbols) {
-		firstSetTable.get(nullableSymbol).add(Lambda);
+		firstSetTable.get(nullableSymbol).add(GSymbol.LAMBDA);
 	}
 
 	return firstSetTable;
@@ -675,10 +661,10 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 			let blocked = false;
 			for(let j = i + 1; j < rhs.length; j++) {
 				for(let t of firstSetTable.get(rhs[j])) {
-					if(t !== Lambda)
+					if(t !== GSymbol.LAMBDA)
 						followSetOfRHSI.add(t);
 				}
-				if(!firstSetTable.get(rhs[j]).has(Lambda)) {
+				if(!firstSetTable.get(rhs[j]).has(GSymbol.LAMBDA)) {
 					blocked = true;
 					break;
 				}
@@ -708,7 +694,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 		}
 		lastUpdatedVocabularies = newUpdatedVocabularies;
 	}
-	followSetTable.get(GSymbol.SYSTEM_GOAL).add(Lambda);
+	followSetTable.get(GSymbol.SYSTEM_GOAL).add(GSymbol.LAMBDA);
 
 	return followSetTable;
 }
@@ -721,7 +707,7 @@ export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 		for(let i = 0; i < rhs.length; i++) {
 			for(let t of firstSetTable.get(rhs[i]))
 				predictSetOfProduction.add(t);
-			if(!firstSetTable.get(rhs[i]).has(Lambda)) {
+			if(!firstSetTable.get(rhs[i]).has(GSymbol.LAMBDA)) {
 				blocked = true;
 				break;
 			}
@@ -842,7 +828,7 @@ export function buildLR1FSM(grammar, firstSetTable) {
 
 	let state0 = new LR1FSM.State(
 		closure1Of(
-			new Set([getLR1Configuration(grammar.augmentingProduction, 0, null)])
+			new Set([getLR1Configuration(grammar.augmentingProduction, 0, GSymbol.LAMBDA)])
 		)
 	);
 	let lr1FSM = new LR1FSM(state0);
@@ -933,10 +919,10 @@ export function buildLR1FSM(grammar, firstSetTable) {
 			let blocked = false;
 			for(let i = lr0conf.dotPos + 1; i < rhs.length; i++) {
 				for(let t of firstSetTable.get(rhs[i])) {
-					if(t !== Lambda)
+					if(t !== GSymbol.LAMBDA)
 						lookaheadSet.add(t);
 				}
-				if(!firstSetTable.get(rhs[i]).has(Lambda)) {
+				if(!firstSetTable.get(rhs[i]).has(GSymbol.LAMBDA)) {
 					blocked = true;
 					break;
 				}
@@ -984,7 +970,7 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 				.groupBy(lr1conf => lr1conf.lookahead)
 		) {
 			for(let lr1conf of confs) {
-				if(lookahead === null)
+				if(lookahead === GSymbol.LAMBDA)
 					continue;
 				if(!gotoActionsMap.has(lookahead))
 					gotoActionsMap.set(lookahead, []);

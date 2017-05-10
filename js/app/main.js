@@ -13,10 +13,14 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 		};
 	}
 
-	let COMMA_SEPERATOR = '<span class="comma"> , </span>';
-	_ParserBase2.default.Lambda.toString = function () {
-		return '<span class="lambda">' + this.name.toString() + '</span>';
+	let original = {
+		toString: {
+			GSymbol: _ParserBase2.default.GSymbol.prototype.toString,
+			Terminal: _ParserBase2.default.Terminal.prototype.toString,
+			NonTerminal: _ParserBase2.default.NonTerminal.prototype.toString
+		}
 	};
+	let COMMA_SEPERATOR = '<span class="comma"> , </span>';
 
 	window.onerror = function (message, file, lineNumber) {
 		window.alert(`${message}\n\nat ${file}:${lineNumber}`);
@@ -48,7 +52,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			}
 
 			let grammar = _ParserBase2.default.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
-			let vocabularyNameMap = new Map([...grammar.terminals, ...grammar.nonTerminals].map(s => [s.name, s]));
+			let vocabularyNameMap = new Map([...grammar.terminals, ...grammar.nonTerminals, _ParserBase2.default.GSymbol.LAMBDA].map(s => [s.name, s]));
 			let unreachableSymbols = _ParserBase2.default.computeUnreachableSymbols(grammar);
 			let unreducibleSymbols = _ParserBase2.default.computeUnreducibleSymbols(grammar);
 			let nullableSymbols = _ParserBase2.default.computeNullableSymbols(grammar);
@@ -70,19 +74,20 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			_ParserBase2.default.GSymbol.prototype.toString = function () {
 				let classArr = ['gsymbol'];
 				if (this === _ParserBase2.default.GSymbol.UNKNOWN) classArr.push('unknown');
-				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+				if (this === _ParserBase2.default.GSymbol.LAMBDA) classArr.push('lambda');
+				return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
 			};
 			_ParserBase2.default.Terminal.prototype.toString = function () {
 				let classArr = ['gsymbol', 'terminal'];
 				if (this === _ParserBase2.default.GSymbol.EOI) classArr.push('end-symbol');
-				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+				return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';
 			};
 			_ParserBase2.default.NonTerminal.prototype.toString = function () {
 				let classArr = ['gsymbol', 'non-terminal'];
 				if (this === _ParserBase2.default.GSymbol.SYSTEM_GOAL) classArr.push('augmenting-symbol');
 				if (this === grammar.startSymbol) classArr.push('start-symbol');
 				if (nullableSymbols.has(this)) classArr.push('nullable');
-				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+				return '<span class="' + classArr.join(' ') + '">' + original.toString.NonTerminal.call(this) + '</span>';
 			};
 
 			// display
@@ -122,7 +127,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 						predictSet: Array.from(predictSet)
 					};
 				}).map(function (e) {
-					return '<tr>' + [e.production.id, e.production.lhs, ' → ', e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : _ParserBase2.default.Lambda, e.predictSet.join(COMMA_SEPERATOR)].map(e => '<td>' + e + '</td>').join('') + '</tr>';
+					return '<tr>' + [e.production.id, e.production.lhs, ' → ', e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : _ParserBase2.default.GSymbol.LAMBDA, e.predictSet.join(COMMA_SEPERATOR)].map(e => '<td>' + e + '</td>').join('') + '</tr>';
 				}).join('') + '</table>');
 
 				// LL(1) Table tab

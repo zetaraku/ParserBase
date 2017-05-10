@@ -5,10 +5,14 @@ import ParserBase from 'app/ParserBase';
 import {processGrammarInput} from 'app/main_functions';
 import canvg from 'canvg';
 
-let COMMA_SEPERATOR = '<span class="comma"> , </span>';
-ParserBase.Lambda.toString = function() {
-	return '<span class="lambda">' + this.name.toString() + '</span>';
+let original = {
+	toString: {
+		GSymbol: ParserBase.GSymbol.prototype.toString,
+		Terminal: ParserBase.Terminal.prototype.toString,
+		NonTerminal: ParserBase.NonTerminal.prototype.toString
+	}
 };
+let COMMA_SEPERATOR = '<span class="comma"> , </span>';
 
 window.onerror = function(message, file, lineNumber) {
 	window.alert(`${message}\n\nat ${file}:${lineNumber}`);
@@ -40,7 +44,11 @@ $(document).ready(function() {
 		}
 
 		let grammar = ParserBase.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
-		let vocabularyNameMap = new Map([...grammar.terminals, ...grammar.nonTerminals].map((s) => [s.name, s]));
+		let vocabularyNameMap = new Map([
+			...grammar.terminals,
+			...grammar.nonTerminals,
+			ParserBase.GSymbol.LAMBDA
+		].map((s) => [s.name, s]));
 		let unreachableSymbols = ParserBase.computeUnreachableSymbols(grammar);
 		let unreducibleSymbols = ParserBase.computeUnreducibleSymbols(grammar);
 		let nullableSymbols = ParserBase.computeNullableSymbols(grammar);
@@ -63,13 +71,15 @@ $(document).ready(function() {
 			let classArr = ['gsymbol'];
 			if(this === ParserBase.GSymbol.UNKNOWN)
 				classArr.push('unknown');
-			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+			if(this === ParserBase.GSymbol.LAMBDA)
+				classArr.push('lambda');
+			return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
 		};
 		ParserBase.Terminal.prototype.toString = function() {
 			let classArr = ['gsymbol','terminal'];
 			if(this === ParserBase.GSymbol.EOI)
 				classArr.push('end-symbol');
-			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';
 		};
 		ParserBase.NonTerminal.prototype.toString = function() {
 			let classArr = ['gsymbol','non-terminal'];
@@ -79,7 +89,7 @@ $(document).ready(function() {
 				classArr.push('start-symbol');
 			if(nullableSymbols.has(this))
 				classArr.push('nullable');
-			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + original.toString.NonTerminal.call(this) + '</span>';
 		};
 
 		// display
@@ -175,7 +185,7 @@ $(document).ready(function() {
 								e.production.id,
 								e.production.lhs,
 								' → ',
-								(e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : ParserBase.Lambda),
+								(e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : ParserBase.GSymbol.LAMBDA),
 								e.predictSet.join(COMMA_SEPERATOR)
 							].map((e) => '<td>' + e + '</td>').join('') +
 							'</tr>');
@@ -374,7 +384,7 @@ $(document).ready(function() {
 							else
 								return updateMsg('Error: ' + r.value.message);
 						}
-						let stepInfo = r.value
+						let stepInfo = r.value;
 						if(stepInfo instanceof ParserBase.LR1Parse.Action.Shift) {
 							updateMsg('Shift');
 							$('#lr1parse .itoken_stream td').first().addClass('highlighted');
