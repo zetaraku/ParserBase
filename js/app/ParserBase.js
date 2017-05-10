@@ -28,12 +28,13 @@ define(['exports', 'viz'], function (exports, _viz) {
 	}
 
 	const Lambda = exports.Lambda = {
+		name: Symbol('λ'),
 		// the placeholder for lambda (nothing)
 		toString: function () {
-			return 'λ';
+			return this.name.toString();
 		},
 		toRawString: function () {
-			return 'λ';
+			return this.name.toString();
 		}
 	};
 	class GSymbol {
@@ -43,17 +44,17 @@ define(['exports', 'viz'], function (exports, _viz) {
 			this.name = name;
 		}
 		toString() {
-			return this.name;
+			return this.name.toString();
 		}
 		toRawString() {
-			return this.name;
+			return this.name.toString();
 		}
 	}exports.GSymbol = GSymbol;
 	{
 		// id = -2 for UNKNOWN, id = -1 for EOI ($), id = 0 for SYSTEM_GOAL
 		GSymbol.serialNo = -2;
 		// the placeholder for unknown terminal type
-		GSymbol.UNKNOWN = new GSymbol('unknown');
+		GSymbol.UNKNOWN = new GSymbol(Symbol('unknown'));
 	}
 	class Terminal extends GSymbol {
 		constructor(name) {
@@ -62,7 +63,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 	}exports.Terminal = Terminal;
 	{
 		// the EndOfInput Terminal ($)
-		GSymbol.EOI = new Terminal('$');
+		GSymbol.EOI = new Terminal(Symbol('$'));
 	}
 	class NonTerminal extends GSymbol {
 		constructor(name) {
@@ -71,7 +72,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 	}exports.NonTerminal = NonTerminal;
 	{
 		// the augmenting NonTerminal
-		GSymbol.SYSTEM_GOAL = new NonTerminal('system_goal');
+		GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'));
 	}
 	class ActionSymbol extends GSymbol {
 		// currently unused

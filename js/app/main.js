@@ -14,7 +14,9 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 	}
 
 	let COMMA_SEPERATOR = '<span class="comma"> , </span>';
-	_ParserBase2.default.Lambda.toString = () => '<span class="lambda">' + 'λ' + '</span>';
+	_ParserBase2.default.Lambda.toString = function () {
+		return '<span class="lambda">' + this.name.toString() + '</span>';
+	};
 
 	window.onerror = function (message, file, lineNumber) {
 		window.alert(`${message}\n\nat ${file}:${lineNumber}`);
@@ -68,19 +70,19 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			_ParserBase2.default.GSymbol.prototype.toString = function () {
 				let classArr = ['gsymbol'];
 				if (this === _ParserBase2.default.GSymbol.UNKNOWN) classArr.push('unknown');
-				return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 			};
 			_ParserBase2.default.Terminal.prototype.toString = function () {
 				let classArr = ['gsymbol', 'terminal'];
 				if (this === _ParserBase2.default.GSymbol.EOI) classArr.push('end-symbol');
-				return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 			};
 			_ParserBase2.default.NonTerminal.prototype.toString = function () {
 				let classArr = ['gsymbol', 'non-terminal'];
 				if (this === _ParserBase2.default.GSymbol.SYSTEM_GOAL) classArr.push('augmenting-symbol');
 				if (this === grammar.startSymbol) classArr.push('start-symbol');
 				if (nullableSymbols.has(this)) classArr.push('nullable');
-				return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+				return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 			};
 
 			// display

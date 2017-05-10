@@ -6,7 +6,9 @@ import {processGrammarInput} from 'app/main_functions';
 import canvg from 'canvg';
 
 let COMMA_SEPERATOR = '<span class="comma"> , </span>';
-ParserBase.Lambda.toString = () => '<span class="lambda">' + 'λ' + '</span>';
+ParserBase.Lambda.toString = function() {
+	return '<span class="lambda">' + this.name.toString() + '</span>';
+};
 
 window.onerror = function(message, file, lineNumber) {
 	window.alert(`${message}\n\nat ${file}:${lineNumber}`);
@@ -61,13 +63,13 @@ $(document).ready(function() {
 			let classArr = ['gsymbol'];
 			if(this === ParserBase.GSymbol.UNKNOWN)
 				classArr.push('unknown');
-			return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 		};
 		ParserBase.Terminal.prototype.toString = function() {
 			let classArr = ['gsymbol','terminal'];
 			if(this === ParserBase.GSymbol.EOI)
 				classArr.push('end-symbol');
-			return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 		};
 		ParserBase.NonTerminal.prototype.toString = function() {
 			let classArr = ['gsymbol','non-terminal'];
@@ -77,7 +79,7 @@ $(document).ready(function() {
 				classArr.push('start-symbol');
 			if(nullableSymbols.has(this))
 				classArr.push('nullable');
-			return '<span class="' + classArr.join(' ') + '">' + this.name + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + this.name.toString() + '</span>';
 		};
 
 		// display
