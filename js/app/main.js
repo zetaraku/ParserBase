@@ -144,9 +144,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 					return '<tr><td class="b">' + st.id + '</td>' + symbolsList.map(function (s) {
 						if (stActionSet.has(s)) {
 							let stActionSetAtT = stActionSet.get(s);
-							return '<td class="' + (stActionSetAtT.length > 1 ? 'conflict' : '') + '">' + stActionSetAtT.map(function (e) {
-								if (e.type === _ParserBase2.default.LR1Parse.Action.shift) return 'S' + _ParserBase2.default.Production.ARROW + e.nextState.id;else if (e.type === _ParserBase2.default.LR1Parse.Action.reduce) return 'R(' + e.reducingProduction.id + ')';else if (e.type === _ParserBase2.default.LR1Parse.Action.accept) return 'A';
-							}).join('<br>') + '</td>';
+							return '<td class="' + (stActionSetAtT.length > 1 ? 'conflict' : '') + '">' + stActionSetAtT.map(e => e.toString()).join('<br>') + '</td>';
 						} else {
 							return '<td>' + '</td>';
 						}
@@ -195,29 +193,32 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 						while (true) {
 							let r = currentParse.step.next();
 							if (r.done) {
-								yield updateMsg("Parse finished");
-								return;
+								if (!(r.value instanceof Error)) return updateMsg("Parse finished");else return updateMsg('Error: ' + r.value.message);
 							}
 							let stepInfo = r.value;
-							clearHighlight();
-							if (stepInfo.type === _ParserBase2.default.LL1Parse.Action.match) {
-								updateMsg("Match " + stepInfo.token.terminalType);
+							if (stepInfo instanceof _ParserBase2.default.LL1Parse.Action.Match) {
+								updateMsg("Match " + stepInfo.terminalType);
 								(0, _jquery2.default)('#ll1parse .parse_stack td').first().addClass('highlighted');
 								(0, _jquery2.default)('#ll1parse .itoken_stream td').first().addClass('highlighted');
 								yield;
 								updateData();
 								yield;
-							} else if (stepInfo.type === _ParserBase2.default.LL1Parse.Action.predict) {
+							} else if (stepInfo instanceof _ParserBase2.default.LL1Parse.Action.Predict) {
 								updateMsg("Predict " + stepInfo.usingProd);
 								(0, _jquery2.default)('#ll1parse .parse_stack td').first().addClass('highlighted');
 								yield;
 								updateData();
 								(0, _jquery2.default)('#ll1parse .parse_stack td').slice(0, stepInfo.usingProd.rhs.length).addClass('highlighted');
 								yield;
-							} else if (stepInfo.type === _ParserBase2.default.LL1Parse.Action.error) {
-								yield updateMsg("Error: " + stepInfo.errMsg);
-								return;
+							} else if (stepInfo instanceof _ParserBase2.default.LL1Parse.Action.Accept) {
+								updateMsg("Match " + stepInfo.terminalType + ' & Accept');
+								(0, _jquery2.default)('#ll1parse .parse_stack td').first().addClass('highlighted');
+								(0, _jquery2.default)('#ll1parse .itoken_stream td').first().addClass('highlighted');
+								yield;
+								updateData();
+								yield;
 							}
+							clearHighlight();
 						}
 					}();
 
@@ -287,26 +288,24 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 						while (true) {
 							let r = currentParse.step.next();
 							if (r.done) {
-								yield updateMsg("Parse finished");
-								return;
+								if (!(r.value instanceof Error)) return updateMsg("Parse finished");else return updateMsg('Error: ' + r.value.message);
 							}
 							let stepInfo = r.value;
-							clearHighlight();
-							if (stepInfo.type === _ParserBase2.default.LR1Parse.Action.shift) {
+							if (stepInfo instanceof _ParserBase2.default.LR1Parse.Action.Shift) {
 								updateMsg('Shift');
 								(0, _jquery2.default)('#lr1parse .itoken_stream td').first().addClass('highlighted');
 								yield;
 								updateData();
 								(0, _jquery2.default)('#lr1parse .parse_stack td').last().addClass('highlighted');
 								yield;
-							} else if (stepInfo.type === _ParserBase2.default.LR1Parse.Action.reduce) {
+							} else if (stepInfo instanceof _ParserBase2.default.LR1Parse.Action.Reduce) {
 								updateMsg('Reduce ' + stepInfo.reducingProduction.toStringReversed());
 								if (stepInfo.reducingProduction.rhs.length > 0) (0, _jquery2.default)('#lr1parse .parse_stack td').slice(-stepInfo.reducingProduction.rhs.length).addClass('highlighted');
 								yield;
 								updateData();
 								(0, _jquery2.default)('#lr1parse .parse_stack td').last().addClass('highlighted');
 								yield;
-							} else if (stepInfo.type === _ParserBase2.default.LR1Parse.Action.accept) {
+							} else if (stepInfo instanceof _ParserBase2.default.LR1Parse.Action.Accept) {
 								updateMsg('Shift & Reduce ' + stepInfo.reducingProduction.toStringReversed() + ' & Accept');
 								(0, _jquery2.default)('#lr1parse .itoken_stream td').first().addClass('highlighted');
 								(0, _jquery2.default)('#lr1parse .parse_stack td').addClass('highlighted');
@@ -314,10 +313,8 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 								updateData();
 								(0, _jquery2.default)('#lr1parse .parse_stack td').last().addClass('highlighted');
 								yield;
-							} else if (stepInfo.type === _ParserBase2.default.LR1Parse.Action.error) {
-								yield updateMsg('Error: ' + stepInfo.errMsg);
-								return;
 							}
+							clearHighlight();
 						}
 					}();
 					f = f.next.bind(f);

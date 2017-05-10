@@ -193,7 +193,7 @@ $(document).ready(function() {
 								let ntPredictSetAtT = ntPredictSet.get(t);
 								return '<td class="' + (ntPredictSetAtT.length > 1 ? 'conflict' : '') + '">' +
 									ntPredictSetAtT.map((p) => 'P(' + p.id + ')').join('<br>') +
-									'</td>';
+								'</td>';
 							} else {
 								return '<td>' + '</td>';
 							}
@@ -212,15 +212,8 @@ $(document).ready(function() {
 							if(stActionSet.has(s)) {
 								let stActionSetAtT = stActionSet.get(s);
 								return '<td class="' + (stActionSetAtT.length > 1 ? 'conflict' : '') + '">' +
-									stActionSetAtT.map(function(e) {
-										if(e.type === ParserBase.LR1Parse.Action.shift)
-											return 'S' + ParserBase.Production.ARROW + e.nextState.id;
-										else if(e.type === ParserBase.LR1Parse.Action.reduce)
-											return 'R(' + e.reducingProduction.id + ')';
-										else if(e.type === ParserBase.LR1Parse.Action.accept)
-											return 'A';
-									}).join('<br>') +
-									'</td>';
+									stActionSetAtT.map(e => e.toString()).join('<br>') +
+								'</td>';
 							} else {
 								return '<td>' + '</td>';
 							}
@@ -272,29 +265,35 @@ $(document).ready(function() {
 					while(true) {
 						let r = currentParse.step.next();
 						if(r.done) {
-							yield updateMsg("Parse finished");
-							return;
+							if(!(r.value instanceof Error))
+								return updateMsg("Parse finished");
+							else
+								return updateMsg('Error: ' + r.value.message);
 						}
 						let stepInfo = r.value;
-						clearHighlight();
-						if(stepInfo.type === ParserBase.LL1Parse.Action.match) {
-							updateMsg("Match " + stepInfo.token.terminalType);
+						if(stepInfo instanceof ParserBase.LL1Parse.Action.Match) {
+							updateMsg("Match " + stepInfo.terminalType);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
 							updateData();
 							yield;
-						} else if(stepInfo.type === ParserBase.LL1Parse.Action.predict) {
+						} else if(stepInfo instanceof ParserBase.LL1Parse.Action.Predict) {
 							updateMsg("Predict " + stepInfo.usingProd);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							yield;
 							updateData();
 							$('#ll1parse .parse_stack td').slice(0,stepInfo.usingProd.rhs.length).addClass('highlighted');
 							yield;
-						} else if(stepInfo.type === ParserBase.LL1Parse.Action.error) {
-							yield updateMsg("Error: " + stepInfo.errMsg);
-							return;
+						} else if(stepInfo instanceof ParserBase.LL1Parse.Action.Accept) {
+							updateMsg("Match " + stepInfo.terminalType + ' & Accept');
+							$('#ll1parse .parse_stack td').first().addClass('highlighted');
+							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
+							yield;
+							updateData();
+							yield;
 						}
+						clearHighlight();
 					}
 				})();
 
@@ -370,19 +369,20 @@ $(document).ready(function() {
 					while(true) {
 						let r = currentParse.step.next();
 						if(r.done) {
-							yield updateMsg("Parse finished");
-							return;
+							if(!(r.value instanceof Error))
+								return updateMsg("Parse finished");
+							else
+								return updateMsg('Error: ' + r.value.message);
 						}
-						let stepInfo = r.value;
-						clearHighlight();
-						if(stepInfo.type === ParserBase.LR1Parse.Action.shift) {
+						let stepInfo = r.value
+						if(stepInfo instanceof ParserBase.LR1Parse.Action.Shift) {
 							updateMsg('Shift');
 							$('#lr1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
 							updateData();
 							$('#lr1parse .parse_stack td').last().addClass('highlighted');
 							yield;
-						} else if(stepInfo.type === ParserBase.LR1Parse.Action.reduce) {
+						} else if(stepInfo instanceof ParserBase.LR1Parse.Action.Reduce) {
 							updateMsg('Reduce ' + stepInfo.reducingProduction.toStringReversed());
 							if(stepInfo.reducingProduction.rhs.length>0)
 								$('#lr1parse .parse_stack td').slice(-stepInfo.reducingProduction.rhs.length).addClass('highlighted');
@@ -390,7 +390,7 @@ $(document).ready(function() {
 							updateData();
 							$('#lr1parse .parse_stack td').last().addClass('highlighted');
 							yield;
-						} else if(stepInfo.type === ParserBase.LR1Parse.Action.accept) {
+						} else if(stepInfo instanceof ParserBase.LR1Parse.Action.Accept) {
 							updateMsg('Shift & Reduce ' + stepInfo.reducingProduction.toStringReversed() + ' & Accept');
 							$('#lr1parse .itoken_stream td').first().addClass('highlighted');
 							$('#lr1parse .parse_stack td').addClass('highlighted');
@@ -398,10 +398,8 @@ $(document).ready(function() {
 							updateData();
 							$('#lr1parse .parse_stack td').last().addClass('highlighted');
 							yield;
-						} else if(stepInfo.type === ParserBase.LR1Parse.Action.error) {
-							yield updateMsg('Error: ' + stepInfo.errMsg);
-							return;
 						}
+						clearHighlight();
 					}
 				})();
 				f = f.next.bind(f);

@@ -220,18 +220,10 @@ export class LL1Parse {
 				if(topSymbol instanceof NonTerminal) {
 					let predictedProds = ll1PredictTable.get(topSymbol).get(nextInput.terminalType);
 					if(predictedProds === undefined) {
-						yield {
-							type: LL1Parse.Action.error,
-							errMsg: `Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (syntax error)`
-						};
-						return;
+						return new Error(`Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (syntax error)`);
 					}
 					if(predictedProds.length > 1) {
-						yield {
-							type: LL1Parse.Action.error,
-							errMsg: `Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (conflict)`
-						};
-						return;
+						return new Error(`Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (conflict)`);
 					}
 
 					let usingProd = predictedProds.first();
@@ -246,19 +238,10 @@ export class LL1Parse {
 					[self.currentRHS, self.currentRHSIndex] = [currentNode.childNodes, 0];
 					checkEOP();
 
-					yield {
-						type: LL1Parse.Action.predict,
-						nonTerminal: topSymbol,
-						usingProd: usingProd,
-						lookahead: nextInput.terminalType
-					};
+					yield new LL1Parse.Action.Predict(usingProd);
 				} else if(topSymbol instanceof Terminal) {
 					if(nextInput.terminalType !== topSymbol) {
-						yield {
-							type: LL1Parse.Action.error,
-							errMsg: `Unable to match ${nextInput.terminalType}`
-						};
-						return;
+						return new Error(`Unable to match ${nextInput.terminalType}`);
 					}
 
 					// parse stack
@@ -270,12 +253,12 @@ export class LL1Parse {
 					self.currentRHSIndex++;
 					checkEOP();
 
-					yield {
-						type: LL1Parse.Action.match,
-						token: nextInput
-					};
-					if(topSymbol === GSymbol.EOI)
+					if(topSymbol !== GSymbol.EOI) {
+						yield new LL1Parse.Action.Match(nextInput.terminalType);
+					} else {
+						yield new LL1Parse.Action.Accept(nextInput.terminalType);
 						return;
+					}
 				} else {
 					throw "Invalid Symbol: " + topSymbol;
 				}
@@ -304,13 +287,30 @@ export class LL1Parse {
 	};{
 		LL1Parse.TreeNode.serialNo = 1;
 	}
-	LL1Parse.Action = (function(Action) {
-		Action[Action["match"] = 0] = "match";
-		Action[Action["predict"] = 1] = "predict";
-		Action[Action["accept"] = 2] = "accept";
-		Action[Action["error"] = 3] = "error";
-		return Action;
-	})({});
+	LL1Parse.Action = class {
+		constructor() {
+
+		}
+	};{
+		LL1Parse.Action.Match = class extends LL1Parse.Action {
+			constructor(terminalType) {
+				super();
+				this.terminalType = terminalType;
+			}
+		};
+		LL1Parse.Action.Predict = class extends LL1Parse.Action {
+			constructor(usingProd) {
+				super();
+				this.usingProd = usingProd;
+			}
+		};
+		LL1Parse.Action.Accept = class extends LL1Parse.Action {
+			constructor(terminalType) {
+				super();
+				this.terminalType = terminalType;
+			}
+		};
+	}
 }
 export class LR1Parse {
 	constructor(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
@@ -326,15 +326,10 @@ export class LR1Parse {
 				let selectedActions = lr1GotoActionTable.get(currentState).get(nextInput.terminalType);
 				if(selectedActions !== undefined) {
 					if(selectedActions.length > 1) {
-						yield {
-							type: LR1Parse.Action.error,
-							errMsg: `Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`
-						};
-						return;
+						return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`);
 					}
 					let action = selectedActions.first();
-					if(action.type === LR1Parse.Action.shift) {
-
+					if(action instanceof LR1Parse.Action.Shift) {
 						// parse stack
 						parseStack.push(nextInput.terminalType);
 						stateStack.push(action.nextState);
@@ -343,11 +338,8 @@ export class LR1Parse {
 
 						inputTokens.shift();
 
-						yield {
-							type: LR1Parse.Action.shift
-						};
-					} else if(action.type === LR1Parse.Action.reduce) {
-
+						yield action;
+					} else if(action instanceof LR1Parse.Action.Reduce) {
 						let reducedNode = new LR1Parse.TreeNode(action.reducingProduction.lhs);
 						reducedNode.childNodes = [];
 
@@ -367,11 +359,8 @@ export class LR1Parse {
 						// parse tree
 						parseForest.push(reducedNode);
 
-						yield {
-							type: LR1Parse.Action.reduce,
-							reducingProduction: action.reducingProduction
-						};
-					} else if(action.type === LR1Parse.Action.accept) {
+						yield action;
+					} else if(action instanceof LR1Parse.Action.Accept) {
 
 						// shift $
 							// parse stack
@@ -397,18 +386,11 @@ export class LR1Parse {
 							// parse tree
 							parseForest.push(reducedNode);
 
-						yield {
-							type: LR1Parse.Action.accept,
-							reducingProduction: action.reducingProduction
-						};
+						yield action;
 						return;
 					}
 				} else {
-					yield {
-						type: LR1Parse.Action.error,
-						errMsg: `Unable to decide next action with lookahead ${nextInput.terminalType} (syntax error)`
-					};
-					return;
+					return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (syntax error)`);
 				}
 			}
 		})();
@@ -428,13 +410,51 @@ export class LR1Parse {
 	};{
 		LR1Parse.TreeNode.serialNo = 1;
 	}
-	LR1Parse.Action = (function(Action) {
-		Action[Action["shift"] = 0] = "shift";
-		Action[Action["reduce"] = 1] = "reduce";
-		Action[Action["accept"] = 2] = "accept";
-		Action[Action["error"] = 3] = "error";
-		return Action;
-	})({});
+	LR1Parse.Action = class {
+		constructor() {
+
+		}
+	};{
+		LR1Parse.Action.Shift = class extends LR1Parse.Action {
+			constructor(nextState) {
+				super();
+				this.nextState = nextState;
+			}
+			equals(that) {
+				return that instanceof LR1Parse.Action.Shift
+					&& this.nextState.equals(that.nextState);
+			}
+			toString() {
+				return 'S' + Production.ARROW + this.nextState.id;
+			}
+		};
+		LR1Parse.Action.Reduce = class extends LR1Parse.Action {
+			constructor(reducingProduction) {
+				super();
+				this.reducingProduction = reducingProduction;
+			}
+			equals(that) {
+				return that instanceof LR1Parse.Action.Reduce
+					&& this.reducingProduction.equals(that.reducingProduction);
+			}
+			toString() {
+				return 'R(' + this.reducingProduction.id + ')';
+			}
+		};
+		LR1Parse.Action.Accept = class extends LR1Parse.Action {
+			constructor(reducingProduction) {
+				super();
+				this.reducingProduction = reducingProduction;
+			}
+			equals(that) {
+				return that instanceof LR1Parse.Action.Accept
+					&& this.reducingProduction.equals(that.reducingProduction);
+			}
+			toString() {
+				return 'A';
+			}
+		};
+	}
 }
 
 export default {
@@ -930,18 +950,9 @@ export function buildLR1FSM(grammar, firstSetTable) {
 export function buildLR1GotoActionTable(grammar, lr1fsm) {
 	let lr1GotoActionTable = new Map();
 	let globalActionMap = {
-		shift: new Map(lr1fsm.states.toArray().map((s) => [s, {
-				type: LR1Parse.Action.shift,
-				nextState: s
-			}])),
-		reduce: new Map(grammar.productions.map((p) => [p, {
-				type: LR1Parse.Action.reduce,
-				reducingProduction: p
-			}])),
-		accept: {
-			type: LR1Parse.Action.accept,
-			reducingProduction: grammar.augmentingProduction
-		}
+		shift: new Map(lr1fsm.states.toArray().map((s) => [s, new LR1Parse.Action.Shift(s)])),
+		reduce: new Map(grammar.productions.map((p) => [p, new LR1Parse.Action.Reduce(p)])),
+		accept: new LR1Parse.Action.Accept(grammar.augmentingProduction)
 	};
 	for(let state of lr1fsm.states) {
 		let gotoActionsMap = new Map();
