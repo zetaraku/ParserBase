@@ -39,3 +39,10 @@ Then in the project directory,
 1. use ` npm install ` *once* to install all devDependencies.
 
 2. use ` gulp ` to rebuild all files *after you edit the source*.
+
+Licence
+-------
+
+Copyright © 2017, Raku Zeta. Licensed under the MIT license.
+
+Other used libraries and licence infomation are located in `ParserBase/js/lib/`.
