@@ -1,6 +1,31 @@
 'use strict';
 
+Object.defineProperties(Object.prototype, {
+	'equals': {
+		value: function(that) {
+			return this === that;
+		},
+		writable: true,
+	},
+});
 Object.defineProperties(Map.prototype, {
+	'equals': {
+		value: function(that) {
+			if(this === that)
+				return true;
+			if(!(that instanceof Map) || this.size !== that.size)
+				return false;
+			for(let k of this.keys()) {
+				if(!that.has(k))
+					return false;
+				let vThis = this.get(k), vThat = that.get(k);
+				if(typeof vThis.equals === 'function' ? !vThis.equals(vThat) : vThis !== vThat) {
+					return false;
+				}
+			}
+			return true;
+		}
+	},
 	'isEmpty': {
 		value: function() {
 			return this.size === 0;
@@ -15,7 +40,9 @@ Object.defineProperties(Map.prototype, {
 Object.defineProperties(Set.prototype, {
 	'equals': {
 		value: function(that) {
-			if(this.size !== that.size)
+			if(this === that)
+				return true;
+			if(!(that instanceof Set) || this.size !== that.size)
 				return false;
 			for(let e of this)
 				if(!that.has(e))
@@ -64,6 +91,21 @@ Object.defineProperties(Set.prototype, {
 	},
 });
 Object.defineProperties(Array.prototype, {
+	'equals': {
+		value: function(that) {
+			if(this === that)
+				return true;
+			if(!(that instanceof Array) || this.length !== that.length)
+				return false;
+			for(let i=0; i<this.length; i++) {
+				let vThis = this[i], vThat = that[i];
+				if(typeof vThis.equals === 'function' ? !vThis.equals(vThat) : vThis !== vThat) {
+					return false;
+				}
+			}
+			return true;
+		}
+	},
 	'groupBy': {
 		value: function(mapf) {
 			let groups = new Map();
