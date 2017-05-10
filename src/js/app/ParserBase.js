@@ -972,6 +972,8 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 				.groupBy(lr1conf => lr1conf.lookahead)
 		) {
 			for(let lr1conf of confs) {
+				if(lookahead === null)
+					continue;
 				if(!gotoActionsMap.has(lookahead))
 					gotoActionsMap.set(lookahead, []);
 				gotoActionsMap.get(lookahead).push(

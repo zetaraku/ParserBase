@@ -945,6 +945,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 			// reduce
 			for (let [lookahead, confs] of Array.from(state.configurationSet.values()).filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null).groupBy(lr1conf => lr1conf.lookahead)) {
 				for (let lr1conf of confs) {
+					if (lookahead === null) continue;
 					if (!gotoActionsMap.has(lookahead)) gotoActionsMap.set(lookahead, []);
 					gotoActionsMap.get(lookahead).push(globalActionMap.reduce.get(lr1conf.baseLR0Configuration.production));
 				}
