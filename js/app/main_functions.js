@@ -1,10 +1,20 @@
-define(['exports'], function (exports) {
+define(['exports', 'app/ParserBase'], function (exports, _ParserBase) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 	exports.processGrammarInput = processGrammarInput;
+	exports.processParseInput = processParseInput;
+
+	var _ParserBase2 = _interopRequireDefault(_ParserBase);
+
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : {
+			default: obj
+		};
+	}
+
 	function processGrammarInput(inputText) {
 		let terminals = new Set();
 		let nonTerminals = new Set();
@@ -58,5 +68,10 @@ define(['exports'], function (exports) {
 			productions: productions,
 			extraResult: extraResult
 		};
+	}
+	function processParseInput(inputText, vocabularyNameMap) {
+		return inputText.trim().split(/\s+/).filter(s => s !== '').map(function (t) {
+			return { terminalType: vocabularyNameMap.get(t) || _ParserBase2.default.GSymbol.UNKNOWN };
+		});
 	}
 });

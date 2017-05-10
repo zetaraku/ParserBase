@@ -1,3 +1,5 @@
+import ParserBase from 'app/ParserBase';
+
 export function processGrammarInput(inputText) {
 	let terminals = new Set();
 	let nonTerminals = new Set();
@@ -54,4 +56,10 @@ export function processGrammarInput(inputText) {
 		productions: productions,
 		extraResult: extraResult,
 	};
+}
+export function processParseInput(inputText, vocabularyNameMap) {
+	return inputText.trim().split(/\s+/).filter(s => s !== '')
+		.map(function(t) {
+		return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
+	})
 }

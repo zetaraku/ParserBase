@@ -183,9 +183,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 				(0, _jquery2.default)('#ll1parse .parse_next_btn').off('click');
 				(0, _jquery2.default)('#ll1parse .view_parse_tree').off('click');
 				(0, _jquery2.default)('#ll1parse .start_parse').on('click', function () {
-					let inputTokens = (0, _jquery2.default)('#ll1parse .source_input').val().trim().split(/\s+/).filter(s => s !== '').map(function (t) {
-						return { terminalType: vocabularyNameMap.get(t) || _ParserBase2.default.GSymbol.UNKNOWN };
-					});
+					let inputTokens = (0, _main_functions.processParseInput)((0, _jquery2.default)('#ll1parse .source_input').val(), vocabularyNameMap);
 					let currentParse = _ParserBase2.default.newLL1Parse(grammar, ll1PredictTable, inputTokens);
 					let parseStack = currentParse.parseStack;
 					let parseTree = currentParse.parseTree;
@@ -278,9 +276,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 				(0, _jquery2.default)('#lr1parse .parse_next_btn').off('click');
 				(0, _jquery2.default)('#lr1parse .view_parse_tree').off('click');
 				(0, _jquery2.default)('#lr1parse .start_parse').on('click', function () {
-					let inputTokens = (0, _jquery2.default)('#lr1parse .source_input').val().trim().split(/\s+/).filter(s => s !== '').map(function (t) {
-						return { terminalType: vocabularyNameMap.get(t) || _ParserBase2.default.GSymbol.UNKNOWN };
-					});
+					let inputTokens = (0, _main_functions.processParseInput)((0, _jquery2.default)('#lr1parse .source_input').val(), vocabularyNameMap);
 					let currentParse = _ParserBase2.default.newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 					let parseStack = currentParse.parseStack;
 					let parseForest = currentParse.parseForest;

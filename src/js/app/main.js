@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import ParserBase from 'app/ParserBase';
-import {processGrammarInput} from 'app/main_functions';
+import {processGrammarInput, processParseInput} from 'app/main_functions';
 import canvg from 'canvg';
 
 let original = {
@@ -259,10 +259,7 @@ $(document).ready(function() {
 			$('#ll1parse .parse_next_btn').off('click');
 			$('#ll1parse .view_parse_tree').off('click');
 			$('#ll1parse .start_parse').on('click', function() {
-				let inputTokens = $('#ll1parse .source_input').val().trim().split(/\s+/).filter(s => s !== '')
-					.map(function(t) {
-					return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
-				});
+				let inputTokens = processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLL1Parse(grammar, ll1PredictTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseTree = currentParse.parseTree;
@@ -363,10 +360,7 @@ $(document).ready(function() {
 			$('#lr1parse .parse_next_btn').off('click');
 			$('#lr1parse .view_parse_tree').off('click');
 			$('#lr1parse .start_parse').on('click', function() {
-				let inputTokens = $('#lr1parse .source_input').val().trim().split(/\s+/).filter(s => s !== '')
-					.map(function(t) {
-					return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
-				});
+				let inputTokens = processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseForest = currentParse.parseForest;
