@@ -1,5 +1,6 @@
 node_modules
 **/*.log
+**/*.local.*
 # js/app/*.js
 # css/*.css
 # *.html

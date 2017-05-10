@@ -17,6 +17,5 @@
   "jquery": true,
   "devel": true,
   "mocha": true,
-  "expr": true,
   "globals": {}
 }
