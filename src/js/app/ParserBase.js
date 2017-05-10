@@ -324,12 +324,18 @@ export class LR1Parse {
 				let currentState = stateStack.last();
 				let nextInput = inputTokens.first();
 				let selectedActions = lr1GotoActionTable.get(currentState).get(nextInput.terminalType);
-				if(selectedActions !== undefined) {
-					if(selectedActions.length > 1) {
-						return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`);
-					}
-					let action = selectedActions.first();
-					if(action instanceof LR1Parse.Action.Shift) {
+
+				if(selectedActions === undefined) {
+					return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (syntax error)`);
+				} else if(selectedActions.length > 1) {
+					return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`);
+				}
+
+				let action = selectedActions.first();
+				if(action instanceof LR1Parse.Action.Shift) {
+
+					/* shift */
+
 						// parse stack
 						parseStack.push(nextInput.terminalType);
 						stateStack.push(action.nextState);
@@ -338,8 +344,11 @@ export class LR1Parse {
 
 						inputTokens.shift();
 
-						yield action;
-					} else if(action instanceof LR1Parse.Action.Reduce) {
+					yield action;
+				} else if(action instanceof LR1Parse.Action.Reduce) {
+
+					/* reduce */
+
 						let reducedNode = new LR1Parse.TreeNode(action.reducingProduction.lhs);
 						reducedNode.childNodes = [];
 
@@ -359,38 +368,41 @@ export class LR1Parse {
 						// parse tree
 						parseForest.push(reducedNode);
 
-						yield action;
-					} else if(action instanceof LR1Parse.Action.Accept) {
+					yield action;
+				} else if(action instanceof LR1Parse.Action.Accept) {
 
-						// shift $
-							// parse stack
-							parseStack.push(inputTokens.shift().terminalType);
-							stateStack.push(action.nextState);
-							// parse tree
-							parseForest.push(new LR1Parse.TreeNode(nextInput.terminalType));
+					/* shift $ */
 
-						// reduce
-							let reducedNode = new LR1Parse.TreeNode(action.reducingProduction.lhs);
-							reducedNode.childNodes = [];
+						// parse stack
+						parseStack.push(nextInput.terminalType);
+						stateStack.push(action.nextState);
+						// parse tree
+						parseForest.push(new LR1Parse.TreeNode(nextInput.terminalType));
 
-							for(let rhsi of action.reducingProduction.rhs) {
-								parseStack.pop();
-								stateStack.pop();
-								reducedNode.childNodes.unshift(parseForest.pop());
-							}
-							currentState = stateStack.last();
+						inputTokens.shift();
 
-							// parse stack
-							parseStack.push(action.reducingProduction.lhs);
+					/* reduce */
+
+						let reducedNode = new LR1Parse.TreeNode(action.reducingProduction.lhs);
+						reducedNode.childNodes = [];
+
+						for(let rhsi of action.reducingProduction.rhs) {
+							parseStack.pop();
 							stateStack.pop();
-							// parse tree
-							parseForest.push(reducedNode);
+							reducedNode.childNodes.unshift(parseForest.pop());
+						}
+						currentState = stateStack.last();
 
-						yield action;
-						return;
-					}
+						// parse stack
+						parseStack.push(action.reducingProduction.lhs);
+						stateStack.pop();
+						// parse tree
+						parseForest.push(reducedNode);
+
+					yield action;
+					return;
 				} else {
-					return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (syntax error)`);
+					throw new Error('Unknown action.')
 				}
 			}
 		})();
