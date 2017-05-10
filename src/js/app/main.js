@@ -44,11 +44,7 @@ $(document).ready(function() {
 		}
 
 		let grammar = ParserBase.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
-		let vocabularyNameMap = new Map([
-			...grammar.terminals,
-			...grammar.nonTerminals,
-			ParserBase.GSymbol.LAMBDA
-		].map((s) => [s.name, s]));
+		let vocabularyNameMap = grammar.buildVocabularyNameMap();
 		let unreachableSymbols = ParserBase.computeUnreachableSymbols(grammar);
 		let unreducibleSymbols = ParserBase.computeUnreducibleSymbols(grammar);
 		let nullableSymbols = ParserBase.computeNullableSymbols(grammar);

@@ -112,13 +112,16 @@ define(['exports', 'viz'], function (exports, _viz) {
 		};
 	}
 	class Grammar {
-		constructor(terminals, nonTerminals, startSymbol, productions, augmentingProduction) {
+		constructor(terminals, nonTerminals, startSymbol, productions) {
 			this.terminals = terminals;
 			this.nonTerminals = nonTerminals;
 			this.startSymbol = startSymbol;
 			this.productions = productions;
 			this.productionsMap = productions.groupBy(e => e.lhs);
-			this.augmentingProduction = augmentingProduction;
+			this.augmentingProduction = productions[0];
+		}
+		buildVocabularyNameMap() {
+			return new Map([...this.terminals, ...this.nonTerminals, GSymbol.LAMBDA].map(s => [s.name, s]));
 		}
 	}exports.Grammar = Grammar;
 	{}
@@ -507,7 +510,6 @@ define(['exports', 'viz'], function (exports, _viz) {
 		newLR1Parse: (grammar, lr1FSM, lr1GotoActionTable, inputTokens) => new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens)
 	};
 	function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, rawProductions) {
-		GSymbol.serialNo = 0;
 		Production.serialNo = 0;
 
 		let vocabularyNameMap = new Map();
@@ -530,7 +532,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 			return new Production(lhs, rhs);
 		})];
 
-		return new Grammar(terminals, nonTerminals, startSymbol, productions, augmentingProduction);
+		return new Grammar(terminals, nonTerminals, startSymbol, productions, { vocabularyNameMap: vocabularyNameMap });
 	}
 	function computeUnreachableSymbols(grammar) {
 		let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);

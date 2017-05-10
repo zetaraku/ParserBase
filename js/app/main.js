@@ -52,7 +52,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			}
 
 			let grammar = _ParserBase2.default.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
-			let vocabularyNameMap = new Map([...grammar.terminals, ...grammar.nonTerminals, _ParserBase2.default.GSymbol.LAMBDA].map(s => [s.name, s]));
+			let vocabularyNameMap = grammar.buildVocabularyNameMap();
 			let unreachableSymbols = _ParserBase2.default.computeUnreachableSymbols(grammar);
 			let unreducibleSymbols = _ParserBase2.default.computeUnreducibleSymbols(grammar);
 			let nullableSymbols = _ParserBase2.default.computeNullableSymbols(grammar);
