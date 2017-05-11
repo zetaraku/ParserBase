@@ -450,6 +450,17 @@ define(['exports', 'viz'], function (exports, _viz) {
 					return 'S' + Production.ARROW + this.nextState.id;
 				}
 			};
+			LR1Parse.Action.PseudoShift = class extends LR1Parse.Action.Shift {
+				constructor(nextState) {
+					super(nextState);
+				}
+				equals(that) {
+					return that instanceof LR1Parse.Action.PseudoShift && this.nextState.equals(that.nextState);
+				}
+				toString() {
+					return Production.ARROW + this.nextState.id;
+				}
+			};
 			LR1Parse.Action.Reduce = class extends LR1Parse.Action {
 				constructor(reducingProduction) {
 					super();
@@ -532,7 +543,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 			return new Production(lhs, rhs);
 		})];
 
-		return new Grammar(terminals, nonTerminals, startSymbol, productions, { vocabularyNameMap: vocabularyNameMap });
+		return new Grammar(terminals, nonTerminals, startSymbol, productions);
 	}
 	function computeUnreachableSymbols(grammar) {
 		let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
@@ -932,6 +943,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		let lr1GotoActionTable = new Map();
 		let globalActionMap = {
 			shift: new Map(lr1fsm.states.toArray().map(s => [s, new LR1Parse.Action.Shift(s)])),
+			pshift: new Map(lr1fsm.states.toArray().map(s => [s, new LR1Parse.Action.PseudoShift(s)])),
 			reduce: new Map(grammar.productions.map(p => [p, new LR1Parse.Action.Reduce(p)])),
 			accept: new LR1Parse.Action.Accept(grammar.augmentingProduction)
 		};
@@ -940,7 +952,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 			// general shift & accept
 			for (let [symbol, nextState] of state.transitionMap) {
 				if (!gotoActionsMap.has(symbol)) gotoActionsMap.set(symbol, []);
-				if (symbol === GSymbol.EOI) gotoActionsMap.get(symbol).push(globalActionMap.accept);else gotoActionsMap.get(symbol).push(globalActionMap.shift.get(nextState));
+				if (symbol === GSymbol.EOI) gotoActionsMap.get(symbol).push(globalActionMap.accept);else if (symbol instanceof Terminal) gotoActionsMap.get(symbol).push(globalActionMap.shift.get(nextState));else if (symbol instanceof NonTerminal) gotoActionsMap.get(symbol).push(globalActionMap.pshift.get(nextState));else throw new Error('something went wrong in transitionMap of state.');
 			}
 			// reduce
 			for (let [lookahead, confs] of Array.from(state.configurationSet.values()).filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null).groupBy(lr1conf => lr1conf.lookahead)) {

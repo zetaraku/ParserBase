@@ -434,6 +434,18 @@ export class LR1Parse {
 				return 'S' + Production.ARROW + this.nextState.id;
 			}
 		};
+		LR1Parse.Action.PseudoShift = class extends LR1Parse.Action.Shift {
+			constructor(nextState) {
+				super(nextState);
+			}
+			equals(that) {
+				return that instanceof LR1Parse.Action.PseudoShift
+					&& this.nextState.equals(that.nextState);
+			}
+			toString() {
+				return Production.ARROW + this.nextState.id;
+			}
+		};
 		LR1Parse.Action.Reduce = class extends LR1Parse.Action {
 			constructor(reducingProduction) {
 				super();
@@ -955,6 +967,7 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 	let lr1GotoActionTable = new Map();
 	let globalActionMap = {
 		shift: new Map(lr1fsm.states.toArray().map((s) => [s, new LR1Parse.Action.Shift(s)])),
+		pshift: new Map(lr1fsm.states.toArray().map((s) => [s, new LR1Parse.Action.PseudoShift(s)])),
 		reduce: new Map(grammar.productions.map((p) => [p, new LR1Parse.Action.Reduce(p)])),
 		accept: new LR1Parse.Action.Accept(grammar.augmentingProduction)
 	};
@@ -966,8 +979,12 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 				gotoActionsMap.set(symbol, []);
 			if(symbol === GSymbol.EOI)
 				gotoActionsMap.get(symbol).push(globalActionMap.accept);
-			else
+			else if(symbol instanceof Terminal)
 				gotoActionsMap.get(symbol).push(globalActionMap.shift.get(nextState));
+			else if(symbol instanceof NonTerminal)
+				gotoActionsMap.get(symbol).push(globalActionMap.pshift.get(nextState));
+			else
+				throw new Error('something went wrong in transitionMap of state.');
 		}
 		// reduce
 		for(let [lookahead, confs] of

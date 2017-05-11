@@ -287,15 +287,15 @@ add_op -> -
 				let expected = new Map(
 					[
 						[0, [
-							["program", ["S→1"]],
+							["program", ["→1"]],
 							["begin", ["S→2"]]
 						]],
 						[1, [
 							[ParserBase.GSymbol.EOI.name, ["A"]]
 						]],
 						[2, [
-							["statement_list", ["S→4"]],
-							["statement", ["S→5"]],
+							["statement_list", ["→4"]],
+							["statement", ["→5"]],
 							["ID", ["S→6"]],
 							["read", ["S→7"]],
 							["write", ["S→8"]]
@@ -306,8 +306,8 @@ add_op -> -
 							["end", ["S→9"]]
 						]],
 						[5, [
-							["statement_tail", ["S→10"]],
-							["statement", ["S→11"]],
+							["statement_tail", ["→10"]],
+							["statement", ["→11"]],
 							["ID", ["S→6"]],
 							["read", ["S→7"]],
 							["write", ["S→8"]],
@@ -329,28 +329,28 @@ add_op -> -
 							["end", ["R(2)"]]
 						]],
 						[11, [
-							["statement_tail", ["S→15"]],
-							["statement", ["S→11"]],
+							["statement_tail", ["→15"]],
+							["statement", ["→11"]],
 							["ID", ["S→6"]],
 							["read", ["S→7"]],
 							["write", ["S→8"]],
 							["end", ["R(4)"]]
 						]],
 						[12, [
-							["expression", ["S→16"]],
-							["primary", ["S→17"]],
+							["expression", ["→16"]],
+							["primary", ["→17"]],
 							["(", ["S→18"]],
 							["ID", ["S→19"]],
 							["INTLIT", ["S→20"]]
 						]],
 						[13, [
-							["id_list", ["S→21"]],
+							["id_list", ["→21"]],
 							["ID", ["S→22"]]
 						]],
 						[14, [
-							["expr_list", ["S→23"]],
-							["expression", ["S→24"]],
-							["primary", ["S→25"]],
+							["expr_list", ["→23"]],
+							["expression", ["→24"]],
+							["primary", ["→25"]],
 							["(", ["S→26"]],
 							["ID", ["S→27"]],
 							["INTLIT", ["S→28"]]
@@ -362,15 +362,15 @@ add_op -> -
 							[";", ["S→29"]]
 						]],
 						[17, [
-							["primary_tail", ["S→30"]],
-							["add_op", ["S→31"]],
+							["primary_tail", ["→30"]],
+							["add_op", ["→31"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[";", ["R(16)"]]
 						]],
 						[18, [
-							["expression", ["S→34"]],
-							["primary", ["S→35"]],
+							["expression", ["→34"]],
+							["primary", ["→35"]],
 							["(", ["S→36"]],
 							["ID", ["S→37"]],
 							["INTLIT", ["S→38"]]
@@ -389,7 +389,7 @@ add_op -> -
 							[")", ["S→39"]]
 						]],
 						[22, [
-							["id_tail", ["S→40"]],
+							["id_tail", ["→40"]],
 							[",", ["S→41"]],
 							[")", ["R(10)"]]
 						]],
@@ -397,21 +397,21 @@ add_op -> -
 							[")", ["S→42"]]
 						]],
 						[24, [
-							["expr_tail", ["S→43"]],
+							["expr_tail", ["→43"]],
 							[",", ["S→44"]],
 							[")", ["R(13)"]]
 						]],
 						[25, [
-							["primary_tail", ["S→45"]],
-							["add_op", ["S→46"]],
+							["primary_tail", ["→45"]],
+							["add_op", ["→46"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[",", ["R(16)"]],
 							[")", ["R(16)"]]
 						]],
 						[26, [
-							["expression", ["S→47"]],
-							["primary", ["S→35"]],
+							["expression", ["→47"]],
+							["primary", ["→35"]],
 							["(", ["S→36"]],
 							["ID", ["S→37"]],
 							["INTLIT", ["S→38"]]
@@ -438,7 +438,7 @@ add_op -> -
 							[";", ["R(14)"]]
 						]],
 						[31, [
-							["primary", ["S→48"]],
+							["primary", ["→48"]],
 							["(", ["S→18"]],
 							["ID", ["S→19"]],
 							["INTLIT", ["S→20"]]
@@ -457,15 +457,15 @@ add_op -> -
 							[")", ["S→49"]]
 						]],
 						[35, [
-							["primary_tail", ["S→50"]],
-							["add_op", ["S→51"]],
+							["primary_tail", ["→50"]],
+							["add_op", ["→51"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[")", ["R(16)"]]
 						]],
 						[36, [
-							["expression", ["S→52"]],
-							["primary", ["S→35"]],
+							["expression", ["→52"]],
+							["primary", ["→35"]],
 							["(", ["S→36"]],
 							["ID", ["S→37"]],
 							["INTLIT", ["S→38"]]
@@ -496,8 +496,8 @@ add_op -> -
 							[")", ["R(11)"]]
 						]],
 						[44, [
-							["expression", ["S→56"]],
-							["primary", ["S→25"]],
+							["expression", ["→56"]],
+							["primary", ["→25"]],
 							["(", ["S→26"]],
 							["ID", ["S→27"]],
 							["INTLIT", ["S→28"]]
@@ -507,7 +507,7 @@ add_op -> -
 							[")", ["R(14)"]]
 						]],
 						[46, [
-							["primary", ["S→57"]],
+							["primary", ["→57"]],
 							["(", ["S→26"]],
 							["ID", ["S→27"]],
 							["INTLIT", ["S→28"]]
@@ -516,8 +516,8 @@ add_op -> -
 							[")", ["S→58"]]
 						]],
 						[48, [
-							["primary_tail", ["S→59"]],
-							["add_op", ["S→31"]],
+							["primary_tail", ["→59"]],
+							["add_op", ["→31"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[";", ["R(16)"]]
@@ -531,7 +531,7 @@ add_op -> -
 							[")", ["R(14)"]]
 						]],
 						[51, [
-							["primary", ["S→60"]],
+							["primary", ["→60"]],
 							["(", ["S→36"]],
 							["ID", ["S→37"]],
 							["INTLIT", ["S→38"]]
@@ -546,7 +546,7 @@ add_op -> -
 							["end", ["R(6)"]]
 						]],
 						[54, [
-							["id_tail", ["S→62"]],
+							["id_tail", ["→62"]],
 							[",", ["S→41"]],
 							[")", ["R(10)"]]
 						]],
@@ -557,13 +557,13 @@ add_op -> -
 							["end", ["R(7)"]]
 						]],
 						[56, [
-							["expr_tail", ["S→63"]],
+							["expr_tail", ["→63"]],
 							[",", ["S→44"]],
 							[")", ["R(13)"]]
 						]],
 						[57, [
-							["primary_tail", ["S→64"]],
-							["add_op", ["S→46"]],
+							["primary_tail", ["→64"]],
+							["add_op", ["→46"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[",", ["R(16)"]],
@@ -579,8 +579,8 @@ add_op -> -
 							[";", ["R(15)"]]
 						]],
 						[60, [
-							["primary_tail", ["S→65"]],
-							["add_op", ["S→51"]],
+							["primary_tail", ["→65"]],
+							["add_op", ["→51"]],
 							["+", ["S→32"]],
 							["-", ["S→33"]],
 							[")", ["R(16)"]]
@@ -617,6 +617,8 @@ add_op -> -
 					let group;
 					if((group = actionRaw.match(/^S→(\d+)$/)) !== null) {
 						return new ParserBase.LR1Parse.Action.Shift(sid2state[parseInt(group[1])]);
+					} else if((group = actionRaw.match(/^→(\d+)$/)) !== null) {
+						return new ParserBase.LR1Parse.Action.PseudoShift(sid2state[parseInt(group[1])]);
 					} else if((group = actionRaw.match(/^R\((\d+)\)$/)) !== null) {
 						return new ParserBase.LR1Parse.Action.Reduce(result.grammar.productions[group[1]]);
 					} else if(actionRaw === 'A') {
