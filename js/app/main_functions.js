@@ -57,7 +57,7 @@ define(['exports', 'app/ParserBase'], function (exports, _ParserBase) {
 		for (let nt of nonTerminals) {
 			terminals.delete(nt);
 		}
-		if (productions.first() === undefined) throw new Error("No production.");
+		if (productions[0] === undefined) throw new Error("No production.");
 		startSymbol = startSymbol || productions[0][0];
 		if (!nonTerminals.has(startSymbol)) throw new Error(`Invalid Start Symbol '${startSymbol}'.`);
 

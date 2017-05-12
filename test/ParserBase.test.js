@@ -1,12 +1,17 @@
 'use strict';
 /*jshint -W030 */
 var define, describe, it;
-define(['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions'], function(chai, module_ParserBase, module_main_functions) {
+define(
+	['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions', 'app/_ext'],
+	function(chai, module_ParserBase, module_main_functions, module__ext)
+{
+
 	let expect = chai.expect;
 	// let should = chai.should();
 	let assert = chai.assert;
 
 	let ParserBase = module_ParserBase.default;
+	let _ext = module__ext.default;
 	let result = {};
 
 	describe('module ParserBase', function() {
@@ -46,8 +51,8 @@ add_op -> -
 				let rawGrammar = module_main_functions.processGrammarInput($inputGrammarText);
 				expect(
 					result.grammar = ParserBase.buildGrammar(
-						rawGrammar.terminals.toArray(),
-						rawGrammar.nonTerminals.toArray(),
+						Array.from(rawGrammar.terminals),
+						Array.from(rawGrammar.nonTerminals),
 						rawGrammar.startSymbol,
 						rawGrammar.productions
 					)
@@ -64,7 +69,7 @@ add_op -> -
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
-				assert(result.unreachableSymbols.equals([]));
+				assert(_ext.equals(result.unreachableSymbols, []));
 			});
 			it('should check Unreducible symbols', function() {
 				expect(
@@ -72,7 +77,7 @@ add_op -> -
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
-				assert(result.unreducibleSymbols.equals([]));
+				assert(_ext.equals(result.unreducibleSymbols, []));
 			});
 		});
 		describe('functionality', function() {
@@ -88,7 +93,7 @@ add_op -> -
 					"expr_tail",
 					"primary_tail",
 				].map(e => result.vocabularyNameMap.get(e)));
-				assert(result.nullableSymbols.equals(expected));
+				assert(_ext.equals(result.nullableSymbols, expected));
 			});
 			it('should build FirstSet(1) Table', function() {
 				expect(
@@ -117,7 +122,7 @@ add_op -> -
 						new Set(v.map(e => result.vocabularyNameMap.get(e)))
 					])
 				);
-				assert(result.firstSetTable.equals(expected));
+				assert(_ext.equals(result.firstSetTable, expected));
 			});
 			it('should build FollowSet(1) Table', function() {
 				expect(
@@ -145,7 +150,7 @@ add_op -> -
 						new Set(v.map(e => result.vocabularyNameMap.get(e)))
 					])
 				);
-				assert(result.followSetTable.equals(expected));
+				assert(_ext.equals(result.followSetTable, expected));
 			});
 			it('should build PredictSet(1) Table', function() {
 				expect(
@@ -182,7 +187,7 @@ add_op -> -
 						new Set(tSetRaw.map(t => result.vocabularyNameMap.get(t)))
 					])
 				);
-				assert(result.predictSetTable.equals(expected));
+				assert(_ext.equals(result.predictSetTable, expected));
 			});
 			it('should build LL(1) Predict Table', function() {
 				expect(
@@ -261,7 +266,7 @@ add_op -> -
 						)
 					])
 				);
-				assert(result.ll1PredictTable.equals(expected));
+				assert(_ext.equals(result.ll1PredictTable, expected));
 			});
 			it('should build LR(0) FSM', function() {
 				expect(
@@ -611,7 +616,7 @@ add_op -> -
 						]))
 					])
 				);
-				assert(result.lr1GotoActionTable.equals(expected));
+				assert(_ext.equals(result.lr1GotoActionTable, expected));
 
 				function makeLR1GotoAction(actionRaw) {
 					let group;

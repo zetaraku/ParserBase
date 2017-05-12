@@ -43,7 +43,7 @@ export function processGrammarInput(inputText) {
 	for(let nt of nonTerminals) {
 		terminals.delete(nt);
 	}
-	if(productions.first() === undefined)
+	if(productions[0] === undefined)
 		throw new Error("No production.");
 	startSymbol = startSymbol || productions[0][0];
 	if(!nonTerminals.has(startSymbol))

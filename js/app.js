@@ -12,6 +12,4 @@ requirejs.config({
 });
 
 // Load the main app module to start the app
-requirejs(["app/helpers"], function() {
-	requirejs(["app/main"]);
-});
+requirejs(["app/main"]);

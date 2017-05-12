@@ -1,5 +1,6 @@
 'use strict';
 
+import _ext from 'app/_ext';
 import Viz from 'viz';
 
 export class GSymbol {
@@ -55,15 +56,15 @@ export class Production {
 	}
 	toString() {
 		return (this.lhs + ' ' + Production.ARROW + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA));
+			(this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA));
 	}
 	toStringReversed() {
 		return (this.lhs + ' ' + Production.ARROW_R + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA));
+			(this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA));
 	}
 	toRawString() {
 		return (this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' +
-			(this.rhs.isNotEmpty() ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString()));
+			(this.rhs.length !== 0 ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString()));
 	}
 } {
 	Production.serialNo = 0;
@@ -90,7 +91,7 @@ export class Grammar {
 		this.nonTerminals = nonTerminals;
 		this.startSymbol = startSymbol;
 		this.productions = productions;
-		this.productionsMap = productions.groupBy(e => e.lhs);
+		this.productionsMap = _ext.groupBy(productions, e => e.lhs);
 		this.augmentingProduction = productions[0];
 	}
 	buildVocabularyNameMap() {
@@ -161,7 +162,7 @@ export class LR0FSM {
 			this.transitionMap.set(symbol, toState);
 		}
 		subContentReprensentation() {
-			return this.configurationSet.toArray()
+			return Array.from(this.configurationSet)
 				.map(function(conf) {
 					return conf.toRawString() + '\\l';
 				}).join('');
@@ -186,10 +187,10 @@ export class LR1FSM {
 			this.transitionMap.set(symbol, toState);
 		}
 		subContentReprensentation() {
-			return Array.from(this.configurationSet.groupBy(e => e.baseLR0Configuration).entries())
+			return Array.from(_ext.groupBy(this.configurationSet, e => e.baseLR0Configuration).entries())
 				.map(function([lr0conf, lr1confs]) {
 					return lr0conf.toRawString() + ' ' + '{' +
-						lr1confs.toArray().map(e => e.lookahead.toRawString()).join(' ') +
+						Array.from(lr1confs).map(e => e.lookahead.toRawString()).join(' ') +
 					'}' + '\\l';
 				}).join('');
 		}
@@ -207,9 +208,9 @@ export class LL1Parse {
 		[this.currentRHS, this.currentRHSIndex] = [[rootNode], 0];
 		const self = this;
 		this.step = (function*() {
-			while(parseStack.isNotEmpty() && inputTokens.isNotEmpty()) {
-				let topSymbol = parseStack.last();
-				let nextInput = inputTokens.first();
+			while(parseStack.length !== 0 && inputTokens.length !== 0) {
+				let topSymbol = parseStack.slice(-1)[0];
+				let nextInput = inputTokens[0];
 				let currentNode = self.currentRHS[self.currentRHSIndex];
 				if(topSymbol instanceof NonTerminal) {
 					let predictedProds = ll1PredictTable.get(topSymbol).get(nextInput.terminalType);
@@ -220,7 +221,7 @@ export class LL1Parse {
 						return new Error(`Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (conflict)`);
 					}
 
-					let usingProd = predictedProds.first();
+					let usingProd = predictedProds[0];
 
 					// parse stack
 					parseStack.pop();
@@ -258,7 +259,7 @@ export class LL1Parse {
 				}
 			}
 			function checkEOP() {
-				while(self.currentRHSIndex >= self.currentRHS.length && rhsStack.isNotEmpty()) {
+				while(self.currentRHSIndex >= self.currentRHS.length && rhsStack.length !== 0) {
 					[self.currentRHS, self.currentRHSIndex] = rhsStack.pop();
 					self.currentRHSIndex++;
 				}
@@ -314,9 +315,9 @@ export class LR1Parse {
 		const stateStack = this.stateStack = [lr1FSM.startState];
 		inputTokens.push({terminalType: GSymbol.EOI});
 		this.step = (function*() {
-			while(inputTokens.isNotEmpty()) {
-				let currentState = stateStack.last();
-				let nextInput = inputTokens.first();
+			while(inputTokens.length !== 0) {
+				let currentState = stateStack.slice(-1)[0];
+				let nextInput = inputTokens[0];
 				let selectedActions = lr1GotoActionTable.get(currentState).get(nextInput.terminalType);
 
 				if(selectedActions === undefined) {
@@ -325,7 +326,7 @@ export class LR1Parse {
 					return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`);
 				}
 
-				let action = selectedActions.first();
+				let action = selectedActions[0];
 				if(action instanceof LR1Parse.Action.Shift) {
 
 					/* shift */
@@ -351,10 +352,10 @@ export class LR1Parse {
 							stateStack.pop();
 							reducedNode.childNodes.unshift(parseForest.pop());
 						}
-						currentState = stateStack.last();
+						currentState = stateStack.slice(-1)[0];
 
 						let nonterminalShiftAction =
-							lr1GotoActionTable.get(currentState).get(action.reducingProduction.lhs).first();
+							lr1GotoActionTable.get(currentState).get(action.reducingProduction.lhs)[0];
 
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
@@ -385,7 +386,7 @@ export class LR1Parse {
 							stateStack.pop();
 							reducedNode.childNodes.unshift(parseForest.pop());
 						}
-						currentState = stateStack.last();
+						currentState = stateStack.slice(-1)[0];
 
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
@@ -426,9 +427,9 @@ export class LR1Parse {
 				super();
 				this.nextState = nextState;
 			}
-			equals(that) {
+			[_ext.overrides.equals](that) {
 				return that instanceof LR1Parse.Action.Shift
-					&& this.nextState.equals(that.nextState);
+					&& _ext.equals(this.nextState, that.nextState);
 			}
 			toString() {
 				return 'S' + Production.ARROW + this.nextState.id;
@@ -438,9 +439,9 @@ export class LR1Parse {
 			constructor(nextState) {
 				super(nextState);
 			}
-			equals(that) {
+			[_ext.overrides.equals](that) {
 				return that instanceof LR1Parse.Action.PseudoShift
-					&& this.nextState.equals(that.nextState);
+					&& _ext.equals(this.nextState, that.nextState);
 			}
 			toString() {
 				return Production.ARROW + this.nextState.id;
@@ -451,9 +452,9 @@ export class LR1Parse {
 				super();
 				this.reducingProduction = reducingProduction;
 			}
-			equals(that) {
+			[_ext.overrides.equals](that) {
 				return that instanceof LR1Parse.Action.Reduce
-					&& this.reducingProduction.equals(that.reducingProduction);
+					&& _ext.equals(this.reducingProduction, that.reducingProduction);
 			}
 			toString() {
 				return 'R(' + this.reducingProduction.id + ')';
@@ -464,9 +465,9 @@ export class LR1Parse {
 				super();
 				this.reducingProduction = reducingProduction;
 			}
-			equals(that) {
+			[_ext.overrides.equals](that) {
 				return that instanceof LR1Parse.Action.Accept
-					&& this.reducingProduction.equals(that.reducingProduction);
+					&& _ext.equals(this.reducingProduction, that.reducingProduction);
 			}
 			toString() {
 				return 'A';
@@ -539,7 +540,7 @@ export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, r
 export function computeUnreachableSymbols(grammar) {
 	let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
 	let processingQueue = [GSymbol.SYSTEM_GOAL];
-	while(processingQueue.isNotEmpty()) {
+	while(processingQueue.length !== 0) {
 		let processingNT = processingQueue.shift();
 		for(let production of grammar.productionsMap.get(processingNT)) {
 			for(let v of production.rhs) {
@@ -564,7 +565,7 @@ export function computeUnreducibleSymbols(grammar) {
 	let reducibleVocabularies = new Set(grammar.terminals);
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
-	while(processingMap.isNotEmpty() && needUpdate) {
+	while(processingMap.size !== 0 && needUpdate) {
 		needUpdate = false;
 		for(let nt of processingMap.keys()) {
 			let processingProdutions = processingMap.get(nt);
@@ -599,7 +600,7 @@ export function computeNullableSymbols(grammar) {
 	let nullableSymbols = new Set();
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
-	while(processingMap.isNotEmpty() && needUpdate) {
+	while(processingMap.size !== 0 && needUpdate) {
 		needUpdate = false;
 		for(let key of processingMap.keys()) {
 			let processingProdutions = processingMap.get(key);
@@ -633,7 +634,7 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 
 	// iteratively adding FirstSet
 	let lastUpdatedVocabularies = new Set(grammar.terminals);
-	while(lastUpdatedVocabularies.isNotEmpty()) {
+	while(lastUpdatedVocabularies.size !== 0) {
 		let newUpdatedVocabularies = new Set();
 		for(let production of grammar.productions) {
 			let lhs = production.lhs, rhs = production.rhs;
@@ -642,8 +643,8 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 			for(let rhsi of rhs) {
 				if(lastUpdatedVocabularies.has(rhsi)) {
 					let firstSetOfRHSI = firstSetTable.get(rhsi);
-					let added = firstSetOfLHS.addAll(firstSetOfRHSI);
-					lhsUpdated = lhsUpdated || added.isNotEmpty();
+					let added = _ext.addAll(firstSetOfLHS, firstSetOfRHSI);
+					lhsUpdated = lhsUpdated || added.size !== 0;
 				}
 				if(!nullableSymbols.has(rhsi))
 					break;
@@ -695,7 +696,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 
 	// state 2: iteratively adding FollowSet
 	let lastUpdatedVocabularies = new Set(grammar.nonTerminals);
-	while(lastUpdatedVocabularies.isNotEmpty()) {
+	while(lastUpdatedVocabularies.size !== 0) {
 		let newUpdatedVocabularies = new Set();
 		for(let [nt, lhnts] of seeThroughTable) {
 			let followSetOfNT = followSetTable.get(nt);
@@ -703,8 +704,8 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 			for(let lhnt of lhnts) {
 				if(lastUpdatedVocabularies.has(lhnt)) {
 					let followSetOfLHNT = followSetTable.get(lhnt);
-					let added = followSetOfNT.addAll(followSetOfLHNT);
-					ntUpdated = ntUpdated || added.isNotEmpty();
+					let added = _ext.addAll(followSetOfNT, followSetOfLHNT);
+					ntUpdated = ntUpdated || added.size !== 0;
 				}
 			}
 			if(ntUpdated)
@@ -770,20 +771,20 @@ export function buildLR0FSM(grammar) {
 	let lr0FSM = new LR0FSM(state0);
 
 	let processingQueue = [state0];
-	while(processingQueue.isNotEmpty()) {
+	while(processingQueue.length !== 0) {
 		let processingState = processingQueue.shift();
-		let nextSymbolGroups = processingState.configurationSet.groupBy(e => e.getNextSymbol());
+		let nextSymbolGroups = _ext.groupBy(processingState.configurationSet, e => e.getNextSymbol());
 		for(let [symbol, lr0ConfSet] of nextSymbolGroups) {
 			if(symbol === null)
 				continue;
 			let newLR0ConfSet = closure0Of(
-				new Set(lr0ConfSet.toArray().map(function(lr0conf) {
+				new Set(Array.from(lr0ConfSet).map(function(lr0conf) {
 					return getLR0Configuration(lr0conf.production, lr0conf.dotPos + 1);
 				}))
 			);
 			let existedState = null;
 			for(let state of lr0FSM.states) {
-				if(state.configurationSet.equals(newLR0ConfSet)) {
+				if(_ext.equals(state.configurationSet, newLR0ConfSet)) {
 					existedState = state;
 					break;
 				}
@@ -818,8 +819,8 @@ export function buildLR0FSM(grammar) {
 	function closure0Of(lr0ConfSet) {
 		let newLR0ConfSet = new Set(lr0ConfSet);
 
-		let processingQueue = lr0ConfSet.toArray();
-		while(processingQueue.isNotEmpty()) {
+		let processingQueue = Array.from(lr0ConfSet);
+		while(processingQueue.length !== 0) {
 			let lr0conf = processingQueue.shift();
 
 			let expandingNonterminal = lr0conf.getNextSymbol();
@@ -852,15 +853,17 @@ export function buildLR1FSM(grammar, firstSetTable) {
 	let lr1FSM = new LR1FSM(state0);
 
 	let processingQueue = [state0];
-	while(processingQueue.isNotEmpty()) {
+	while(processingQueue.length !== 0) {
 		let processingState = processingQueue.shift();
-		let nextSymbolGroups = processingState.configurationSet
-			.groupBy(e => e.baseLR0Configuration.getNextSymbol());
+		let nextSymbolGroups = _ext.groupBy(
+			processingState.configurationSet,
+			e => e.baseLR0Configuration.getNextSymbol()
+		);
 		for(let [symbol, lr1ConfSet] of nextSymbolGroups) {
 			if(symbol === null)
 				continue;
 			let newLR1ConfSet = closure1Of(
-				new Set(lr1ConfSet.toArray().map(function(lr1conf) {
+				new Set(Array.from(lr1ConfSet).map(function(lr1conf) {
 					return getLR1Configuration(
 						lr1conf.baseLR0Configuration.production,
 						lr1conf.baseLR0Configuration.dotPos + 1,
@@ -870,7 +873,7 @@ export function buildLR1FSM(grammar, firstSetTable) {
 			);
 			let existedState = null;
 			for(let state of lr1FSM.states) {
-				if(state.configurationSet.equals(newLR1ConfSet)) {
+				if(_ext.equals(state.configurationSet, newLR1ConfSet)) {
 					existedState = state;
 					break;
 				}
@@ -923,8 +926,8 @@ export function buildLR1FSM(grammar, firstSetTable) {
 	function closure1Of(lr1ConfSet) {
 		let newLR1ConfSet = new Set(lr1ConfSet);
 
-		let processingQueue = lr1ConfSet.toArray();
-		while(processingQueue.isNotEmpty()) {
+		let processingQueue = Array.from(lr1ConfSet);
+		while(processingQueue.length !== 0) {
 			let lr1conf = processingQueue.shift();
 			let lr0conf = lr1conf.baseLR0Configuration;
 
@@ -966,8 +969,8 @@ export function buildLR1FSM(grammar, firstSetTable) {
 export function buildLR1GotoActionTable(grammar, lr1fsm) {
 	let lr1GotoActionTable = new Map();
 	let globalActionMap = {
-		shift: new Map(lr1fsm.states.toArray().map((s) => [s, new LR1Parse.Action.Shift(s)])),
-		pshift: new Map(lr1fsm.states.toArray().map((s) => [s, new LR1Parse.Action.PseudoShift(s)])),
+		shift: new Map(Array.from(lr1fsm.states).map((s) => [s, new LR1Parse.Action.Shift(s)])),
+		pshift: new Map(Array.from(lr1fsm.states).map((s) => [s, new LR1Parse.Action.PseudoShift(s)])),
 		reduce: new Map(grammar.productions.map((p) => [p, new LR1Parse.Action.Reduce(p)])),
 		accept: new LR1Parse.Action.Accept(grammar.augmentingProduction)
 	};
@@ -988,9 +991,11 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 		}
 		// reduce
 		for(let [lookahead, confs] of
-			Array.from(state.configurationSet.values())
-				.filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null)
-				.groupBy(lr1conf => lr1conf.lookahead)
+			_ext.groupBy(
+				Array.from(state.configurationSet.values())
+					.filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null),
+				lr1conf => lr1conf.lookahead
+			)
 		) {
 			for(let lr1conf of confs) {
 				if(lookahead === GSymbol.LAMBDA)

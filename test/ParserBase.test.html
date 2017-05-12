@@ -20,7 +20,7 @@
 					}
 				}
 			});
-			requirejs(['node_modules/mocha/mocha',"app/helpers"], function() {
+			requirejs(['node_modules/mocha/mocha'], function() {
 				mocha.setup('bdd');
 				requirejs(['test/ParserBase.test'], function() {
 					mocha.run();

@@ -1,4 +1,4 @@
-define(['exports', 'viz'], function (exports, _viz) {
+define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -18,6 +18,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 	exports.buildLR1GotoActionTable = buildLR1GotoActionTable;
 	exports.generateDotImageOfCFSM = generateDotImageOfCFSM;
 	exports.generateDotImageOfParseTrees = generateDotImageOfParseTrees;
+
+	var _ext3 = _interopRequireDefault(_ext2);
 
 	var _viz2 = _interopRequireDefault(_viz);
 
@@ -83,13 +85,13 @@ define(['exports', 'viz'], function (exports, _viz) {
 			this.rhs = rhs;
 		}
 		toString() {
-			return this.lhs + ' ' + Production.ARROW + ' ' + (this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA);
+			return this.lhs + ' ' + Production.ARROW + ' ' + (this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA);
 		}
 		toStringReversed() {
-			return this.lhs + ' ' + Production.ARROW_R + ' ' + (this.rhs.isNotEmpty() ? this.rhs.join(' ') : GSymbol.LAMBDA);
+			return this.lhs + ' ' + Production.ARROW_R + ' ' + (this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA);
 		}
 		toRawString() {
-			return this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + (this.rhs.isNotEmpty() ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString());
+			return this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + (this.rhs.length !== 0 ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString());
 		}
 	}exports.Production = Production;
 	{
@@ -117,7 +119,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 			this.nonTerminals = nonTerminals;
 			this.startSymbol = startSymbol;
 			this.productions = productions;
-			this.productionsMap = productions.groupBy(e => e.lhs);
+			this.productionsMap = _ext3.default.groupBy(productions, e => e.lhs);
 			this.augmentingProduction = productions[0];
 		}
 		buildVocabularyNameMap() {
@@ -184,7 +186,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 				this.transitionMap.set(symbol, toState);
 			}
 			subContentReprensentation() {
-				return this.configurationSet.toArray().map(function (conf) {
+				return Array.from(this.configurationSet).map(function (conf) {
 					return conf.toRawString() + '\\l';
 				}).join('');
 			}
@@ -209,8 +211,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 				this.transitionMap.set(symbol, toState);
 			}
 			subContentReprensentation() {
-				return Array.from(this.configurationSet.groupBy(e => e.baseLR0Configuration).entries()).map(function ([lr0conf, lr1confs]) {
-					return lr0conf.toRawString() + ' ' + '{' + lr1confs.toArray().map(e => e.lookahead.toRawString()).join(' ') + '}' + '\\l';
+				return Array.from(_ext3.default.groupBy(this.configurationSet, e => e.baseLR0Configuration).entries()).map(function ([lr0conf, lr1confs]) {
+					return lr0conf.toRawString() + ' ' + '{' + Array.from(lr1confs).map(e => e.lookahead.toRawString()).join(' ') + '}' + '\\l';
 				}).join('');
 			}
 		};{
@@ -227,9 +229,9 @@ define(['exports', 'viz'], function (exports, _viz) {
 			[this.currentRHS, this.currentRHSIndex] = [[rootNode], 0];
 			const self = this;
 			this.step = function* () {
-				while (parseStack.isNotEmpty() && inputTokens.isNotEmpty()) {
-					let topSymbol = parseStack.last();
-					let nextInput = inputTokens.first();
+				while (parseStack.length !== 0 && inputTokens.length !== 0) {
+					let topSymbol = parseStack.slice(-1)[0];
+					let nextInput = inputTokens[0];
 					let currentNode = self.currentRHS[self.currentRHSIndex];
 					if (topSymbol instanceof NonTerminal) {
 						let predictedProds = ll1PredictTable.get(topSymbol).get(nextInput.terminalType);
@@ -240,7 +242,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 							return new Error(`Unable to predict ${topSymbol} with lookahead ${nextInput.terminalType} (conflict)`);
 						}
 
-						let usingProd = predictedProds.first();
+						let usingProd = predictedProds[0];
 
 						// parse stack
 						parseStack.pop();
@@ -278,7 +280,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 					}
 				}
 				function checkEOP() {
-					while (self.currentRHSIndex >= self.currentRHS.length && rhsStack.isNotEmpty()) {
+					while (self.currentRHSIndex >= self.currentRHS.length && rhsStack.length !== 0) {
 						[self.currentRHS, self.currentRHSIndex] = rhsStack.pop();
 						self.currentRHSIndex++;
 					}
@@ -333,9 +335,9 @@ define(['exports', 'viz'], function (exports, _viz) {
 			const stateStack = this.stateStack = [lr1FSM.startState];
 			inputTokens.push({ terminalType: GSymbol.EOI });
 			this.step = function* () {
-				while (inputTokens.isNotEmpty()) {
-					let currentState = stateStack.last();
-					let nextInput = inputTokens.first();
+				while (inputTokens.length !== 0) {
+					let currentState = stateStack.slice(-1)[0];
+					let nextInput = inputTokens[0];
 					let selectedActions = lr1GotoActionTable.get(currentState).get(nextInput.terminalType);
 
 					if (selectedActions === undefined) {
@@ -344,7 +346,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 						return new Error(`Unable to decide next action with lookahead ${nextInput.terminalType} (conflict)`);
 					}
 
-					let action = selectedActions.first();
+					let action = selectedActions[0];
 					if (action instanceof LR1Parse.Action.Shift) {
 
 						/* shift */
@@ -370,9 +372,9 @@ define(['exports', 'viz'], function (exports, _viz) {
 							stateStack.pop();
 							reducedNode.childNodes.unshift(parseForest.pop());
 						}
-						currentState = stateStack.last();
+						currentState = stateStack.slice(-1)[0];
 
-						let nonterminalShiftAction = lr1GotoActionTable.get(currentState).get(action.reducingProduction.lhs).first();
+						let nonterminalShiftAction = lr1GotoActionTable.get(currentState).get(action.reducingProduction.lhs)[0];
 
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
@@ -403,7 +405,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 							stateStack.pop();
 							reducedNode.childNodes.unshift(parseForest.pop());
 						}
-						currentState = stateStack.last();
+						currentState = stateStack.slice(-1)[0];
 
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
@@ -443,8 +445,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 					super();
 					this.nextState = nextState;
 				}
-				equals(that) {
-					return that instanceof LR1Parse.Action.Shift && this.nextState.equals(that.nextState);
+				[_ext3.default.overrides.equals](that) {
+					return that instanceof LR1Parse.Action.Shift && _ext3.default.equals(this.nextState, that.nextState);
 				}
 				toString() {
 					return 'S' + Production.ARROW + this.nextState.id;
@@ -454,8 +456,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 				constructor(nextState) {
 					super(nextState);
 				}
-				equals(that) {
-					return that instanceof LR1Parse.Action.PseudoShift && this.nextState.equals(that.nextState);
+				[_ext3.default.overrides.equals](that) {
+					return that instanceof LR1Parse.Action.PseudoShift && _ext3.default.equals(this.nextState, that.nextState);
 				}
 				toString() {
 					return Production.ARROW + this.nextState.id;
@@ -466,8 +468,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 					super();
 					this.reducingProduction = reducingProduction;
 				}
-				equals(that) {
-					return that instanceof LR1Parse.Action.Reduce && this.reducingProduction.equals(that.reducingProduction);
+				[_ext3.default.overrides.equals](that) {
+					return that instanceof LR1Parse.Action.Reduce && _ext3.default.equals(this.reducingProduction, that.reducingProduction);
 				}
 				toString() {
 					return 'R(' + this.reducingProduction.id + ')';
@@ -478,8 +480,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 					super();
 					this.reducingProduction = reducingProduction;
 				}
-				equals(that) {
-					return that instanceof LR1Parse.Action.Accept && this.reducingProduction.equals(that.reducingProduction);
+				[_ext3.default.overrides.equals](that) {
+					return that instanceof LR1Parse.Action.Accept && _ext3.default.equals(this.reducingProduction, that.reducingProduction);
 				}
 				toString() {
 					return 'A';
@@ -548,7 +550,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 	function computeUnreachableSymbols(grammar) {
 		let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
 		let processingQueue = [GSymbol.SYSTEM_GOAL];
-		while (processingQueue.isNotEmpty()) {
+		while (processingQueue.length !== 0) {
 			let processingNT = processingQueue.shift();
 			for (let production of grammar.productionsMap.get(processingNT)) {
 				for (let v of production.rhs) {
@@ -571,7 +573,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		let reducibleVocabularies = new Set(grammar.terminals);
 		let processingMap = new Map(grammar.productionsMap);
 		let needUpdate = true;
-		while (processingMap.isNotEmpty() && needUpdate) {
+		while (processingMap.size !== 0 && needUpdate) {
 			needUpdate = false;
 			for (let nt of processingMap.keys()) {
 				let processingProdutions = processingMap.get(nt);
@@ -607,7 +609,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 		let nullableSymbols = new Set();
 		let processingMap = new Map(grammar.productionsMap);
 		let needUpdate = true;
-		while (processingMap.isNotEmpty() && needUpdate) {
+		while (processingMap.size !== 0 && needUpdate) {
 			needUpdate = false;
 			for (let key of processingMap.keys()) {
 				let processingProdutions = processingMap.get(key);
@@ -640,7 +642,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 
 		// iteratively adding FirstSet
 		let lastUpdatedVocabularies = new Set(grammar.terminals);
-		while (lastUpdatedVocabularies.isNotEmpty()) {
+		while (lastUpdatedVocabularies.size !== 0) {
 			let newUpdatedVocabularies = new Set();
 			for (let production of grammar.productions) {
 				let lhs = production.lhs,
@@ -650,8 +652,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 				for (let rhsi of rhs) {
 					if (lastUpdatedVocabularies.has(rhsi)) {
 						let firstSetOfRHSI = firstSetTable.get(rhsi);
-						let added = firstSetOfLHS.addAll(firstSetOfRHSI);
-						lhsUpdated = lhsUpdated || added.isNotEmpty();
+						let added = _ext3.default.addAll(firstSetOfLHS, firstSetOfRHSI);
+						lhsUpdated = lhsUpdated || added.size !== 0;
 					}
 					if (!nullableSymbols.has(rhsi)) break;
 				}
@@ -700,7 +702,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 
 		// state 2: iteratively adding FollowSet
 		let lastUpdatedVocabularies = new Set(grammar.nonTerminals);
-		while (lastUpdatedVocabularies.isNotEmpty()) {
+		while (lastUpdatedVocabularies.size !== 0) {
 			let newUpdatedVocabularies = new Set();
 			for (let [nt, lhnts] of seeThroughTable) {
 				let followSetOfNT = followSetTable.get(nt);
@@ -708,8 +710,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 				for (let lhnt of lhnts) {
 					if (lastUpdatedVocabularies.has(lhnt)) {
 						let followSetOfLHNT = followSetTable.get(lhnt);
-						let added = followSetOfNT.addAll(followSetOfLHNT);
-						ntUpdated = ntUpdated || added.isNotEmpty();
+						let added = _ext3.default.addAll(followSetOfNT, followSetOfLHNT);
+						ntUpdated = ntUpdated || added.size !== 0;
 					}
 				}
 				if (ntUpdated) newUpdatedVocabularies.add(nt);
@@ -768,17 +770,17 @@ define(['exports', 'viz'], function (exports, _viz) {
 		let lr0FSM = new LR0FSM(state0);
 
 		let processingQueue = [state0];
-		while (processingQueue.isNotEmpty()) {
+		while (processingQueue.length !== 0) {
 			let processingState = processingQueue.shift();
-			let nextSymbolGroups = processingState.configurationSet.groupBy(e => e.getNextSymbol());
+			let nextSymbolGroups = _ext3.default.groupBy(processingState.configurationSet, e => e.getNextSymbol());
 			for (let [symbol, lr0ConfSet] of nextSymbolGroups) {
 				if (symbol === null) continue;
-				let newLR0ConfSet = closure0Of(new Set(lr0ConfSet.toArray().map(function (lr0conf) {
+				let newLR0ConfSet = closure0Of(new Set(Array.from(lr0ConfSet).map(function (lr0conf) {
 					return getLR0Configuration(lr0conf.production, lr0conf.dotPos + 1);
 				})));
 				let existedState = null;
 				for (let state of lr0FSM.states) {
-					if (state.configurationSet.equals(newLR0ConfSet)) {
+					if (_ext3.default.equals(state.configurationSet, newLR0ConfSet)) {
 						existedState = state;
 						break;
 					}
@@ -812,8 +814,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 		function closure0Of(lr0ConfSet) {
 			let newLR0ConfSet = new Set(lr0ConfSet);
 
-			let processingQueue = lr0ConfSet.toArray();
-			while (processingQueue.isNotEmpty()) {
+			let processingQueue = Array.from(lr0ConfSet);
+			while (processingQueue.length !== 0) {
 				let lr0conf = processingQueue.shift();
 
 				let expandingNonterminal = lr0conf.getNextSymbol();
@@ -841,17 +843,17 @@ define(['exports', 'viz'], function (exports, _viz) {
 		let lr1FSM = new LR1FSM(state0);
 
 		let processingQueue = [state0];
-		while (processingQueue.isNotEmpty()) {
+		while (processingQueue.length !== 0) {
 			let processingState = processingQueue.shift();
-			let nextSymbolGroups = processingState.configurationSet.groupBy(e => e.baseLR0Configuration.getNextSymbol());
+			let nextSymbolGroups = _ext3.default.groupBy(processingState.configurationSet, e => e.baseLR0Configuration.getNextSymbol());
 			for (let [symbol, lr1ConfSet] of nextSymbolGroups) {
 				if (symbol === null) continue;
-				let newLR1ConfSet = closure1Of(new Set(lr1ConfSet.toArray().map(function (lr1conf) {
+				let newLR1ConfSet = closure1Of(new Set(Array.from(lr1ConfSet).map(function (lr1conf) {
 					return getLR1Configuration(lr1conf.baseLR0Configuration.production, lr1conf.baseLR0Configuration.dotPos + 1, lr1conf.lookahead);
 				})));
 				let existedState = null;
 				for (let state of lr1FSM.states) {
-					if (state.configurationSet.equals(newLR1ConfSet)) {
+					if (_ext3.default.equals(state.configurationSet, newLR1ConfSet)) {
 						existedState = state;
 						break;
 					}
@@ -901,8 +903,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 		function closure1Of(lr1ConfSet) {
 			let newLR1ConfSet = new Set(lr1ConfSet);
 
-			let processingQueue = lr1ConfSet.toArray();
-			while (processingQueue.isNotEmpty()) {
+			let processingQueue = Array.from(lr1ConfSet);
+			while (processingQueue.length !== 0) {
 				let lr1conf = processingQueue.shift();
 				let lr0conf = lr1conf.baseLR0Configuration;
 
@@ -942,8 +944,8 @@ define(['exports', 'viz'], function (exports, _viz) {
 	function buildLR1GotoActionTable(grammar, lr1fsm) {
 		let lr1GotoActionTable = new Map();
 		let globalActionMap = {
-			shift: new Map(lr1fsm.states.toArray().map(s => [s, new LR1Parse.Action.Shift(s)])),
-			pshift: new Map(lr1fsm.states.toArray().map(s => [s, new LR1Parse.Action.PseudoShift(s)])),
+			shift: new Map(Array.from(lr1fsm.states).map(s => [s, new LR1Parse.Action.Shift(s)])),
+			pshift: new Map(Array.from(lr1fsm.states).map(s => [s, new LR1Parse.Action.PseudoShift(s)])),
 			reduce: new Map(grammar.productions.map(p => [p, new LR1Parse.Action.Reduce(p)])),
 			accept: new LR1Parse.Action.Accept(grammar.augmentingProduction)
 		};
@@ -955,7 +957,7 @@ define(['exports', 'viz'], function (exports, _viz) {
 				if (symbol === GSymbol.EOI) gotoActionsMap.get(symbol).push(globalActionMap.accept);else if (symbol instanceof Terminal) gotoActionsMap.get(symbol).push(globalActionMap.shift.get(nextState));else if (symbol instanceof NonTerminal) gotoActionsMap.get(symbol).push(globalActionMap.pshift.get(nextState));else throw new Error('something went wrong in transitionMap of state.');
 			}
 			// reduce
-			for (let [lookahead, confs] of Array.from(state.configurationSet.values()).filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null).groupBy(lr1conf => lr1conf.lookahead)) {
+			for (let [lookahead, confs] of _ext3.default.groupBy(Array.from(state.configurationSet.values()).filter(lr1conf => lr1conf.baseLR0Configuration.getNextSymbol() === null), lr1conf => lr1conf.lookahead)) {
 				for (let lr1conf of confs) {
 					if (lookahead === GSymbol.LAMBDA) continue;
 					if (!gotoActionsMap.has(lookahead)) gotoActionsMap.set(lookahead, []);
