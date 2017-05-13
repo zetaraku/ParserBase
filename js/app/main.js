@@ -73,12 +73,12 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			// set display of parser components
 			_ParserBase2.default.GSymbol.prototype.toString = function () {
 				let classArr = ['gsymbol'];
-				if (this === _ParserBase2.default.GSymbol.UNKNOWN) classArr.push('unknown');
 				if (this === _ParserBase2.default.GSymbol.LAMBDA) classArr.push('lambda');
 				return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
 			};
 			_ParserBase2.default.Terminal.prototype.toString = function () {
 				let classArr = ['gsymbol', 'terminal'];
+				if (this === _ParserBase2.default.GSymbol.UNKNOWN) classArr.push('unknown');
 				if (this === _ParserBase2.default.GSymbol.EOI) classArr.push('end-symbol');
 				return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';
 			};

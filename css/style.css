@@ -17,8 +17,15 @@ code {
 
 span.gsymbol {
   font-weight: bold; }
+  span.gsymbol.lambda {
+    color: gray;
+    font-style: italic; }
   span.gsymbol.terminal.end-symbol {
     color: red; }
+  span.gsymbol.terminal.unknown {
+    font-weight: normal;
+    font-style: italic;
+    color: gray; }
   span.gsymbol.non-terminal {
     color: blue; }
     span.gsymbol.non-terminal.augmenting-symbol {
@@ -27,10 +34,6 @@ span.gsymbol {
       color: skyblue; }
     span.gsymbol.non-terminal.nullable {
       font-style: italic; }
-  span.gsymbol.unknown {
-    font-weight: normal;
-    font-style: italic;
-    color: gray; }
 
 span.comma {
   color: gray;

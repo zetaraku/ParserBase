@@ -20,9 +20,18 @@ code {
 span {
 	&.gsymbol {
 		font-weight: bold;
+		&.lambda {
+			color: gray;
+			font-style: italic;
+		}
 		&.terminal {
 			&.end-symbol {
 				color: red;
+			}
+			&.unknown {
+				font-weight: normal;
+				font-style: italic;
+				color: gray;
 			}
 		}
 		&.non-terminal {
@@ -36,11 +45,6 @@ span {
 			&.nullable {
 				font-style: italic;
 			}
-		}
-		&.unknown {
-			font-weight: normal;
-			font-style: italic;
-			color: gray;
 		}
 	}
 	&.comma {

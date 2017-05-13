@@ -31,8 +31,9 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 
 	class GSymbol {
 		// Do NOT use 'Symbol', that will confilct with 'Symbol' type in ES6
-		constructor(name) {
-			this.name = this.displayName = name;
+		constructor(name, displayName) {
+			this.name = name;
+			this.displayName = displayName || name;
 		}
 		toString() {
 			return this.displayName;
@@ -42,42 +43,38 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		}
 	}exports.GSymbol = GSymbol;
 	{
-		// the placeholder for unknown terminal type
-		GSymbol.UNKNOWN = new GSymbol(Symbol('unknown'));
-		GSymbol.UNKNOWN.displayName = 'unknown';
 		// the placeholder for lambda (nothing)
-		GSymbol.LAMBDA = new GSymbol(Symbol('λ'));
-		GSymbol.LAMBDA.displayName = 'λ';
+		GSymbol.LAMBDA = new GSymbol(Symbol('λ'), 'λ');
+		// the indicator for current position of Configuration
+		GSymbol.DOT = new GSymbol(Symbol('●'), '●');
 	}
 	class Terminal extends GSymbol {
-		constructor(name) {
-			super(name);
+		constructor(name, displayName) {
+			super(name, displayName);
 		}
 	}exports.Terminal = Terminal;
 	{
 		// the EndOfInput Terminal ($)
-		GSymbol.EOI = new Terminal(Symbol('$'));
-		GSymbol.EOI.displayName = '$';
+		GSymbol.EOI = new Terminal(Symbol('$'), '$');
+		// the placeholder for unknown terminal type
+		GSymbol.UNKNOWN = new Terminal(Symbol('unknown'), 'unknown');
 	}
 	class NonTerminal extends GSymbol {
-		constructor(name) {
-			super(name);
+		constructor(name, displayName) {
+			super(name, displayName);
 		}
 	}exports.NonTerminal = NonTerminal;
 	{
 		// the augmenting NonTerminal
-		GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'));
-		GSymbol.SYSTEM_GOAL.displayName = 'system_goal';
+		GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'), 'system_goal');
 	}
 	class ActionSymbol extends GSymbol {
 		// currently unused
-		constructor(name) {
-			super(name);
+		constructor(name, displayName) {
+			super(name, displayName);
 		}
 	}exports.ActionSymbol = ActionSymbol;
-	{
-		ActionSymbol.serialNo = 1;
-	}
+	{}
 	class Production {
 		constructor(lhs, rhs) {
 			this.id = Production.serialNo++;
@@ -139,25 +136,17 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		}
 		toString() {
 			let r = this.production.rhs.slice();
-			r.splice(this.dotPos, 0, LR0Configuration.DOT);
+			r.splice(this.dotPos, 0, GSymbol.DOT);
 			return this.production.lhs + ' ' + Production.ARROW + ' ' + r.join(' ');
 		}
 		toRawString() {
 			let r = this.production.rhs.slice();
-			r.splice(this.dotPos, 0, LR0Configuration.DOT);
+			r.splice(this.dotPos, 0, GSymbol.DOT);
 			return this.production.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + r.map(e => e.toRawString()).join(' ');
 		}
 	}exports.LR0Configuration = LR0Configuration;
 	{
 		LR0Configuration.serialNo = 1;
-		LR0Configuration.DOT = {
-			toString: function () {
-				return '●';
-			},
-			toRawString: function () {
-				return '●';
-			}
-		};
 	}
 	class LR1Configuration {
 		constructor(baseLR0Configuration, lookahead) {

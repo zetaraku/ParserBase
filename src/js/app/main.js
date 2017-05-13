@@ -65,14 +65,14 @@ $(document).ready(function() {
 		// set display of parser components
 		ParserBase.GSymbol.prototype.toString = function() {
 			let classArr = ['gsymbol'];
-			if(this === ParserBase.GSymbol.UNKNOWN)
-				classArr.push('unknown');
 			if(this === ParserBase.GSymbol.LAMBDA)
 				classArr.push('lambda');
 			return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
 		};
 		ParserBase.Terminal.prototype.toString = function() {
 			let classArr = ['gsymbol','terminal'];
+			if(this === ParserBase.GSymbol.UNKNOWN)
+				classArr.push('unknown');
 			if(this === ParserBase.GSymbol.EOI)
 				classArr.push('end-symbol');
 			return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';

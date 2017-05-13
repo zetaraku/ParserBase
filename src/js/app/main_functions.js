@@ -1,3 +1,5 @@
+'use strict';
+
 import ParserBase from 'app/ParserBase';
 
 export function processGrammarInput(inputText) {
@@ -60,6 +62,6 @@ export function processGrammarInput(inputText) {
 export function processParseInput(inputText, vocabularyNameMap) {
 	return inputText.trim().split(/\s+/).filter(s => s !== '')
 		.map(function(t) {
-		return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
-	})
+			return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
+		});
 }
