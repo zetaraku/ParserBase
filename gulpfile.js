@@ -8,15 +8,7 @@ gulp.task('default', ['babel','jade','scss']);
 
 gulp.task('babel', () => {
 	return gulp.src('./src/js/app/**/*.js')
-		.pipe(babel({
-			presets: [
-				'es2016'
-			],
-			plugins: [
-				"transform-es2015-modules-amd",
-				"transform-strict-mode"
-			]
-		}))
+		.pipe(babel())
 		.pipe(gulp.dest('./js/app/'));
 });
 gulp.task('jade', () => {
