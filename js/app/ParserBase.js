@@ -68,10 +68,11 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		// the augmenting NonTerminal
 		GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'), 'system_goal');
 	}
-	class ActionSymbol extends GSymbol {
+	class ActionSymbol extends NonTerminal {
 		// currently unused
-		constructor(name, displayName) {
+		constructor(name, displayName, action) {
 			super(name, displayName);
+			this.action = action;
 		}
 	}exports.ActionSymbol = ActionSymbol;
 	{}

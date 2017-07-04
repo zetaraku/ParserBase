@@ -39,13 +39,13 @@ export class NonTerminal extends GSymbol {
 	// the augmenting NonTerminal
 	GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'), 'system_goal');
 }
-export class ActionSymbol extends GSymbol {
+export class ActionSymbol extends NonTerminal {
 	// currently unused
-	constructor(name, displayName) {
+	constructor(name, displayName, action) {
 		super(name, displayName);
+		this.action = action;
 	}
 } {
-
 }
 export class Production {
 	constructor(lhs, rhs) {
