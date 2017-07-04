@@ -3,7 +3,7 @@
 import _ext from 'app/_ext';
 import Viz from 'viz';
 
-export class GSymbol {
+class GSymbol {
 	// Do NOT use 'Symbol', that will confilct with 'Symbol' type in ES6
 	constructor(name, displayName) {
 		this.name = name;
@@ -21,7 +21,7 @@ export class GSymbol {
 	// the indicator for current position of Configuration
 	GSymbol.DOT = new GSymbol(Symbol('●'), '●');
 }
-export class Terminal extends GSymbol {
+class Terminal extends GSymbol {
 	constructor(name, displayName) {
 		super(name, displayName);
 	}
@@ -31,7 +31,7 @@ export class Terminal extends GSymbol {
 	// the placeholder for unknown terminal type
 	GSymbol.UNKNOWN = new Terminal(Symbol('unknown'), 'unknown');
 }
-export class NonTerminal extends GSymbol {
+class NonTerminal extends GSymbol {
 	constructor(name, displayName) {
 		super(name, displayName);
 	}
@@ -39,7 +39,7 @@ export class NonTerminal extends GSymbol {
 	// the augmenting NonTerminal
 	GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'), 'system_goal');
 }
-export class ActionSymbol extends NonTerminal {
+class ActionSymbol extends NonTerminal {
 	// currently unused
 	constructor(name, displayName, action) {
 		super(name, displayName);
@@ -47,7 +47,7 @@ export class ActionSymbol extends NonTerminal {
 	}
 } {
 }
-export class Production {
+class Production {
 	constructor(lhs, rhs) {
 		this.id = Production.serialNo++;
 		this.lhs = lhs;
@@ -84,7 +84,7 @@ export class Production {
 		}
 	};
 }
-export class Grammar {
+class Grammar {
 	constructor(terminals, nonTerminals, startSymbol, productions) {
 		this.terminals = terminals;
 		this.nonTerminals = nonTerminals;
@@ -102,7 +102,7 @@ export class Grammar {
 	}
 } {
 }
-export class LR0Configuration {
+class LR0Configuration {
 	constructor(production, dotPos) {
 		this.id = LR0Configuration.serialNo++;
 		this.production = production;
@@ -128,7 +128,7 @@ export class LR0Configuration {
 } {
 	LR0Configuration.serialNo = 1;
 }
-export class LR1Configuration {
+class LR1Configuration {
 	constructor(baseLR0Configuration, lookahead) {
 		this.id = LR1Configuration.serialNo++;
 		this.baseLR0Configuration = baseLR0Configuration;
@@ -137,7 +137,7 @@ export class LR1Configuration {
 } {
 	LR1Configuration.serialNo = 1;
 }
-export class LR0FSM {
+class LR0FSM {
 	constructor(startState) {
 		this.startState = startState;
 		this.states = new Set([startState]);
@@ -162,7 +162,7 @@ export class LR0FSM {
 		LR0FSM.State.serialNo = 1;
 	}
 }
-export class LR1FSM {
+class LR1FSM {
 	constructor(startState) {
 		this.startState = startState;
 		this.states = new Set([startState]);
@@ -189,7 +189,7 @@ export class LR1FSM {
 		LR1FSM.State.serialNo = 1;
 	}
 }
-export class LL1Parse {
+class LL1Parse {
 	constructor(grammar, ll1PredictTable, inputTokens) {
 		LL1Parse.TreeNode.serialNo = 1;
 		const rootNode = this.parseTree = new LL1Parse.TreeNode(GSymbol.SYSTEM_GOAL);
@@ -298,7 +298,7 @@ export class LL1Parse {
 		};
 	}
 }
-export class LR1Parse {
+class LR1Parse {
 	constructor(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
 		LR1Parse.TreeNode.serialNo = 1;
 		const parseForest = this.parseForest = [];
@@ -467,41 +467,7 @@ export class LR1Parse {
 	}
 }
 
-export default {
-	GSymbol: GSymbol,
-	Terminal: Terminal,
-	NonTerminal: NonTerminal,
-	ActionSymbol: ActionSymbol,
-	Production: Production,
-	Grammar: Grammar,
-	LR0Configuration: LR0Configuration,
-	LR1Configuration: LR1Configuration,
-	LR0FSM: LR0FSM,
-	LR1FSM: LR1FSM,
-	LL1Parse: LL1Parse,
-	LR1Parse: LR1Parse,
-
-	buildGrammar: buildGrammar,
-	computeUnreachableSymbols: computeUnreachableSymbols,
-	computeUnreducibleSymbols: computeUnreducibleSymbols,
-	computeNullableSymbols: computeNullableSymbols,
-	buildFirstSetTable: buildFirstSetTable,
-	buildFollowSetTable: buildFollowSetTable,
-	buildPredictSetTable: buildPredictSetTable,
-	buildLL1PredictTable: buildLL1PredictTable,
-	buildLR0FSM: buildLR0FSM,
-	buildLR1FSM: buildLR1FSM,
-	buildLR1GotoActionTable: buildLR1GotoActionTable,
-
-	generateDotImageOfCFSM: generateDotImageOfCFSM,
-	generateDotImageOfParseTrees: generateDotImageOfParseTrees,
-
-	newLL1Parse: (grammar, ll1PredictTable, inputTokens) => (new LL1Parse(grammar, ll1PredictTable, inputTokens)),
-	newLR1Parse: (grammar, lr1FSM, lr1GotoActionTable, inputTokens) => (new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens)),
-};
-
-
-export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, rawProductions) {
+function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, rawProductions) {
 	Production.serialNo = 0;
 
 	let vocabularyNameMap = new Map();
@@ -528,7 +494,7 @@ export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, r
 
 	return new Grammar(terminals, nonTerminals, startSymbol, productions);
 }
-export function computeUnreachableSymbols(grammar) {
+function computeUnreachableSymbols(grammar) {
 	let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
 	let processingQueue = [GSymbol.SYSTEM_GOAL];
 	while(processingQueue.length !== 0) {
@@ -552,7 +518,7 @@ export function computeUnreachableSymbols(grammar) {
 
 	return unreachableSymbols;
 }
-export function computeUnreducibleSymbols(grammar) {
+function computeUnreducibleSymbols(grammar) {
 	let reducibleVocabularies = new Set(grammar.terminals);
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
@@ -587,7 +553,7 @@ export function computeUnreducibleSymbols(grammar) {
 
 	return unreducibleSymbols;
 }
-export function computeNullableSymbols(grammar) {
+function computeNullableSymbols(grammar) {
 	let nullableSymbols = new Set();
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
@@ -616,7 +582,7 @@ export function computeNullableSymbols(grammar) {
 
 	return nullableSymbols;
 }
-export function buildFirstSetTable(grammar, nullableSymbols) {
+function buildFirstSetTable(grammar, nullableSymbols) {
 	let firstSetTable = new Map();
 	for(let t of grammar.terminals)
 		firstSetTable.set(t, new Set([t]));
@@ -652,7 +618,7 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 
 	return firstSetTable;
 }
-export function buildFollowSetTable(grammar, firstSetTable) {
+function buildFollowSetTable(grammar, firstSetTable) {
 	let followSetTable = new Map();
 	let seeThroughTable = new Map();
 	for(let nt of grammar.nonTerminals) {
@@ -708,7 +674,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 
 	return followSetTable;
 }
-export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
+function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 	let predictSetTable = new Map();
 	for(let production of grammar.productions) {
 		let lhs = production.lhs, rhs = production.rhs;
@@ -732,7 +698,7 @@ export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 
 	return predictSetTable;
 }
-export function buildLL1PredictTable(grammar, predictSetTable) {
+function buildLL1PredictTable(grammar, predictSetTable) {
 	let ll1PredictTable = new Map();
 	for(let [nt, prods] of grammar.productionsMap) {
 		let ntPredictSet = new Map();
@@ -748,7 +714,7 @@ export function buildLL1PredictTable(grammar, predictSetTable) {
 
 	return ll1PredictTable;
 }
-export function buildLR0FSM(grammar) {
+function buildLR0FSM(grammar) {
 	LR0Configuration.serialNo = 1;
 	LR0FSM.State.serialNo = 0;
 
@@ -830,7 +796,7 @@ export function buildLR0FSM(grammar) {
 		return newLR0ConfSet;
 	}
 }
-export function buildLR1FSM(grammar, firstSetTable) {
+function buildLR1FSM(grammar, firstSetTable) {
 	LR0Configuration.serialNo = LR1Configuration.serialNo = 1;
 	LR1FSM.State.serialNo = 0;
 
@@ -957,7 +923,7 @@ export function buildLR1FSM(grammar, firstSetTable) {
 		return newLR1ConfSet;
 	}
 }
-export function buildLR1GotoActionTable(grammar, lr1fsm) {
+function buildLR1GotoActionTable(grammar, lr1fsm) {
 	let lr1GotoActionTable = new Map();
 	let globalActionMap = {
 		shift: new Map(Array.from(lr1fsm.states).map((s) => [s, new LR1Parse.Action.Shift(s)])),
@@ -1003,7 +969,7 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 
 	return lr1GotoActionTable;
 }
-export function generateDotImageOfCFSM(cfsm) {
+function generateDotImageOfCFSM(cfsm) {
 	let dotFileSrc = "";
 	dotFileSrc += ("digraph CFSM { ");
 	dotFileSrc += ("rankdir=\"LR\"; ");
@@ -1027,7 +993,7 @@ export function generateDotImageOfCFSM(cfsm) {
 
 	return Viz(dotFileSrc);
 }
-export function generateDotImageOfParseTrees(parseTrees) {
+function generateDotImageOfParseTrees(parseTrees) {
 	let dotFileSrc = "";
 	dotFileSrc += ("digraph ParseTree { ");
 	dotFileSrc += ("rankdir=\"UD\"; ");
@@ -1048,3 +1014,39 @@ export function generateDotImageOfParseTrees(parseTrees) {
 		}
 	}
 }
+
+export default {
+	GSymbol,
+	Terminal,
+	NonTerminal,
+	ActionSymbol,
+	Production,
+	Grammar,
+	LR0Configuration,
+	LR1Configuration,
+	LR0FSM,
+	LR1FSM,
+	LL1Parse,
+	LR1Parse,
+
+	buildGrammar,
+	computeUnreachableSymbols,
+	computeUnreducibleSymbols,
+	computeNullableSymbols,
+	buildFirstSetTable,
+	buildFollowSetTable,
+	buildPredictSetTable,
+	buildLL1PredictTable,
+	buildLR0FSM,
+	buildLR1FSM,
+	buildLR1GotoActionTable,
+	generateDotImageOfCFSM,
+	generateDotImageOfParseTrees,
+
+	newLL1Parse(grammar, ll1PredictTable, inputTokens) {
+		return new LL1Parse(grammar, ll1PredictTable, inputTokens)
+	},
+	newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
+		return new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens)
+	},
+};

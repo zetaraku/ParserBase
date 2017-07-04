@@ -4,20 +4,6 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.LR1Parse = exports.LL1Parse = exports.LR1FSM = exports.LR0FSM = exports.LR1Configuration = exports.LR0Configuration = exports.Grammar = exports.Production = exports.ActionSymbol = exports.NonTerminal = exports.Terminal = exports.GSymbol = undefined;
-	exports.buildGrammar = buildGrammar;
-	exports.computeUnreachableSymbols = computeUnreachableSymbols;
-	exports.computeUnreducibleSymbols = computeUnreducibleSymbols;
-	exports.computeNullableSymbols = computeNullableSymbols;
-	exports.buildFirstSetTable = buildFirstSetTable;
-	exports.buildFollowSetTable = buildFollowSetTable;
-	exports.buildPredictSetTable = buildPredictSetTable;
-	exports.buildLL1PredictTable = buildLL1PredictTable;
-	exports.buildLR0FSM = buildLR0FSM;
-	exports.buildLR1FSM = buildLR1FSM;
-	exports.buildLR1GotoActionTable = buildLR1GotoActionTable;
-	exports.generateDotImageOfCFSM = generateDotImageOfCFSM;
-	exports.generateDotImageOfParseTrees = generateDotImageOfParseTrees;
 
 	var _ext3 = _interopRequireDefault(_ext2);
 
@@ -41,8 +27,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		toRawString() {
 			return this.displayName;
 		}
-	}exports.GSymbol = GSymbol;
-	{
+	}{
 		// the placeholder for lambda (nothing)
 		GSymbol.LAMBDA = new GSymbol(Symbol('λ'), 'λ');
 		// the indicator for current position of Configuration
@@ -52,8 +37,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		constructor(name, displayName) {
 			super(name, displayName);
 		}
-	}exports.Terminal = Terminal;
-	{
+	}{
 		// the EndOfInput Terminal ($)
 		GSymbol.EOI = new Terminal(Symbol('$'), '$');
 		// the placeholder for unknown terminal type
@@ -63,8 +47,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		constructor(name, displayName) {
 			super(name, displayName);
 		}
-	}exports.NonTerminal = NonTerminal;
-	{
+	}{
 		// the augmenting NonTerminal
 		GSymbol.SYSTEM_GOAL = new NonTerminal(Symbol('system_goal'), 'system_goal');
 	}
@@ -74,8 +57,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			super(name, displayName);
 			this.action = action;
 		}
-	}exports.ActionSymbol = ActionSymbol;
-	{}
+	}{}
 	class Production {
 		constructor(lhs, rhs) {
 			this.id = Production.serialNo++;
@@ -91,8 +73,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		toRawString() {
 			return this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + (this.rhs.length !== 0 ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString());
 		}
-	}exports.Production = Production;
-	{
+	}{
 		Production.serialNo = 0;
 		Production.ARROW = {
 			toString: function () {
@@ -123,8 +104,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		buildVocabularyNameMap() {
 			return new Map([...this.terminals, ...this.nonTerminals, GSymbol.LAMBDA].map(s => [s.name, s]));
 		}
-	}exports.Grammar = Grammar;
-	{}
+	}{}
 	class LR0Configuration {
 		constructor(production, dotPos) {
 			this.id = LR0Configuration.serialNo++;
@@ -145,8 +125,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			r.splice(this.dotPos, 0, GSymbol.DOT);
 			return this.production.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' + r.map(e => e.toRawString()).join(' ');
 		}
-	}exports.LR0Configuration = LR0Configuration;
-	{
+	}{
 		LR0Configuration.serialNo = 1;
 	}
 	class LR1Configuration {
@@ -155,8 +134,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			this.baseLR0Configuration = baseLR0Configuration;
 			this.lookahead = lookahead;
 		}
-	}exports.LR1Configuration = LR1Configuration;
-	{
+	}{
 		LR1Configuration.serialNo = 1;
 	}
 	class LR0FSM {
@@ -164,8 +142,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			this.startState = startState;
 			this.states = new Set([startState]);
 		}
-	}exports.LR0FSM = LR0FSM;
-	{
+	}{
 		LR0FSM.State = class {
 			constructor(lr0ConfigurationSet) {
 				this.id = LR0FSM.State.serialNo++;
@@ -189,8 +166,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			this.startState = startState;
 			this.states = new Set([startState]);
 		}
-	}exports.LR1FSM = LR1FSM;
-	{
+	}{
 		LR1FSM.State = class {
 			constructor(lr1ConfigurationSet) {
 				this.id = LR1FSM.State.serialNo++;
@@ -277,8 +253,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 				}
 			}();
 		}
-	}exports.LL1Parse = LL1Parse;
-	{
+	}{
 		LL1Parse.TreeNode = class {
 			constructor(symbol) {
 				this.id = LL1Parse.TreeNode.serialNo++;
@@ -411,8 +386,7 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 				}
 			}();
 		}
-	}exports.LR1Parse = LR1Parse;
-	{
+	}{
 		LR1Parse.TreeNode = class {
 			constructor(symbol) {
 				this.id = LR1Parse.TreeNode.serialNo++;
@@ -480,38 +454,6 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 		}
 	}
 
-	exports.default = {
-		GSymbol: GSymbol,
-		Terminal: Terminal,
-		NonTerminal: NonTerminal,
-		ActionSymbol: ActionSymbol,
-		Production: Production,
-		Grammar: Grammar,
-		LR0Configuration: LR0Configuration,
-		LR1Configuration: LR1Configuration,
-		LR0FSM: LR0FSM,
-		LR1FSM: LR1FSM,
-		LL1Parse: LL1Parse,
-		LR1Parse: LR1Parse,
-
-		buildGrammar: buildGrammar,
-		computeUnreachableSymbols: computeUnreachableSymbols,
-		computeUnreducibleSymbols: computeUnreducibleSymbols,
-		computeNullableSymbols: computeNullableSymbols,
-		buildFirstSetTable: buildFirstSetTable,
-		buildFollowSetTable: buildFollowSetTable,
-		buildPredictSetTable: buildPredictSetTable,
-		buildLL1PredictTable: buildLL1PredictTable,
-		buildLR0FSM: buildLR0FSM,
-		buildLR1FSM: buildLR1FSM,
-		buildLR1GotoActionTable: buildLR1GotoActionTable,
-
-		generateDotImageOfCFSM: generateDotImageOfCFSM,
-		generateDotImageOfParseTrees: generateDotImageOfParseTrees,
-
-		newLL1Parse: (grammar, ll1PredictTable, inputTokens) => new LL1Parse(grammar, ll1PredictTable, inputTokens),
-		newLR1Parse: (grammar, lr1FSM, lr1GotoActionTable, inputTokens) => new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens)
-	};
 	function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, rawProductions) {
 		Production.serialNo = 0;
 
@@ -993,4 +935,40 @@ define(['exports', 'app/_ext', 'viz'], function (exports, _ext2, _viz) {
 			}
 		}
 	}
+
+	exports.default = {
+		GSymbol,
+		Terminal,
+		NonTerminal,
+		ActionSymbol,
+		Production,
+		Grammar,
+		LR0Configuration,
+		LR1Configuration,
+		LR0FSM,
+		LR1FSM,
+		LL1Parse,
+		LR1Parse,
+
+		buildGrammar,
+		computeUnreachableSymbols,
+		computeUnreducibleSymbols,
+		computeNullableSymbols,
+		buildFirstSetTable,
+		buildFollowSetTable,
+		buildPredictSetTable,
+		buildLL1PredictTable,
+		buildLR0FSM,
+		buildLR1FSM,
+		buildLR1GotoActionTable,
+		generateDotImageOfCFSM,
+		generateDotImageOfParseTrees,
+
+		newLL1Parse(grammar, ll1PredictTable, inputTokens) {
+			return new LL1Parse(grammar, ll1PredictTable, inputTokens);
+		},
+		newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
+			return new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
+		}
+	};
 });
