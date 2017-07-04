@@ -209,7 +209,7 @@ $(document).ready(function() {
 			'</table>');
 
 			// LR(1) Table tab
-			$("#lr1table").html('<table class="compact-table hoverable">' +
+			$('#lr1table').html('<table class="compact-table hoverable">' +
 				'<th class="diagonalFalling">State\\Symbol</th>' + symbolsList.map((s) => '<th>' + s + '</th>').join('') +
 				Array.from(lr1FSM.states).map(function(st) {
 					let stActionSet = lr1GotoActionTable.get(st);
@@ -235,7 +235,7 @@ $(document).ready(function() {
 				$('#lr0fsm').html(lr0FSM_Viz);
 				$('#lr0fsm_tab a.downloadLink').show().on('click', function(event) {
 					canvg(tmpCanvas, lr0FSM_Viz);
-					event.target.href = tmpCanvas.toDataURL("image/png");
+					event.target.href = tmpCanvas.toDataURL('image/png');
 				});
 			});
 
@@ -246,7 +246,7 @@ $(document).ready(function() {
 				$('#lr1fsm').html(lr1FSM_Viz);
 				$('#lr1fsm_tab a.downloadLink').show().on('click', function(event) {
 					canvg(tmpCanvas, lr1FSM_Viz);
-					event.target.href = tmpCanvas.toDataURL("image/png");
+					event.target.href = tmpCanvas.toDataURL('image/png');
 				});
 			});
 
@@ -330,7 +330,7 @@ $(document).ready(function() {
 				}
 				function displayParseTree() {
 					let ll1parsetree_Viz = ParserBase.generateDotImageOfParseTrees([parseTree]);
-					var myWindow = window.open();
+					var myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>
 								<head>
@@ -347,7 +347,7 @@ $(document).ready(function() {
 							canvg(tmpCanvas, ll1parsetree_Viz);
 							event.target.href = tmpCanvas.toDataURL("image/png");
 						};
-					myWindow.document.close();
+					} myWindow.document.close();
 				}
 			});
 
@@ -425,7 +425,7 @@ $(document).ready(function() {
 				}
 				function displayParseTree() {
 					let lr1parsetree_Viz = ParserBase.generateDotImageOfParseTrees(parseForest);
-					var myWindow = window.open();
+					var myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>
 								<head>
@@ -440,15 +440,15 @@ $(document).ready(function() {
 						myWindow.document.getElementById('parsetree').innerHTML = lr1parsetree_Viz;
 						myWindow.document.getElementById('downloadLink').onclick = function(event) {
 							canvg(tmpCanvas, lr1parsetree_Viz);
-							event.target.href = tmpCanvas.toDataURL("image/png");
+							event.target.href = tmpCanvas.toDataURL('image/png');
 						};
-					myWindow.document.close();
+					} myWindow.document.close();
 				}
 			});
 
-			$("#generate").val('Edit');
+			$('#generate').val('Edit');
 			editMode = false;
-			$("#info").slideDown();
+			$('#info').slideDown();
 		});
 
 		return false;
@@ -470,12 +470,12 @@ function initTabs() {
 		lr1parse_tab: "LR(1) Parse",
 	};
 	for(let tabname in tablis) {
-		$("#tab_ul").append(
+		$('#tab_ul').append(
 			`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks" ` +
 			`onclick="openTab('${tabname}');">${tablis[tabname]}</a></li>`
 		);
 	}
-	document.getElementsByClassName("tablinks")[0].click();
+	document.getElementsByClassName('tablinks')[0].click();
 }
 
 function TD(e) {

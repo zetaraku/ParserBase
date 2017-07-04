@@ -144,7 +144,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 				}).join('') + '</table>');
 
 				// LR(1) Table tab
-				(0, _jquery2.default)("#lr1table").html('<table class="compact-table hoverable">' + '<th class="diagonalFalling">State\\Symbol</th>' + symbolsList.map(s => '<th>' + s + '</th>').join('') + Array.from(lr1FSM.states).map(function (st) {
+				(0, _jquery2.default)('#lr1table').html('<table class="compact-table hoverable">' + '<th class="diagonalFalling">State\\Symbol</th>' + symbolsList.map(s => '<th>' + s + '</th>').join('') + Array.from(lr1FSM.states).map(function (st) {
 					let stActionSet = lr1GotoActionTable.get(st);
 					return '<tr><td class="b">' + st.id + '</td>' + symbolsList.map(function (s) {
 						if (stActionSet.has(s)) {
@@ -163,7 +163,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 					(0, _jquery2.default)('#lr0fsm').html(lr0FSM_Viz);
 					(0, _jquery2.default)('#lr0fsm_tab a.downloadLink').show().on('click', function (event) {
 						(0, _canvg2.default)(tmpCanvas, lr0FSM_Viz);
-						event.target.href = tmpCanvas.toDataURL("image/png");
+						event.target.href = tmpCanvas.toDataURL('image/png');
 					});
 				});
 
@@ -174,7 +174,7 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 					(0, _jquery2.default)('#lr1fsm').html(lr1FSM_Viz);
 					(0, _jquery2.default)('#lr1fsm_tab a.downloadLink').show().on('click', function (event) {
 						(0, _canvg2.default)(tmpCanvas, lr1FSM_Viz);
-						event.target.href = tmpCanvas.toDataURL("image/png");
+						event.target.href = tmpCanvas.toDataURL('image/png');
 					});
 				});
 
@@ -250,8 +250,8 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 					}
 					function displayParseTree() {
 						let ll1parsetree_Viz = _ParserBase2.default.generateDotImageOfParseTrees([parseTree]);
-						var myWindow = window.open();
-						myWindow.document.write(`
+						var myWindow = window.open();{
+							myWindow.document.write(`
 							<html>
 								<head>
 									<title>ParseTree</title>
@@ -262,12 +262,12 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 								</body>
 							</html>
 						`);
-						myWindow.document.getElementById('parsetree').innerHTML = ll1parsetree_Viz;
-						myWindow.document.getElementById('downloadLink').onclick = function (event) {
-							(0, _canvg2.default)(tmpCanvas, ll1parsetree_Viz);
-							event.target.href = tmpCanvas.toDataURL("image/png");
-						};
-						myWindow.document.close();
+							myWindow.document.getElementById('parsetree').innerHTML = ll1parsetree_Viz;
+							myWindow.document.getElementById('downloadLink').onclick = function (event) {
+								(0, _canvg2.default)(tmpCanvas, ll1parsetree_Viz);
+								event.target.href = tmpCanvas.toDataURL("image/png");
+							};
+						}myWindow.document.close();
 					}
 				});
 
@@ -341,8 +341,8 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 					}
 					function displayParseTree() {
 						let lr1parsetree_Viz = _ParserBase2.default.generateDotImageOfParseTrees(parseForest);
-						var myWindow = window.open();
-						myWindow.document.write(`
+						var myWindow = window.open();{
+							myWindow.document.write(`
 							<html>
 								<head>
 									<title>ParseTree</title>
@@ -353,18 +353,18 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 								</body>
 							</html>
 						`);
-						myWindow.document.getElementById('parsetree').innerHTML = lr1parsetree_Viz;
-						myWindow.document.getElementById('downloadLink').onclick = function (event) {
-							(0, _canvg2.default)(tmpCanvas, lr1parsetree_Viz);
-							event.target.href = tmpCanvas.toDataURL("image/png");
-						};
-						myWindow.document.close();
+							myWindow.document.getElementById('parsetree').innerHTML = lr1parsetree_Viz;
+							myWindow.document.getElementById('downloadLink').onclick = function (event) {
+								(0, _canvg2.default)(tmpCanvas, lr1parsetree_Viz);
+								event.target.href = tmpCanvas.toDataURL('image/png');
+							};
+						}myWindow.document.close();
 					}
 				});
 
-				(0, _jquery2.default)("#generate").val('Edit');
+				(0, _jquery2.default)('#generate').val('Edit');
 				editMode = false;
-				(0, _jquery2.default)("#info").slideDown();
+				(0, _jquery2.default)('#info').slideDown();
 			});
 
 			return false;
@@ -386,9 +386,9 @@ define(['jquery', 'app/ParserBase', 'app/main_functions', 'canvg'], function (_j
 			lr1parse_tab: "LR(1) Parse"
 		};
 		for (let tabname in tablis) {
-			(0, _jquery2.default)("#tab_ul").append(`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks" ` + `onclick="openTab('${tabname}');">${tablis[tabname]}</a></li>`);
+			(0, _jquery2.default)('#tab_ul').append(`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks" ` + `onclick="openTab('${tabname}');">${tablis[tabname]}</a></li>`);
 		}
-		document.getElementsByClassName("tablinks")[0].click();
+		document.getElementsByClassName('tablinks')[0].click();
 	}
 
 	function TD(e) {
