@@ -40,9 +40,9 @@ Then in the project directory,
 
 2. use ` gulp ` to rebuild all files *after you edit the source*.
 
-Licence
+License
 -------
 
 Copyright © 2017, Raku Zeta. Licensed under the MIT license.
 
-Other used libraries and licence infomation are located in `ParserBase/js/lib/`.
+Other used libraries and license infomation are located in `ParserBase/js/lib/`.
