@@ -1323,7 +1323,9 @@ function v(a){void 0!==a?(e.print(a),e.X(a),a=JSON.stringify(a)):a="";w=!0;var b
     });
   }
   
-  if (typeof module === "object" && module.exports) {
+  if (typeof define !== 'undefined' && define.amd) {
+    define(function () { return Viz; });
+  } else if (typeof module !== 'undefined' && module.exports) {
     module.exports = Viz;
   } else {
     global.Viz = Viz;

@@ -1,7 +1,6 @@
 requirejs.config({
-	baseUrl: "js/lib",
+	baseUrl: "js/app",
 	paths: {
-		"app": "../app",
 		"jquery": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
 	},
 	shim: {
@@ -12,4 +11,4 @@ requirejs.config({
 });
 
 // Load the main app module to start the app
-requirejs(["app/main"]);
+requirejs(["main"]);
