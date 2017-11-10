@@ -1,7 +1,9 @@
 'use strict';
 
 const _ext = require('./_ext');
-const Viz = require('../lib/viz');
+let Viz;
+if(!process.env.SURPRESS_GRAPHVIZ)
+	Viz = require('../lib/viz');
 
 class GSymbol {
 	// Do NOT use 'Symbol', that will confilct with 'Symbol' type in ES6

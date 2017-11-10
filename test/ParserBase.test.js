@@ -650,19 +650,21 @@ add_op -> -
 				expect(r.value).to.not.be.an.instanceof(Error);
 			});
 		});
-		describe('visualization', function() {
-			it('should visualize LR(0) FSM', function() {
-				this.timeout(0);
-				expect(
-					result.lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr0FSM)
-				).to.exist;
+		if(!process.env.SURPRESS_GRAPHVIZ) {
+			describe('visualization', function() {
+				it('should visualize LR(0) FSM', function() {
+					this.timeout(0);
+					expect(
+						result.lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr0FSM)
+					).to.exist;
+				});
+				it('should visualize LR(1) FSM', function() {
+					this.timeout(0);
+					expect(
+						result.lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr1FSM)
+					).to.exist;
+				});
 			});
-			it('should visualize LR(1) FSM', function() {
-				this.timeout(0);
-				expect(
-					result.lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr1FSM)
-				).to.exist;
-			});
-		});
+		}
 	});
 }
