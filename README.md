@@ -1,6 +1,7 @@
 Parser Base
 ===========
-[![Build Status](https://travis-ci.org/ztrk1600/ParserBase.svg?branch=githubio)](https://travis-ci.org/ztrk1600/ParserBase)
+[![Build Status](https://travis-ci.org/ztrk1600/ParserBase.svg?branch=master)](https://travis-ci.org/ztrk1600/ParserBase)
+[![Coverage Status](https://coveralls.io/repos/github/ztrk1600/ParserBase/badge.svg?branch=master)](https://coveralls.io/github/ztrk1600/ParserBase?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/maintainability)](https://codeclimate.com/github/ztrk1600/ParserBase/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/test_coverage)](https://codeclimate.com/github/ztrk1600/ParserBase/test_coverage)
 
