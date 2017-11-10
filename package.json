@@ -11,6 +11,7 @@
     "babel-plugin-transform-strict-mode": "^6.24.1",
     "babel-preset-es2016": "^6.24.1",
     "chai": "^3.5.0",
+    "coveralls": "^3.0.0",
     "cross-env": "^5.1.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
@@ -22,6 +23,7 @@
   },
   "scripts": {
     "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha",
+    "coverage": "cross-env SURPRESS_GRAPHVIZ=1 nyc report --reporter=text-lcov | coveralls",
     "localtest": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=html --reporter=text mocha"
   },
   "dependencies": {},
