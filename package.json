@@ -11,15 +11,17 @@
     "babel-plugin-transform-strict-mode": "^6.24.1",
     "babel-preset-es2016": "^6.24.1",
     "chai": "^3.5.0",
+    "cross-env": "^5.1.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-pug": "^3.3.0",
     "gulp-sass": "^3.1.0",
     "mocha": "^3.2.0",
+    "nyc": "^11.3.0",
     "pug": "^2.0.0-beta11"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha"
   },
   "dependencies": {},
   "bugs": {
