@@ -1,20 +1,15 @@
-'use strict';
-/*jshint -W030 */
-var define, describe, it;
-define(
-	['node_modules/chai/chai', 'app/ParserBase', 'app/main_functions', 'app/_ext'],
-	function(chai, module_ParserBase, module_main_functions, module__ext)
+const chai = require('chai');
+let expect = chai.expect;
+// let should = chai.should();
+let assert = chai.assert;
+
+const ParserBase = require('../src/js/app/ParserBase');
+const _ext = require('../src/js/app/_ext');
+const main_functions = require('../src/js/app/main_functions');
+
 {
-
-	let expect = chai.expect;
-	// let should = chai.should();
-	let assert = chai.assert;
-
-	let ParserBase = module_ParserBase.default;
-	let _ext = module__ext.default;
-	let result = {};
-
 	describe('module ParserBase', function() {
+		let result = {};
 		it('should exist', function() {
 			expect(ParserBase).to.exist;
 		});
@@ -48,7 +43,7 @@ primary -> INTLIT
 add_op -> +
 add_op -> -
 				`);
-				let rawGrammar = module_main_functions.processGrammarInput($inputGrammarText);
+				let rawGrammar = main_functions.processGrammarInput($inputGrammarText);
 				expect(
 					result.grammar = ParserBase.buildGrammar(
 						Array.from(rawGrammar.terminals),
@@ -637,7 +632,7 @@ add_op -> -
 		describe('parsing', function() {
 			let $inputTokensText = `begin ID := INTLIT ; read ( ID ) ; end`;
 			it('should finish LL(1) Parse without error', function() {
-				let inputTokens = module_main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
+				let inputTokens = main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
 				let currentParse = ParserBase.newLL1Parse(result.grammar, result.ll1PredictTable, inputTokens);
 				let r;
 				do {
@@ -646,7 +641,7 @@ add_op -> -
 				expect(r.value).to.not.be.an.instanceof(Error);
 			});
 			it('should finish LR(1) Parse without error', function() {
-				let inputTokens = module_main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
+				let inputTokens = main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
 				let currentParse = ParserBase.newLR1Parse(result.grammar, result.lr1FSM, result.lr1GotoActionTable, inputTokens);
 				let r;
 				do {
@@ -670,4 +665,4 @@ add_op -> -
 			});
 		});
 	});
-});
+}
