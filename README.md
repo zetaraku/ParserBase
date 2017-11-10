@@ -1,5 +1,8 @@
 Parser Base
 ===========
+[![Build Status](https://travis-ci.org/ztrk1600/ParserBase.svg?branch=githubio)](https://travis-ci.org/ztrk1600/ParserBase)
+[![Maintainability](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/maintainability)](https://codeclimate.com/github/ztrk1600/ParserBase/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/test_coverage)](https://codeclimate.com/github/ztrk1600/ParserBase/test_coverage)
 
 This is a **demonstrative parser** with a **webpage user interface**.
 
