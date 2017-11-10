@@ -30,7 +30,7 @@ Before you start
 
 This project is *ready to use* as a web application.
 
-You can *try it now* [**HERE**](https://ztrk1600.github.io/ParserBase/) !
+You can *try it now* [**HERE**](https://ztrk1600.github.io/ParserBase/dist) !
 
 If you want to modify it, you must have installed [Node.js](https://nodejs.org/).
 
