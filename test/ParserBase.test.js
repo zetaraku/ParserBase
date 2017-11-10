@@ -651,17 +651,18 @@ add_op -> -
 			});
 		});
 		if(!process.env.SURPRESS_GRAPHVIZ) {
+			const graphviz_functions = require('../src/js/app/graphviz_functions');
 			describe('visualization', function() {
 				it('should visualize LR(0) FSM', function() {
 					this.timeout(0);
 					expect(
-						result.lr0FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr0FSM)
+						result.lr0FSM_Viz = graphviz_functions.generateDotImageOfCFSM(result.lr0FSM)
 					).to.exist;
 				});
 				it('should visualize LR(1) FSM', function() {
 					this.timeout(0);
 					expect(
-						result.lr1FSM_Viz = ParserBase.generateDotImageOfCFSM(result.lr1FSM)
+						result.lr1FSM_Viz = graphviz_functions.generateDotImageOfCFSM(result.lr1FSM)
 					).to.exist;
 				});
 			});
