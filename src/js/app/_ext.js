@@ -4,7 +4,7 @@ let overrides = {
 	equals: Symbol('equals')
 };
 
-export function equals(_this, _that) {
+function equals(_this, _that) {
 	if(typeof _this[overrides.equals] === 'function') {
 		return _this[overrides.equals](_that);
 	} else if(_this instanceof Map) {
@@ -44,7 +44,7 @@ export function equals(_this, _that) {
 		return _this === _that;
 	}
 }
-export function groupBy(_this, mapf) {
+function groupBy(_this, mapf) {
 	if(_this instanceof Set) {
 		let groups = new Map();
 		for(let e of _this) {
@@ -67,7 +67,7 @@ export function groupBy(_this, mapf) {
 		throw new Error("'groupBy' is not supported by this class.");
 	}
 }
-export function addAll(_this, _that) {
+function addAll(_this, _that) {
 	if(_this instanceof Set) {
 		let added = new Set();
 		for(let e of _that) {
@@ -82,10 +82,9 @@ export function addAll(_this, _that) {
 	}
 }
 
-let _ext = {
+module.exports = {
 	overrides: overrides,
 	equals: equals,
 	groupBy: groupBy,
 	addAll: addAll,
 };
-export default _ext;

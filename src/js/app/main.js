@@ -1,9 +1,9 @@
 'use strict';
 
-import $ from 'jquery';
-import ParserBase from 'app/ParserBase';
-import {processGrammarInput, processParseInput} from 'app/main_functions';
-import canvg from 'canvg';
+const $ = require('jquery');
+const ParserBase = require('./ParserBase');
+const main_functions = require('./main_functions');
+const canvg = require('../lib/canvg');
 
 let original = {
 	toString: {
@@ -37,7 +37,7 @@ $(document).ready(function() {
 			return false;
 		}
 
-		let rawGrammar = processGrammarInput($('#grammar_input').val());
+		let rawGrammar = main_functions.processGrammarInput($('#grammar_input').val());
 
 		if(rawGrammar.extraResult.parseExample !== undefined) {
 			$('.source_input').val(rawGrammar.extraResult.parseExample);
@@ -255,7 +255,7 @@ $(document).ready(function() {
 			$('#ll1parse .parse_next_btn').off('click');
 			$('#ll1parse .view_parse_tree').off('click');
 			$('#ll1parse .start_parse').on('click', function() {
-				let inputTokens = processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
+				let inputTokens = main_functions.processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLL1Parse(grammar, ll1PredictTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseTree = currentParse.parseTree;
@@ -356,7 +356,7 @@ $(document).ready(function() {
 			$('#lr1parse .parse_next_btn').off('click');
 			$('#lr1parse .view_parse_tree').off('click');
 			$('#lr1parse .start_parse').on('click', function() {
-				let inputTokens = processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
+				let inputTokens = main_functions.processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseForest = currentParse.parseForest;

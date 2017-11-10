@@ -1,7 +1,7 @@
 'use strict';
 
-import _ext from 'app/_ext';
-import Viz from 'viz';
+const _ext = require('./_ext');
+const Viz = require('../lib/viz');
 
 class GSymbol {
 	// Do NOT use 'Symbol', that will confilct with 'Symbol' type in ES6
@@ -1015,7 +1015,7 @@ function generateDotImageOfParseTrees(parseTrees) {
 	}
 }
 
-export default {
+module.exports = {
 	GSymbol,
 	Terminal,
 	NonTerminal,

@@ -1,8 +1,8 @@
 'use strict';
 
-import ParserBase from 'app/ParserBase';
+const ParserBase = require('./ParserBase');
 
-export function processGrammarInput(inputText) {
+function processGrammarInput(inputText) {
 	let terminals = new Set();
 	let nonTerminals = new Set();
 	let startSymbol = null;
@@ -59,9 +59,14 @@ export function processGrammarInput(inputText) {
 		extraResult: extraResult,
 	};
 }
-export function processParseInput(inputText, vocabularyNameMap) {
+function processParseInput(inputText, vocabularyNameMap) {
 	return inputText.trim().split(/\s+/).filter(s => s !== '')
 		.map(function(t) {
 			return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
 		});
 }
+
+module.exports = {
+	processGrammarInput: processGrammarInput,
+	processParseInput: processParseInput,
+};
