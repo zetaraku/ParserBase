@@ -21,7 +21,8 @@
     "pug": "^2.0.0-beta11"
   },
   "scripts": {
-    "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha"
+    "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha",
+    "localtest": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=html --reporter=text mocha"
   },
   "dependencies": {},
   "bugs": {
