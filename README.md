@@ -1,9 +1,9 @@
 Parser Base
 ===========
-[![Build Status](https://travis-ci.org/ztrk1600/ParserBase.svg?branch=master)](https://travis-ci.org/ztrk1600/ParserBase)
-[![Coverage Status](https://coveralls.io/repos/github/ztrk1600/ParserBase/badge.svg?branch=master)](https://coveralls.io/github/ztrk1600/ParserBase?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/maintainability)](https://codeclimate.com/github/ztrk1600/ParserBase/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/23b0788de5fdb4364057/test_coverage)](https://codeclimate.com/github/ztrk1600/ParserBase/test_coverage)
+[![Build Status](https://travis-ci.org/zetaraku/ParserBase.svg?branch=master)](https://travis-ci.org/zetaraku/ParserBase)
+[![Coverage Status](https://coveralls.io/repos/github/zetaraku/ParserBase/badge.svg?branch=master)](https://coveralls.io/github/zetaraku/ParserBase?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2af5d485d54b7bbb3f76/maintainability)](https://codeclimate.com/github/zetaraku/ParserBase/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/2af5d485d54b7bbb3f76/test_coverage)](https://codeclimate.com/github/zetaraku/ParserBase/test_coverage)
 
 This is a **demonstrative parser** with a **webpage user interface**.
 
@@ -34,15 +34,15 @@ Before you start
 
 This project is *ready to use* as a web application.
 
-You can *try it now* [**HERE**](https://ztrk1600.github.io/ParserBase/dist) !
+You can *try it now* [**HERE**](https://zetaraku.github.io/ParserBase/dist) !
 
 If you want to modify it, you must have installed [Node.js](https://nodejs.org/).
 
 Then in the project directory,
 
-1. use ` npm install ` *once* to install all devDependencies.
+1. use `npm install` *once* to install all devDependencies.
 
-2. use ` gulp ` to rebuild all files *after you edit the source*.
+2. use `gulp` to rebuild all files *after you edit the source*.
 
 License
 -------

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A demonstrative parser with a webpage user interface.",
   "main": "index.js",
-  "author": "Raku Zeta <ztrk1600@gmail.com>",
+  "author": "Raku Zeta <zetaraku@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -28,8 +28,8 @@
   },
   "dependencies": {},
   "bugs": {
-    "url": "https://github.com/ztrk1600/ParserBase/issues"
+    "url": "https://github.com/zetaraku/ParserBase/issues"
   },
-  "homepage": "https://github.com/ztrk1600/ParserBase#readme",
+  "homepage": "https://github.com/zetaraku/ParserBase#readme",
   "private": true
 }
