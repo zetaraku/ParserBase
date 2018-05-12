@@ -42,7 +42,9 @@ Then in the project directory,
 
 1. use `npm install` *once* to install all dependencies.
 
-2. use `npx webpack` to watch files and generate target files (in `./dist/`) while developing.
+2. use `npx webpack` to generate the target files (into `./dist/`).
+
+	* You can use the option `--watch` to watch for changes in files.
 
 License
 -------

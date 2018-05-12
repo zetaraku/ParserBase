@@ -8,7 +8,7 @@ module.exports = {
 		filename: 'bundle.js'
 	},
 	mode: 'development',
-	watch: true,
+	// watch: true,
 	devtool: 'source-map',
 	module: {
 		rules: [
