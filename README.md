@@ -40,13 +40,13 @@ If you want to modify it, you must have installed [Node.js](https://nodejs.org/)
 
 Then in the project directory,
 
-1. use `npm install` *once* to install all devDependencies.
+1. use `npm install` *once* to install all dependencies.
 
-2. use `gulp` to rebuild all files *after you edit the source*.
+2. use `npx webpack` to watch files and generate target files (in `./dist/`) while developing.
 
 License
 -------
 
 Copyright © 2017, Raku Zeta. Licensed under the MIT license.
 
-Other used libraries and license infomation are located in `ParserBase/js/lib/`.
+Other used libraries and license infomation are located in `./js/lib/`.

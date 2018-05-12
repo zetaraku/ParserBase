@@ -1,17 +1,8 @@
-- var example_cfgs_page = 'https://github.com/zetaraku/ParserBase/tree/master/example-cfgs'
 doctype html
 html
 	head
 		meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
-		script(src='js/lib/require.js', data-main='app')
-		script.
-			function openTab(tabname) {
-				$('.tabcontent').css('display', 'none');
-				$('.tablinks').removeClass('active');
-				$('#'+tabname).css('display', 'block');
-				$('#tab_ul').find('[name='+tabname+']').addClass('active');
-			}
-		link(rel='stylesheet', type='text/css', href='css/style.css')
+		//- link(rel='stylesheet', type='text/css', href='./scss/style.scss')
 		title ParserBase
 	body
 		form#grammar_form

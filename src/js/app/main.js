@@ -472,8 +472,8 @@ function initTabs() {
 	};
 	for(let tabname in tablis) {
 		$('#tab_ul').append(
-			`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks" ` +
-			`onclick="openTab('${tabname}');">${tablis[tabname]}</a></li>`
+			$(`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks">${tablis[tabname]}</a></li>`)
+				.on('click', () => openTab(tabname))
 		);
 	}
 	document.getElementsByClassName('tablinks')[0].click();
@@ -485,4 +485,11 @@ function TD(e) {
 
 function TDs(eArr) {
 	return eArr.map(TD).join('');
+}
+
+function openTab(tabname) {
+	$('.tabcontent').css('display', 'none');
+	$('.tablinks').removeClass('active');
+	$('#'+tabname).css('display', 'block');
+	$('#tab_ul').find('[name='+tabname+']').addClass('active');
 }
