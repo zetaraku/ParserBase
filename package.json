@@ -12,7 +12,6 @@
     "cross-env": "^5.1.1",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
-    "gh-pages": "^1.1.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "jquery": "^3.3.1",
@@ -27,9 +26,7 @@
     "webpack-cli": "^2.1.3"
   },
   "scripts": {
-    "deploy": "gh-pages -d dist",
     "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha",
-    "coverage": "cross-env SURPRESS_GRAPHVIZ=1 nyc report --reporter=text-lcov | npx coveralls",
     "localtest": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=html --reporter=text mocha"
   },
   "dependencies": {},
