@@ -1,5 +1,3 @@
-'use strict';
-
 const _ext = require('./_ext');
 const {
 	GSymbol,

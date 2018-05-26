@@ -1,5 +1,3 @@
-'use strict';
-
 const $ = require('jquery');
 const ParserBase = require('./ParserBase');
 const main_functions = require('./main_functions');
