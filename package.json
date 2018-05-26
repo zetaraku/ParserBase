@@ -14,7 +14,6 @@
     "babel-core": "^6.26.3",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
-    "canvg-browser": "^1.0.0",
     "chai": "^3.5.0",
     "coveralls": "^3.0.0",
     "cross-env": "^5.1.6",
@@ -22,7 +21,6 @@
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "jquery": "^3.3.1",
     "mocha": "^5.2.0",
     "mocha-webpack": "^2.0.0-beta.0",
     "node-sass": "^4.9.0",
@@ -31,7 +29,6 @@
     "pug-html-loader": "^1.1.5",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",
-    "viz.js": "^2.0.0",
     "webpack": "^4.8.3",
     "webpack-cli": "^2.1.4"
   },
@@ -39,7 +36,11 @@
     "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha --require babel-core/register",
     "localtest": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=html --reporter=text mocha --require babel-core/register --colors"
   },
-  "dependencies": {},
+  "dependencies": {
+    "canvg-browser": "^1.0.0",
+    "jquery": "^3.3.1",
+    "viz.js": "^2.0.0"
+  },
   "bugs": {
     "url": "https://github.com/zetaraku/ParserBase/issues"
   },
