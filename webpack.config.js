@@ -8,6 +8,13 @@ module.exports = {
 		filename: 'bundle.js'
 	},
 	mode: 'development',
+	node: {
+		fs: 'empty',
+		child_process: 'empty',
+		net: 'empty',
+		tls: 'empty',
+		process: false
+	},
 	// watch: true,
 	devtool: 'source-map',
 	module: {
@@ -39,6 +46,15 @@ module.exports = {
 					}},
 				]
 			},
+			// {
+			// 	test: /\.js$/,
+			// 	exclude: /(node_modules|bower_components)/,
+			// 	use: [
+			// 		{
+			// 			loader: 'babel-loader'
+			// 		}
+			// 	]
+			// }
 		]
 	},
 	plugins: [

@@ -9,7 +9,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - SURPRESS_GRAPHVIZ=1 npx nyc --reporter=lcov mocha
+  - npm run test
 after_success:
   - npx nyc report --reporter=text-lcov | npx coveralls             # report to Coveralls
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT  # report to Code Climate

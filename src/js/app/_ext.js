@@ -80,9 +80,9 @@ function addAll(_this, _that) {
 	}
 }
 
-module.exports = {
-	overrides: overrides,
-	equals: equals,
-	groupBy: groupBy,
-	addAll: addAll,
+export default {
+	overrides,
+	equals,
+	groupBy,
+	addAll,
 };

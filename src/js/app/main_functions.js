@@ -1,7 +1,6 @@
+import { GSymbol } from './ParserBase.classes';
 
-const ParserBase = require('./ParserBase');
-
-function processGrammarInput(inputText) {
+export function processGrammarInput(inputText) {
 	let terminals = new Set();
 	let nonTerminals = new Set();
 	let startSymbol = null;
@@ -58,14 +57,9 @@ function processGrammarInput(inputText) {
 		extraResult: extraResult,
 	};
 }
-function processParseInput(inputText, vocabularyNameMap) {
+export function processParseInput(inputText, vocabularyNameMap) {
 	return inputText.trim().split(/\s+/).filter(s => s !== '')
 		.map(function(t) {
-			return {terminalType: vocabularyNameMap.get(t) || ParserBase.GSymbol.UNKNOWN};
+			return {terminalType: vocabularyNameMap.get(t) || GSymbol.UNKNOWN};
 		});
 }
-
-module.exports = {
-	processGrammarInput: processGrammarInput,
-	processParseInput: processParseInput,
-};

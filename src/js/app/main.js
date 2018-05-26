@@ -1,14 +1,34 @@
-const $ = require('jquery');
-const ParserBase = require('./ParserBase');
-const main_functions = require('./main_functions');
-const graphviz_functions = require('./graphviz_functions');
-const canvg = require('../lib/canvg');
+import $ from 'jquery';
+import * as ParserBase from './ParserBase';
+import {
+	GSymbol,
+	Terminal,
+	NonTerminal,
+	// ActionSymbol,
+	// Production,
+	// Grammar,
+	// LR0Configuration,
+	// LR1Configuration,
+	// LR0FSM,
+	// LR1FSM,
+	LL1Parse,
+	LR1Parse,
+} from './ParserBase.classes';
+import {
+	processGrammarInput,
+	processParseInput,
+} from './main_functions';
+import {
+	generateDotImageOfCFSM,
+	generateDotImageOfParseTrees,
+} from './graphviz_functions';
+import canvg from 'canvg-browser';
 
 let original = {
 	toString: {
-		GSymbol: ParserBase.GSymbol.prototype.toString,
-		Terminal: ParserBase.Terminal.prototype.toString,
-		NonTerminal: ParserBase.NonTerminal.prototype.toString
+		GSymbol: GSymbol.prototype.toString,
+		Terminal: Terminal.prototype.toString,
+		NonTerminal: NonTerminal.prototype.toString
 	}
 };
 let COMMA_SEPERATOR = '<span class="comma"> , </span>';
@@ -36,7 +56,7 @@ $(document).ready(function() {
 			return false;
 		}
 
-		let rawGrammar = main_functions.processGrammarInput($('#grammar_input').val());
+		let rawGrammar = processGrammarInput($('#grammar_input').val());
 
 		if(rawGrammar.extraResult.parseExample !== undefined) {
 			$('.source_input').val(rawGrammar.extraResult.parseExample);
@@ -53,8 +73,8 @@ $(document).ready(function() {
 		let ll1PredictTable = ParserBase.buildLL1PredictTable(grammar, predictSetTable);
 		let lr0FSM = ParserBase.buildLR0FSM(grammar);
 		let lr1FSM = ParserBase.buildLR1FSM(grammar, firstSetTable);
-		// let lr0FSM_Viz = graphviz_functions.generateDotImageOfCFSM(lr0FSM);
-		// let lr1FSM_Viz = graphviz_functions.generateDotImageOfCFSM(lr1FSM);
+		// let lr0FSM_Viz = await generateDotImageOfCFSM(lr0FSM);
+		// let lr1FSM_Viz = await generateDotImageOfCFSM(lr1FSM);
 		let lr1GotoActionTable = ParserBase.buildLR1GotoActionTable(grammar, lr1FSM);
 
 		let terminalsList = Array.from(grammar.terminals);
@@ -62,23 +82,23 @@ $(document).ready(function() {
 		let symbolsList = [...terminalsList, ...nonTerminalsList];
 
 		// set display of parser components
-		ParserBase.GSymbol.prototype.toString = function() {
+		GSymbol.prototype.toString = function() {
 			let classArr = ['gsymbol'];
-			if(this === ParserBase.GSymbol.LAMBDA)
+			if(this === GSymbol.LAMBDA)
 				classArr.push('lambda');
 			return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
 		};
-		ParserBase.Terminal.prototype.toString = function() {
+		Terminal.prototype.toString = function() {
 			let classArr = ['gsymbol','terminal'];
-			if(this === ParserBase.GSymbol.UNKNOWN)
+			if(this === GSymbol.UNKNOWN)
 				classArr.push('unknown');
-			if(this === ParserBase.GSymbol.EOI)
+			if(this === GSymbol.EOI)
 				classArr.push('end-symbol');
 			return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';
 		};
-		ParserBase.NonTerminal.prototype.toString = function() {
+		NonTerminal.prototype.toString = function() {
 			let classArr = ['gsymbol','non-terminal'];
-			if(this === ParserBase.GSymbol.SYSTEM_GOAL)
+			if(this === GSymbol.SYSTEM_GOAL)
 				classArr.push('augmenting-symbol');
 			if(this === grammar.startSymbol)
 				classArr.push('start-symbol');
@@ -134,7 +154,7 @@ $(document).ready(function() {
 				'<tr><th>NonTerminal</th><th>FirstSet</th></tr>' +
 				Array.from(firstSetTable.entries())
 					.filter(function([symbol, firstSet]) {
-						return (symbol instanceof ParserBase.NonTerminal);
+						return (symbol instanceof NonTerminal);
 					}).map(function([symbol, firstSet]) {
 						return {
 							symbol: symbol,
@@ -180,7 +200,7 @@ $(document).ready(function() {
 								e.production.id,
 								e.production.lhs,
 								' → ',
-								(e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : ParserBase.GSymbol.LAMBDA),
+								(e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : GSymbol.LAMBDA),
 								e.predictSet.join(COMMA_SEPERATOR)
 							].map((e) => '<td>' + e + '</td>').join('') +
 							'</tr>');
@@ -229,10 +249,11 @@ $(document).ready(function() {
 
 			// LR(0) FSM tab
 			$('#lr0fsm').html("Please click on the button above to generate the FSM diagram.");
-			$('#lr0fsm_gen').on('click', function() {
-				let lr0FSM_Viz = graphviz_functions.generateDotImageOfCFSM(lr0FSM);
+			$('#lr0fsm_gen').on('click', async function() {
+				let lr0FSM_Viz = await generateDotImageOfCFSM(lr0FSM);
 				$('#lr0fsm').html(lr0FSM_Viz);
 				$('#lr0fsm_tab a.downloadLink').show().on('click', function(event) {
+					console.log(lr0FSM_Viz);
 					canvg(tmpCanvas, lr0FSM_Viz);
 					event.target.href = tmpCanvas.toDataURL('image/png');
 				});
@@ -240,8 +261,8 @@ $(document).ready(function() {
 
 			// LR(1) FSM tab
 			$('#lr1fsm').html("Please click on the button above to generate the FSM diagram.");
-			$('#lr1fsm_gen').on('click', function() {
-				let lr1FSM_Viz = graphviz_functions.generateDotImageOfCFSM(lr1FSM);
+			$('#lr1fsm_gen').on('click', async function() {
+				let lr1FSM_Viz = await generateDotImageOfCFSM(lr1FSM);
 				$('#lr1fsm').html(lr1FSM_Viz);
 				$('#lr1fsm_tab a.downloadLink').show().on('click', function(event) {
 					canvg(tmpCanvas, lr1FSM_Viz);
@@ -254,7 +275,7 @@ $(document).ready(function() {
 			$('#ll1parse .parse_next_btn').off('click');
 			$('#ll1parse .view_parse_tree').off('click');
 			$('#ll1parse .start_parse').on('click', function() {
-				let inputTokens = main_functions.processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
+				let inputTokens = processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLL1Parse(grammar, ll1PredictTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseTree = currentParse.parseTree;
@@ -273,21 +294,21 @@ $(document).ready(function() {
 								return updateMsg('Error: ' + r.value.message);
 						}
 						let stepInfo = r.value;
-						if(stepInfo instanceof ParserBase.LL1Parse.Action.Match) {
+						if(stepInfo instanceof LL1Parse.Action.Match) {
 							updateMsg("Match " + stepInfo.terminalType);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
 							updateData();
 							yield;
-						} else if(stepInfo instanceof ParserBase.LL1Parse.Action.Predict) {
+						} else if(stepInfo instanceof LL1Parse.Action.Predict) {
 							updateMsg("Predict " + stepInfo.usingProd);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							yield;
 							updateData();
 							$('#ll1parse .parse_stack td').slice(0,stepInfo.usingProd.rhs.length).addClass('highlighted');
 							yield;
-						} else if(stepInfo instanceof ParserBase.LL1Parse.Action.Accept) {
+						} else if(stepInfo instanceof LL1Parse.Action.Accept) {
 							updateMsg("Match " + stepInfo.terminalType + ' & Accept');
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
@@ -327,9 +348,9 @@ $(document).ready(function() {
 							}).join('') + '</tr></table>').join(''));
 					$('#ll1parse .parse_step_info').html('');
 				}
-				function displayParseTree() {
-					let ll1parsetree_Viz = graphviz_functions.generateDotImageOfParseTrees([parseTree]);
-					var myWindow = window.open(); {
+				async function displayParseTree() {
+					let ll1parsetree_Viz = await generateDotImageOfParseTrees([parseTree]);
+					let myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>
 								<head>
@@ -355,7 +376,7 @@ $(document).ready(function() {
 			$('#lr1parse .parse_next_btn').off('click');
 			$('#lr1parse .view_parse_tree').off('click');
 			$('#lr1parse .start_parse').on('click', function() {
-				let inputTokens = main_functions.processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
+				let inputTokens = processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
 				let currentParse = ParserBase.newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseForest = currentParse.parseForest;
@@ -374,14 +395,14 @@ $(document).ready(function() {
 								return updateMsg('Error: ' + r.value.message);
 						}
 						let stepInfo = r.value;
-						if(stepInfo instanceof ParserBase.LR1Parse.Action.Shift) {
+						if(stepInfo instanceof LR1Parse.Action.Shift) {
 							updateMsg('Shift');
 							$('#lr1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
 							updateData();
 							$('#lr1parse .parse_stack td').last().addClass('highlighted');
 							yield;
-						} else if(stepInfo instanceof ParserBase.LR1Parse.Action.Reduce) {
+						} else if(stepInfo instanceof LR1Parse.Action.Reduce) {
 							updateMsg('Reduce ' + stepInfo.reducingProduction.toStringReversed());
 							if(stepInfo.reducingProduction.rhs.length>0)
 								$('#lr1parse .parse_stack td').slice(-stepInfo.reducingProduction.rhs.length).addClass('highlighted');
@@ -389,7 +410,7 @@ $(document).ready(function() {
 							updateData();
 							$('#lr1parse .parse_stack td').last().addClass('highlighted');
 							yield;
-						} else if(stepInfo instanceof ParserBase.LR1Parse.Action.Accept) {
+						} else if(stepInfo instanceof LR1Parse.Action.Accept) {
 							updateMsg('Shift & Reduce ' + stepInfo.reducingProduction.toStringReversed() + ' & Accept');
 							$('#lr1parse .itoken_stream td').first().addClass('highlighted');
 							$('#lr1parse .parse_stack td').addClass('highlighted');
@@ -422,9 +443,9 @@ $(document).ready(function() {
 					$('#lr1parse .state_stack').html(TDs(stateStack.map((e) => e.id)));
 					$('#lr1parse .parse_step_info').html('');
 				}
-				function displayParseTree() {
-					let lr1parsetree_Viz = graphviz_functions.generateDotImageOfParseTrees(parseForest);
-					var myWindow = window.open(); {
+				async function displayParseTree() {
+					let lr1parsetree_Viz = await generateDotImageOfParseTrees(parseForest);
+					let myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>
 								<head>
@@ -456,17 +477,17 @@ $(document).ready(function() {
 
 function initTabs() {
 	const tablis = {
-		grammar_tab: "Grammar",
-		lambda_tab: "Nullables",
-		first_tab: "First Set (1)",
-		follow_tab: "Follow Set (1)",
-		predict_tab: "Predict Set (1)",
-		ll1table_tab: "LL(1) Table",
-		ll1parse_tab: "LL(1) Parse",
-		lr0fsm_tab: "LR(0) FSM",
-		lr1fsm_tab: "LR(1) FSM",
-		lr1table_tab: "LR(1) Table",
-		lr1parse_tab: "LR(1) Parse",
+		grammar_tab: 'Grammar',
+		lambda_tab: 'Nullables',
+		first_tab: 'First Set (1)',
+		follow_tab: 'Follow Set (1)',
+		predict_tab: 'Predict Set (1)',
+		ll1table_tab: 'LL(1) Table',
+		ll1parse_tab: 'LL(1) Parse',
+		lr0fsm_tab: 'LR(0) FSM',
+		lr1fsm_tab: 'LR(1) FSM',
+		lr1table_tab: 'LR(1) Table',
+		lr1parse_tab: 'LR(1) Parse',
 	};
 	for(let tabname in tablis) {
 		$('#tab_ul').append(

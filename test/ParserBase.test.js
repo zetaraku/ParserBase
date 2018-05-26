@@ -1,11 +1,25 @@
 const chai = require('chai');
+const ParserBase = require('../src/js/app/ParserBase');
+const {
+	GSymbol,
+	Terminal,
+	NonTerminal,
+	ActionSymbol,
+	Production,
+	Grammar,
+	LR0Configuration,
+	LR1Configuration,
+	LR0FSM,
+	LR1FSM,
+	LL1Parse,
+	LR1Parse,
+} = require('../src/js/app/ParserBase.classes');
+const main_functions = require('../src/js/app/main_functions');
+const _ext = require('../src/js/app/_ext').default;
+
 let expect = chai.expect;
 // let should = chai.should();
 let assert = chai.assert;
-
-const ParserBase = require('../src/js/app/ParserBase');
-const _ext = require('../src/js/app/_ext');
-const main_functions = require('../src/js/app/main_functions');
 
 {
 	describe('module ParserBase', function() {
@@ -100,17 +114,17 @@ add_op -> -
 					[
 						["program",			["begin"]],
 						["statement_list",	["ID", "read", "write"]],
-						["statement_tail",	["ID", "read", "write", ParserBase.GSymbol.LAMBDA.name]],
+						["statement_tail",	["ID", "read", "write", GSymbol.LAMBDA.name]],
 						["statement",		["ID", "read", "write"]],
 						["id_list",			["ID"]],
-						["id_tail",			[",", ParserBase.GSymbol.LAMBDA.name]],
+						["id_tail",			[",", GSymbol.LAMBDA.name]],
 						["expr_list",		["(", "ID", "INTLIT"]],
-						["expr_tail",		[",", ParserBase.GSymbol.LAMBDA.name]],
+						["expr_tail",		[",", GSymbol.LAMBDA.name]],
 						["expression",		["(", "ID", "INTLIT"]],
-						["primary_tail",	["+", "-", ParserBase.GSymbol.LAMBDA.name]],
+						["primary_tail",	["+", "-", GSymbol.LAMBDA.name]],
 						["primary",			["(", "ID", "INTLIT"]],
 						["add_op",			["+", "-"]],
-						[ParserBase.GSymbol.SYSTEM_GOAL.name,		["begin"]],
+						[GSymbol.SYSTEM_GOAL.name,		["begin"]],
 					].concat(result.grammar.terminals.map(t => [t.name, [t.name]]))
 					.map(([k, v]) => [
 						result.vocabularyNameMap.get(k),
@@ -127,7 +141,7 @@ add_op -> -
 			it('- correct (verified)', function() {
 				let expected = new Map(			// verified
 					[
-						["program",			[ParserBase.GSymbol.EOI.name]],
+						["program",			[GSymbol.EOI.name]],
 						["statement_list",	["end"]],
 						["statement_tail",	["end"]],
 						["statement",		["ID", "read", "write", "end"]],
@@ -139,7 +153,7 @@ add_op -> -
 						["primary_tail",	[";", ",", ")"]],
 						["primary",			["+", "-", ";", "," , ")"]],
 						["add_op",			["(", "ID", "INTLIT"]],
-						[ParserBase.GSymbol.SYSTEM_GOAL.name,		[ParserBase.GSymbol.LAMBDA.name]],
+						[GSymbol.SYSTEM_GOAL.name,		[GSymbol.LAMBDA.name]],
 					].map(([k, v]) => [
 						result.vocabularyNameMap.get(k),
 						new Set(v.map(e => result.vocabularyNameMap.get(e)))
@@ -192,7 +206,7 @@ add_op -> -
 			it('- correct (verified)', function() {
 				let expected = new Map(			// verified
 					[
-						[ParserBase.GSymbol.SYSTEM_GOAL.name, [
+						[GSymbol.SYSTEM_GOAL.name, [
 							["begin", [0]]
 						]],
 						["program", [
@@ -291,7 +305,7 @@ add_op -> -
 							["begin", ["S→2"]]
 						]],
 						[1, [
-							[ParserBase.GSymbol.EOI.name, ["A"]]
+							[GSymbol.EOI.name, ["A"]]
 						]],
 						[2, [
 							["statement_list", ["→4"]],
@@ -323,7 +337,7 @@ add_op -> -
 							["(", ["S→14"]]
 						]],
 						[9, [
-							[ParserBase.GSymbol.EOI.name, ["R(1)"]]
+							[GSymbol.EOI.name, ["R(1)"]]
 						]],
 						[10, [
 							["end", ["R(2)"]]
@@ -616,13 +630,13 @@ add_op -> -
 				function makeLR1GotoAction(actionRaw) {
 					let group;
 					if((group = actionRaw.match(/^S→(\d+)$/)) !== null) {
-						return new ParserBase.LR1Parse.Action.Shift(sid2state[parseInt(group[1])]);
+						return new LR1Parse.Action.Shift(sid2state[parseInt(group[1])]);
 					} else if((group = actionRaw.match(/^→(\d+)$/)) !== null) {
-						return new ParserBase.LR1Parse.Action.PseudoShift(sid2state[parseInt(group[1])]);
+						return new LR1Parse.Action.PseudoShift(sid2state[parseInt(group[1])]);
 					} else if((group = actionRaw.match(/^R\((\d+)\)$/)) !== null) {
-						return new ParserBase.LR1Parse.Action.Reduce(result.grammar.productions[group[1]]);
+						return new LR1Parse.Action.Reduce(result.grammar.productions[group[1]]);
 					} else if(actionRaw === 'A') {
-						return new ParserBase.LR1Parse.Action.Accept(result.grammar.augmentingProduction);
+						return new LR1Parse.Action.Accept(result.grammar.augmentingProduction);
 					} else {
 						throw new Error('Invalid state literal.');
 					}
@@ -650,19 +664,21 @@ add_op -> -
 				expect(r.value).to.not.be.an.instanceof(Error);
 			});
 		});
+
 		if(!process.env.SURPRESS_GRAPHVIZ) {
 			const graphviz_functions = require('../src/js/app/graphviz_functions');
+
 			describe('visualization', function() {
-				it('should visualize LR(0) FSM', function() {
+				it('should visualize LR(0) FSM', async function() {
 					this.timeout(0);
 					expect(
-						result.lr0FSM_Viz = graphviz_functions.generateDotImageOfCFSM(result.lr0FSM)
+						result.lr0FSM_Viz = await graphviz_functions.generateDotImageOfCFSM(result.lr0FSM)
 					).to.exist;
 				});
-				it('should visualize LR(1) FSM', function() {
+				it('should visualize LR(1) FSM', async function() {
 					this.timeout(0);
 					expect(
-						result.lr1FSM_Viz = graphviz_functions.generateDotImageOfCFSM(result.lr1FSM)
+						result.lr1FSM_Viz = await graphviz_functions.generateDotImageOfCFSM(result.lr1FSM)
 					).to.exist;
 				});
 			});

@@ -1,6 +1,9 @@
-let Viz = require('../lib/viz');
+import Viz from 'viz.js';
+import { Module, render } from 'viz.js/full.render';
 
-function generateDotImageOfCFSM(cfsm) {
+const viz = new Viz({ Module, render });
+
+export function generateDotImageOfCFSM(cfsm) {
 	let dotFileSrc = "";
 	dotFileSrc += ("digraph CFSM { ");
 	dotFileSrc += ("rankdir=\"LR\"; ");
@@ -22,9 +25,9 @@ function generateDotImageOfCFSM(cfsm) {
 	}
 	dotFileSrc += ("}");
 
-	return Viz(dotFileSrc);
+	return viz.renderString(dotFileSrc);
 }
-function generateDotImageOfParseTrees(parseTrees) {
+export function generateDotImageOfParseTrees(parseTrees) {
 	let dotFileSrc = "";
 	dotFileSrc += ("digraph ParseTree { ");
 	dotFileSrc += ("rankdir=\"UD\"; ");
@@ -33,7 +36,7 @@ function generateDotImageOfParseTrees(parseTrees) {
 			traverseNode(parseTree);
 	dotFileSrc += ("}");
 
-	return Viz(dotFileSrc);
+	return viz.renderString(dotFileSrc);
 
 	function traverseNode(node) {
 		dotFileSrc += (node.id + " [label = \"" + node.toRawString() + "\"]; ");
@@ -45,8 +48,3 @@ function generateDotImageOfParseTrees(parseTrees) {
 		}
 	}
 }
-
-module.exports = {
-	generateDotImageOfCFSM,
-	generateDotImageOfParseTrees,
-};
