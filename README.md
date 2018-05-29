@@ -52,8 +52,4 @@ License
 
 Copyright © 2017, Raku Zeta. Licensed under the MIT license.
 
-Other used libraries and license infomation are located in `./js/lib/`.
-
-
-## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fzetaraku%2FParserBase.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fzetaraku%2FParserBase?ref=badge_large)
