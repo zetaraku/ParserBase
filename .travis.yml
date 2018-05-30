@@ -9,11 +9,12 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - npm run test
+  - SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha --require babel-core/register
 after_success:
-  - npx nyc report --reporter=text-lcov | npx coveralls             # report to Coveralls
+  - nyc report --reporter=text-lcov | coveralls                     # report to Coveralls
+  - nyc report --reporter=text-lcov > coverage.lcov && codecov      # report to Codecov
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT  # report to Code Climate
-  - npx webpack
+  - webpack   # prepare for deployment
 deploy:
   provider: pages
   skip-cleanup: true

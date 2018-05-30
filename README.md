@@ -2,6 +2,7 @@ Parser Base
 ===========
 [![Build Status](https://travis-ci.org/zetaraku/ParserBase.svg?branch=master)](https://travis-ci.org/zetaraku/ParserBase)
 [![Coverage Status](https://coveralls.io/repos/github/zetaraku/ParserBase/badge.svg?branch=master)](https://coveralls.io/github/zetaraku/ParserBase?branch=master)
+[![codecov](https://codecov.io/gh/zetaraku/ParserBase/branch/master/graph/badge.svg)](https://codecov.io/gh/zetaraku/ParserBase)
 [![Maintainability](https://api.codeclimate.com/v1/badges/2af5d485d54b7bbb3f76/maintainability)](https://codeclimate.com/github/zetaraku/ParserBase/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2af5d485d54b7bbb3f76/test_coverage)](https://codeclimate.com/github/zetaraku/ParserBase/test_coverage)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fzetaraku%2FParserBase.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fzetaraku%2FParserBase?ref=badge_shield)
