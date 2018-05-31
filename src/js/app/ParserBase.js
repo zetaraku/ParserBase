@@ -516,11 +516,9 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 
 	return lr1GotoActionTable;
 }
-
 export function newLL1Parse(grammar, ll1PredictTable, inputTokens) {
 	return new LL1Parse(grammar, ll1PredictTable, inputTokens);
 }
-
 export function newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
 	return new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 }

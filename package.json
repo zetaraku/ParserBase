@@ -38,6 +38,7 @@
     "localtest": "nyc --reporter=html --reporter=text mocha --require babel-core/register --colors"
   },
   "dependencies": {
+    "babel-runtime": "^6.26.0",
     "canvg-browser": "^1.0.0",
     "jquery": "^3.3.1",
     "viz.js": "^2.0.0"
