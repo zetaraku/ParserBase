@@ -13,12 +13,6 @@ export default class LR0FSM {
 		linkTo(toState, symbol) {
 			this.transitionMap.set(symbol, toState);
 		}
-		subContentReprensentation() {
-			return Array.from(this.configurationSet)
-				.map(function(conf) {
-					return conf.toRawString() + '\\l';
-				}).join('');
-		}
 	};{
 		LR0FSM.State.serialNo = 1;
 	}

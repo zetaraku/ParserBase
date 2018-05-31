@@ -19,10 +19,14 @@ import {
 	processParseInput,
 } from './main_functions';
 import {
-	generateDotImageOfCFSM,
-	generateDotImageOfParseTrees,
+	buildDotSourceOfCFSM,
+	buildDotSourceOfParseTrees,
 } from './graphviz_functions';
+import Viz from 'viz.js';
+import { Module, render } from 'viz.js/full.render';
 import canvg from 'canvg-browser';
+
+const viz = new Viz({ Module, render });
 
 let original = {
 	toString: {
@@ -73,8 +77,8 @@ $(document).ready(function() {
 		let ll1PredictTable = ParserBase.buildLL1PredictTable(grammar, predictSetTable);
 		let lr0FSM = ParserBase.buildLR0FSM(grammar);
 		let lr1FSM = ParserBase.buildLR1FSM(grammar, firstSetTable);
-		// let lr0FSM_Viz = await generateDotImageOfCFSM(lr0FSM);
-		// let lr1FSM_Viz = await generateDotImageOfCFSM(lr1FSM);
+		// let lr0FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr0FSM));
+		// let lr1FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr1FSM));
 		let lr1GotoActionTable = ParserBase.buildLR1GotoActionTable(grammar, lr1FSM);
 
 		let terminalsList = Array.from(grammar.terminals);
@@ -250,7 +254,7 @@ $(document).ready(function() {
 			// LR(0) FSM tab
 			$('#lr0fsm').html("Please click on the button above to generate the FSM diagram.");
 			$('#lr0fsm_gen').on('click', async function() {
-				let lr0FSM_Viz = await generateDotImageOfCFSM(lr0FSM);
+				let lr0FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr0FSM));
 				$('#lr0fsm').html(lr0FSM_Viz);
 				$('#lr0fsm_tab a.downloadLink').show().on('click', function(event) {
 					console.log(lr0FSM_Viz);
@@ -262,7 +266,7 @@ $(document).ready(function() {
 			// LR(1) FSM tab
 			$('#lr1fsm').html("Please click on the button above to generate the FSM diagram.");
 			$('#lr1fsm_gen').on('click', async function() {
-				let lr1FSM_Viz = await generateDotImageOfCFSM(lr1FSM);
+				let lr1FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr1FSM));
 				$('#lr1fsm').html(lr1FSM_Viz);
 				$('#lr1fsm_tab a.downloadLink').show().on('click', function(event) {
 					canvg(tmpCanvas, lr1FSM_Viz);
@@ -349,7 +353,7 @@ $(document).ready(function() {
 					$('#ll1parse .parse_step_info').html('');
 				}
 				async function displayParseTree() {
-					let ll1parsetree_Viz = await generateDotImageOfParseTrees([parseTree]);
+					let ll1parsetree_Viz = await viz.renderString(buildDotSourceOfParseTrees([parseTree]));
 					let myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>
@@ -444,7 +448,7 @@ $(document).ready(function() {
 					$('#lr1parse .parse_step_info').html('');
 				}
 				async function displayParseTree() {
-					let lr1parsetree_Viz = await generateDotImageOfParseTrees(parseForest);
+					let lr1parsetree_Viz = await viz.renderString(buildDotSourceOfParseTrees(parseForest));
 					let myWindow = window.open(); {
 						myWindow.document.write(`
 							<html>

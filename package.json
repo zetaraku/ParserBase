@@ -34,8 +34,8 @@
     "webpack-cli": "^2.1.4"
   },
   "scripts": {
-    "test": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=lcov mocha --require babel-core/register",
-    "localtest": "cross-env SURPRESS_GRAPHVIZ=1 nyc --reporter=html --reporter=text mocha --require babel-core/register --colors"
+    "test": "nyc --reporter=lcov mocha --require babel-core/register",
+    "localtest": "nyc --reporter=html --reporter=text mocha --require babel-core/register --colors"
   },
   "dependencies": {
     "canvg-browser": "^1.0.0",

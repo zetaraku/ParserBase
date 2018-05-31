@@ -15,6 +15,7 @@ const {
 	LR1Parse,
 } = require('../src/js/app/ParserBase.classes');
 const main_functions = require('../src/js/app/main_functions');
+const graphviz_functions = require('../src/js/app/graphviz_functions');
 const _ext = require('../src/js/app/_ext').default;
 
 let expect = chai.expect;
@@ -38,19 +39,19 @@ let assert = chai.assert;
 program -> begin statement_list end
 statement_list -> statement statement_tail
 statement_tail -> statement statement_tail
-statement_tail -> 
+statement_tail ->
 statement -> ID := expression ;
 statement -> read ( id_list ) ;
 statement -> write ( expr_list ) ;
 id_list -> ID id_tail
 id_tail -> , ID id_tail
-id_tail -> 
+id_tail ->
 expr_list -> expression expr_tail
 expr_tail -> , expression expr_tail
-expr_tail -> 
+expr_tail ->
 expression -> primary primary_tail
 primary_tail -> add_op primary primary_tail
-primary_tail -> 
+primary_tail ->
 primary -> ( expression )
 primary -> ID
 primary -> INTLIT
@@ -653,6 +654,7 @@ add_op -> -
 					r = currentParse.step.next();
 				} while(!r.done);
 				expect(r.value).to.not.be.an.instanceof(Error);
+				result.ll1Parse = currentParse;
 			});
 			it('should finish LR(1) Parse without error', function() {
 				let inputTokens = main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
@@ -662,26 +664,30 @@ add_op -> -
 					r = currentParse.step.next();
 				} while(!r.done);
 				expect(r.value).to.not.be.an.instanceof(Error);
+				result.lr1Parse = currentParse;
 			});
 		});
-
-		if(!process.env.SURPRESS_GRAPHVIZ) {
-			const graphviz_functions = require('../src/js/app/graphviz_functions');
-
-			describe('visualization', function() {
-				it('should visualize LR(0) FSM', async function() {
-					this.timeout(0);
-					expect(
-						result.lr0FSM_Viz = await graphviz_functions.generateDotImageOfCFSM(result.lr0FSM)
-					).to.exist;
-				});
-				it('should visualize LR(1) FSM', async function() {
-					this.timeout(0);
-					expect(
-						result.lr1FSM_Viz = await graphviz_functions.generateDotImageOfCFSM(result.lr1FSM)
-					).to.exist;
-				});
+		describe('dot source generation', function() {
+			it('should generate dot source for LL(1) ParseTree', function() {
+				expect(
+					result.ll1ParseTree_Viz = graphviz_functions.buildDotSourceOfParseTrees([result.ll1Parse.parseTree])
+				).to.exist;
 			});
-		}
+			it('should generate dot source for LR(1) ParseTree', function() {
+				expect(
+					result.lr1ParseTree_Viz = graphviz_functions.buildDotSourceOfParseTrees(result.lr1Parse.parseForest)
+				).to.exist;
+			});
+			it('should generate dot source for LR(0) FSM', function() {
+				expect(
+					result.lr0FSM_Viz = graphviz_functions.buildDotSourceOfCFSM(result.lr0FSM)
+				).to.exist;
+			});
+			it('should generate dot source for LR(1) FSM', function() {
+				expect(
+					result.lr1FSM_Viz = graphviz_functions.buildDotSourceOfCFSM(result.lr1FSM)
+				).to.exist;
+			});
+		});
 	});
 }

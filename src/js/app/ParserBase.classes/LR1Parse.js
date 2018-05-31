@@ -101,9 +101,6 @@ export default class LR1Parse {
 		toString() {
 			return this.symbol.toString();
 		}
-		toRawString() {
-			return this.symbol.toRawString();
-		}
 	};{
 		LR1Parse.TreeNode.serialNo = 1;
 	}

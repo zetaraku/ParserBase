@@ -7,9 +7,6 @@ export class GSymbol {
 	toString() {
 		return this.displayName;
 	}
-	toRawString() {
-		return this.displayName;
-	}
 } {
 	// the placeholder for lambda (nothing)
 	GSymbol.LAMBDA = new GSymbol(Symbol('λ'), 'λ');

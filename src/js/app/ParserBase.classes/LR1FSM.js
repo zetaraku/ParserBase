@@ -15,14 +15,6 @@ export default class LR1FSM {
 		linkTo(toState, symbol) {
 			this.transitionMap.set(symbol, toState);
 		}
-		subContentReprensentation() {
-			return Array.from(_ext.groupBy(this.configurationSet, e => e.baseLR0Configuration).entries())
-				.map(function([lr0conf, lr1confs]) {
-					return lr0conf.toRawString() + ' ' + '{' +
-						Array.from(lr1confs).map(e => e.lookahead.toRawString()).join(' ') +
-					'}' + '\\l';
-				}).join('');
-		}
 	};{
 		LR1FSM.State.serialNo = 1;
 	}

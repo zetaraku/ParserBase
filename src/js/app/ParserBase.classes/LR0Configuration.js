@@ -18,12 +18,6 @@ export default class LR0Configuration {
 		return (this.production.lhs + ' ' + Production.ARROW + ' ' +
 			r.join(' '));
 	}
-	toRawString() {
-		let r = this.production.rhs.slice();
-		r.splice(this.dotPos, 0, GSymbol.DOT);
-		return (this.production.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' +
-			r.map(e => e.toRawString()).join(' '));
-	}
 } {
 	LR0Configuration.serialNo = 1;
 }

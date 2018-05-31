@@ -14,26 +14,16 @@ export default class Production {
 		return (this.lhs + ' ' + Production.ARROW_R + ' ' +
 			(this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA));
 	}
-	toRawString() {
-		return (this.lhs.toRawString() + ' ' + Production.ARROW.toRawString() + ' ' +
-			(this.rhs.length !== 0 ? this.rhs.map(e => e.toRawString()).join(' ') : GSymbol.LAMBDA.toRawString()));
-	}
 } {
 	Production.serialNo = 0;
 	Production.ARROW = {
 		toString: function() {
 			return '→';
 		},
-		toRawString: function() {
-			return '→';
-		}
 	};
 	Production.ARROW_R = {
 		toString: function() {
 			return '←';
 		},
-		toRawString: function() {
-			return '←';
-		}
 	};
 }
