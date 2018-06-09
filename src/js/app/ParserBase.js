@@ -28,11 +28,16 @@ export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, r
 			throw new Error(`Error: Vocabulary name '${name}' declared more than once!`);
 		vocabularyNameMap.set(name, new NonTerminal(name));
 	}
+
 	let terminals = [...terminalNames.map(name => vocabularyNameMap.get(name)), GSymbol.EOI];
 	let nonTerminals = [...nonTerminalNames.map(name => vocabularyNameMap.get(name)), GSymbol.SYSTEM_GOAL];
+
 	let startSymbol = vocabularyNameMap.get(startSymbolName);
-		if(!startSymbol) throw new Error(`start symbol '${startSymbolName}' no found`);
+	if(!startSymbol)
+		throw new Error(`start symbol '${startSymbolName}' no found`);
+
 	let augmentingProduction = new Production(GSymbol.SYSTEM_GOAL, [startSymbol, GSymbol.EOI]);
+
 	let productions = [augmentingProduction, ...rawProductions.map(function([lhsName, ...rhsNames]) {
 		let lhs = vocabularyNameMap.get(lhsName);
 		let rhs = rhsNames.map(name => vocabularyNameMap.get(name));
@@ -43,6 +48,7 @@ export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, r
 }
 export function computeUnreachableSymbols(grammar) {
 	let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
+
 	let processingQueue = [GSymbol.SYSTEM_GOAL];
 	while(processingQueue.length !== 0) {
 		let processingNT = processingQueue.shift();
@@ -56,12 +62,11 @@ export function computeUnreachableSymbols(grammar) {
 			}
 		}
 	}
-	let unreachableSymbols = [];
-	for(let symbol of [...grammar.terminals, ...grammar.nonTerminals]) {
-		if(!reachableVocabularies.has(symbol)) {
-			unreachableSymbols.push(symbol);
-		}
-	}
+
+	let unreachableSymbols = [
+		...grammar.terminals,
+		...grammar.nonTerminals
+	].filter(symbol => !reachableVocabularies.has(symbol));
 
 	return unreachableSymbols;
 }
@@ -74,7 +79,7 @@ export function computeUnreducibleSymbols(grammar) {
 		for(let nt of processingMap.keys()) {
 			let processingProdutions = processingMap.get(nt);
 			for(let production of processingProdutions) {
-				let lhs = production.lhs, rhs = production.rhs;
+				let { lhs, rhs } = production;
 				let isReducible = true;
 				for(let v of rhs) {
 					if(!reducibleVocabularies.has(v)) {
@@ -91,12 +96,9 @@ export function computeUnreducibleSymbols(grammar) {
 			}
 		}
 	}
-	let unreducibleSymbols = [];
-	for(let symbol of grammar.nonTerminals) {
-		if(!reducibleVocabularies.has(symbol)) {
-			unreducibleSymbols.push(symbol);
-		}
-	}
+
+	let unreducibleSymbols = grammar.nonTerminals
+		.filter(symbol => !reducibleVocabularies.has(symbol));
 
 	return unreducibleSymbols;
 }
@@ -109,7 +111,7 @@ export function computeNullableSymbols(grammar) {
 		for(let key of processingMap.keys()) {
 			let processingProdutions = processingMap.get(key);
 			for(let production of processingProdutions) {
-				let lhs = production.lhs, rhs = production.rhs;
+				let { lhs, rhs } = production;
 				let isNullable = true;
 				for(let v of rhs) {
 					if(!nullableSymbols.has(v)) {
@@ -141,7 +143,7 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 	while(lastUpdatedVocabularies.size !== 0) {
 		let newUpdatedVocabularies = new Set();
 		for(let production of grammar.productions) {
-			let lhs = production.lhs, rhs = production.rhs;
+			let { lhs, rhs } = production;
 			let firstSetOfLHS = firstSetTable.get(lhs);
 			let lhsUpdated = false;
 			for(let rhsi of rhs) {
@@ -175,7 +177,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 
 	// stage 1: adding terminals from first set (one pass)
 	for(let production of grammar.productions) {
-		let lhs = production.lhs, rhs = production.rhs;
+		let { lhs, rhs } = production;
 		for(let i = 0; i < rhs.length; i++) {
 			if(!(rhs[i] instanceof NonTerminal))
 				continue;	// only consider NonTerminals
@@ -224,7 +226,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 	let predictSetTable = new Map();
 	for(let production of grammar.productions) {
-		let lhs = production.lhs, rhs = production.rhs;
+		let { lhs, rhs } = production;
 		let predictSetOfProduction = new Set();
 		let blocked = false;
 		for(let i = 0; i < rhs.length; i++) {

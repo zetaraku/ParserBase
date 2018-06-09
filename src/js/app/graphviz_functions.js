@@ -20,7 +20,7 @@ function dotStringOf(self) {
 	} else if(self instanceof LR0Configuration) {
 		let r = self.production.rhs.slice();
 		r.splice(self.dotPos, 0, GSymbol.DOT);
-		return dotStringOf(self.production.lhs) + ' -> ' + r.map(e => dotStringOf(e)).join(' ');
+		return dotStringOf(self.production.lhs) + ' → ' + r.map(e => dotStringOf(e)).join(' ');
 	} else if(self instanceof LR0FSM.State) {
 		return Array.from(self.configurationSet)
 			.map(function(lr0conf) {
@@ -29,12 +29,12 @@ function dotStringOf(self) {
 	} else if(self instanceof LR1FSM.State) {
 		return Array.from(_ext.groupBy(self.configurationSet, e => e.baseLR0Configuration).entries())
 			.map(function([lr0conf, lr1confs]) {
-				return dotStringOf(lr0conf) + ' ' + '{' +
+				return dotStringOf(lr0conf) + ' ' + '{ ' +
 					Array.from(lr1confs).map(e => dotStringOf(e.lookahead)).join(' ') +
-				'}' + '\\l';
+				' }' + '\\l';
 			}).join('');
 	} else if(self instanceof Production) {
-		return (dotStringOf(self.lhs) + ' -> ' +
+		return (dotStringOf(self.lhs) + ' → ' +
 			(self.rhs.length !== 0 ? self.rhs.map(e => dotStringOf(e)).join(' ') : dotStringOf(GSymbol.LAMBDA)));
 	} else {
 		console.error(self);

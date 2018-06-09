@@ -2,7 +2,7 @@ import $ from 'jquery';
 import * as ParserBase from './ParserBase';
 import {
 	GSymbol,
-	Terminal,
+	// Terminal,
 	NonTerminal,
 	// ActionSymbol,
 	// Production,
@@ -25,16 +25,10 @@ import {
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render';
 import canvg from 'canvg-browser';
+import './main_util';
 
 const viz = new Viz({ Module, render });
 
-let original = {
-	toString: {
-		GSymbol: GSymbol.prototype.toString,
-		Terminal: Terminal.prototype.toString,
-		NonTerminal: NonTerminal.prototype.toString
-	}
-};
 let COMMA_SEPERATOR = '<span class="comma"> , </span>';
 
 window.onerror = function(message, file, lineNumber) {
@@ -85,72 +79,67 @@ $(document).ready(function() {
 		let nonTerminalsList = Array.from(grammar.nonTerminals);
 		let symbolsList = [...terminalsList, ...nonTerminalsList];
 
-		// set display of parser components
-		GSymbol.prototype.toString = function() {
-			let classArr = ['gsymbol'];
-			if(this === GSymbol.LAMBDA)
-				classArr.push('lambda');
-			return '<span class="' + classArr.join(' ') + '">' + original.toString.GSymbol.call(this) + '</span>';
-		};
-		Terminal.prototype.toString = function() {
-			let classArr = ['gsymbol','terminal'];
-			if(this === GSymbol.UNKNOWN)
-				classArr.push('unknown');
-			if(this === GSymbol.EOI)
-				classArr.push('end-symbol');
-			return '<span class="' + classArr.join(' ') + '">' + original.toString.Terminal.call(this) + '</span>';
-		};
 		NonTerminal.prototype.toString = function() {
 			let classArr = ['gsymbol','non-terminal'];
 			if(this === GSymbol.SYSTEM_GOAL)
 				classArr.push('augmenting-symbol');
 			if(this === grammar.startSymbol)
 				classArr.push('start-symbol');
-			if(nullableSymbols.has(this))
+			if(nullableSymbols.has(this))		// need nullableSymbols
 				classArr.push('nullable');
-			return '<span class="' + classArr.join(' ') + '">' + original.toString.NonTerminal.call(this) + '</span>';
+			return '<span class="' + classArr.join(' ') + '">' + this.displayName + '</span>';
 		};
 
 		// display
 		$('#editor').slideUp(function() {
 			// Grammar tab
 			$('#grammar').html('<table style="width: 100%;"><tr>' +
-				'<td style="width: 20%; vertical-align: top;">Terminals: <ul>' +
-					Array.from(grammar.terminals).map((e) => '<li>' + e + '</li>').join(' ') +
-				'</ul></td>' +
-				'<td style="width: 25%; vertical-align: top;">NonTerminals: <ul>' +
-					Array.from(grammar.nonTerminals).map((e) => '<li>' + e + '</li>').join(' ') +
-				'</ul>' +
-				'Start Symbol: <ul>' +
-					'<li>' + grammar.startSymbol + '</li>' +
-				'</ul>' +
-				'Unreachable Symbols: <ul>' +
-					(unreachableSymbols.length > 0 ?
-						unreachableSymbols
-							.map((e) => '<li>' + e + '</li>')
-							.join('')
-						: '<li class="lambda">(none)</li>') +
-				'</ul>' +
-				'Unreducible Symbols: <ul>' +
-					(unreducibleSymbols.length > 0 ?
-						unreducibleSymbols
-							.map((e) => '<li>' + e + '</li>')
-							.join('')
-						: '<li class="lambda">(none)</li>') +
-				'</ul></td>' +
-				'<td style="width: 50%; vertical-align: top;">Productions: <ul>' +
-					grammar.productions.map((e) => '<li>' + e + '</li>').join(' ') +
-				'</ul></td>' +
+
+				'<td style="width: 20%; vertical-align: top;">' +
+
+					'Terminals: <ul>' +
+						tagList(Array.from(grammar.terminals), 'li') +
+					'</ul></td>' +
+
+				'<td style="width: 25%; vertical-align: top;">' +
+
+					'NonTerminals: <ul>' +
+						tagList(Array.from(grammar.nonTerminals), 'li') +
+					'</ul>' +
+
+					'Start Symbol: <ul>' +
+						tagList([grammar.startSymbol], 'li') +
+					'</ul>' +
+
+					'Unreachable Symbols: <ul>' +
+						(unreachableSymbols.length > 0 ?
+							tagList(unreachableSymbols, 'li')
+							: '<li class="lambda">(none)</li>'
+						) +
+					'</ul>' +
+
+					'Unreducible Symbols: <ul>' +
+						(unreducibleSymbols.length > 0 ?
+							tagList(unreducibleSymbols, 'li')
+							: '<li class="lambda">(none)</li>'
+						) +
+					'</ul></td>' +
+
+				'<td style="width: 50%; vertical-align: top;">' +
+
+					'Productions: <ul>' +
+						tagList(grammar.productions, 'li') +
+					'</ul></td>' +
+
 			'</tr></table>');
 
 			// Nullables tab
 			$('#lambda').html('<table class="compact-table hoverable">' +
 				'<tr><th>NonTerminal</th></tr>' +
 				(nullableSymbols.size > 0 ?
-					Array.from(nullableSymbols)
-						.map(e => '<tr><td>' + e + '</td></tr>')
-						.join('')
-					: '<tr><td class="lambda">(none)</td></tr>') +
+					Array.from(nullableSymbols).map(e => '<tr><td>' + e + '</td></tr>').join('')
+					: '<tr><td class="lambda">(none)</td></tr>'
+				) +
 			'</table>');
 
 			// FirstSet(1) tab
@@ -164,10 +153,10 @@ $(document).ready(function() {
 							symbol: symbol,
 							firstSet: Array.from(firstSet)
 						};
-					}).map(function(e) {
+					}).map(function({symbol, firstSet}) {
 						return ('<tr>' +
-							'<td>' + e.symbol + '</td>' +
-							'<td>' + e.firstSet.join(COMMA_SEPERATOR) + '</td>' +
+							'<td>' + symbol + '</td>' +
+							'<td>' + firstSet.join(COMMA_SEPERATOR) + '</td>' +
 						'</tr>');
 					}).join('') +
 			'</table>');
@@ -176,15 +165,15 @@ $(document).ready(function() {
 			$('#follow').html('<table class="compact-table hoverable">' +
 				'<tr><th>NonTerminal</th><th>FollowSet</th></tr>' +
 				Array.from(followSetTable.entries())
-					.map(function([symbol,followSet]) {
+					.map(function([symbol, followSet]) {
 						return {
 							symbol: symbol,
 							followSet: Array.from(followSet)
 						};
-					}).map(function(e) {
+					}).map(function({symbol, followSet}) {
 						return ('<tr>' +
-							'<td>' + e.symbol + '</td>' +
-							'<td>' + e.followSet.join(COMMA_SEPERATOR) + '</td>' +
+							'<td>' + symbol + '</td>' +
+							'<td>' + followSet.join(COMMA_SEPERATOR) + '</td>' +
 						'</tr>');
 					}).join('') +
 			'</table>');
@@ -193,21 +182,21 @@ $(document).ready(function() {
 			$('#predict').html('<table class="compact-table hoverable">' +
 				'<tr><th colspan="4">Production</th><th>PredictSet</th></tr>' +
 				Array.from(predictSetTable.entries())
-					.map(function([production,predictSet]) {
+					.map(function([production, predictSet]) {
 						return {
 							production: production,
 							predictSet: Array.from(predictSet)
 						};
-					}).map(function(e) {
+					}).map(function({production, predictSet}) {
 						return ('<tr>' +
-							[
-								e.production.id,
-								e.production.lhs,
+							tagList([
+								production.id,
+								production.lhs,
 								' → ',
-								(e.production.rhs.length !== 0 ? e.production.rhs.join(' ') : GSymbol.LAMBDA),
-								e.predictSet.join(COMMA_SEPERATOR)
-							].map((e) => '<td>' + e + '</td>').join('') +
-							'</tr>');
+								(production.rhs.length !== 0 ? production.rhs.join(' ') : GSymbol.LAMBDA),
+								predictSet.join(COMMA_SEPERATOR)
+							], 'td') +
+						'</tr>');
 					}).join('') +
 			'</table>');
 
@@ -233,7 +222,8 @@ $(document).ready(function() {
 
 			// LR(1) Table tab
 			$('#lr1table').html('<table class="compact-table hoverable">' +
-				'<th class="diagonalFalling">State\\Symbol</th>' + symbolsList.map((s) => '<th>' + s + '</th>').join('') +
+				'<th class="diagonalFalling">State\\Symbol</th>' +
+				tagList(symbolsList, 'th') +
 				Array.from(lr1FSM.states).map(function(st) {
 					let stActionSet = lr1GotoActionTable.get(st);
 					return '<tr><td class="b">' + st.id + '</td>' +
@@ -252,19 +242,18 @@ $(document).ready(function() {
 			'</table>');
 
 			// LR(0) FSM tab
-			$('#lr0fsm').html("Please click on the button above to generate the FSM diagram.");
+			$('#lr0fsm').html('Please click on the button above to generate the FSM diagram.');
 			$('#lr0fsm_gen').on('click', async function() {
 				let lr0FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr0FSM));
 				$('#lr0fsm').html(lr0FSM_Viz);
 				$('#lr0fsm_tab a.downloadLink').show().on('click', function(event) {
-					console.log(lr0FSM_Viz);
 					canvg(tmpCanvas, lr0FSM_Viz);
 					event.target.href = tmpCanvas.toDataURL('image/png');
 				});
 			});
 
 			// LR(1) FSM tab
-			$('#lr1fsm').html("Please click on the button above to generate the FSM diagram.");
+			$('#lr1fsm').html('Please click on the button above to generate the FSM diagram.');
 			$('#lr1fsm_gen').on('click', async function() {
 				let lr1FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr1FSM));
 				$('#lr1fsm').html(lr1FSM_Viz);
@@ -285,7 +274,7 @@ $(document).ready(function() {
 				let parseTree = currentParse.parseTree;
 				let rhsStack = currentParse.rhsStack;
 
-				updateMsg("Parse started");
+				updateMsg('Parse started');
 				updateData();
 
 				let f = (function*() {
@@ -293,27 +282,27 @@ $(document).ready(function() {
 						let r = currentParse.step.next();
 						if(r.done) {
 							if(!(r.value instanceof Error))
-								return updateMsg("Parse finished");
+								return updateMsg('Parse finished');
 							else
 								return updateMsg('Error: ' + r.value.message);
 						}
 						let stepInfo = r.value;
 						if(stepInfo instanceof LL1Parse.Action.Match) {
-							updateMsg("Match " + stepInfo.terminalType);
+							updateMsg(`Match ${stepInfo.terminalType}`);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
 							updateData();
 							yield;
 						} else if(stepInfo instanceof LL1Parse.Action.Predict) {
-							updateMsg("Predict " + stepInfo.usingProd);
+							updateMsg(`Predict ${stepInfo.usingProd}`);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							yield;
 							updateData();
 							$('#ll1parse .parse_stack td').slice(0,stepInfo.usingProd.rhs.length).addClass('highlighted');
 							yield;
 						} else if(stepInfo instanceof LL1Parse.Action.Accept) {
-							updateMsg("Match " + stepInfo.terminalType + ' & Accept');
+							updateMsg(`Match ${stepInfo.terminalType} & Accept`);
 							$('#ll1parse .parse_stack td').first().addClass('highlighted');
 							$('#ll1parse .itoken_stream td').first().addClass('highlighted');
 							yield;
@@ -340,16 +329,18 @@ $(document).ready(function() {
 				}
 				function updateData() {
 					// update stacks
-					$('#ll1parse .parse_stack').html(TDs(parseStack.slice().reverse()));
-					$('#ll1parse .itoken_stream').html(TDs(inputTokens.map((e) => e.terminalType)));
+					$('#ll1parse .parse_stack').html(tagList(parseStack.slice().reverse(), 'td'));
+					$('#ll1parse .itoken_stream').html(tagList(inputTokens.map(e => e.terminalType), 'td'));
 					$('#ll1parse .semantic_stack').html(
 						[...rhsStack, [currentParse.currentRHS, currentParse.currentRHSIndex]]
-							.map(([currentRHS, currentRHSIndex]) => '<table><tr>' + currentRHS.map((ee, ii, aa) => {
-								if(ii === currentRHSIndex)
-									return '<td class="highlighted">' + ee + '</td>';
-								else
-									return '<td>' + ee + '</td>';
-							}).join('') + '</tr></table>').join(''));
+							.map(([currentRHS, currentRHSIndex]) => {
+								return '<table><tr>' + currentRHS.map((ee, ii) => {
+									if(ii === currentRHSIndex)
+										return '<td class="highlighted">' + ee + '</td>';
+									else
+										return '<td>' + ee + '</td>';
+								}).join('') + '</tr></table>';
+							}).join(''));
 					$('#ll1parse .parse_step_info').html('');
 				}
 				async function displayParseTree() {
@@ -369,7 +360,7 @@ $(document).ready(function() {
 						myWindow.document.getElementById('parsetree').innerHTML = ll1parsetree_Viz;
 						myWindow.document.getElementById('downloadLink').onclick = function(event) {
 							canvg(tmpCanvas, ll1parsetree_Viz);
-							event.target.href = tmpCanvas.toDataURL("image/png");
+							event.target.href = tmpCanvas.toDataURL('image/png');
 						};
 					} myWindow.document.close();
 				}
@@ -386,7 +377,7 @@ $(document).ready(function() {
 				let parseForest = currentParse.parseForest;
 				let stateStack = currentParse.stateStack;
 
-				updateMsg("Parse started");
+				updateMsg('Parse started');
 				updateData();
 
 				let f = (function*() {
@@ -394,7 +385,7 @@ $(document).ready(function() {
 						let r = currentParse.step.next();
 						if(r.done) {
 							if(!(r.value instanceof Error))
-								return updateMsg("Parse finished");
+								return updateMsg('Parse finished');
 							else
 								return updateMsg('Error: ' + r.value.message);
 						}
@@ -442,9 +433,9 @@ $(document).ready(function() {
 					$('#lr1parse .itoken_stream td').removeClass('highlighted');
 				}
 				function updateData() {
-					$('#lr1parse .parse_stack').html(TDs(parseStack));
-					$('#lr1parse .itoken_stream').html(TDs(inputTokens.map((e) => e.terminalType)));
-					$('#lr1parse .state_stack').html(TDs(stateStack.map((e) => e.id)));
+					$('#lr1parse .parse_stack').html(tagList(parseStack, 'td'));
+					$('#lr1parse .itoken_stream').html(tagList(inputTokens.map(e => e.terminalType), 'td'));
+					$('#lr1parse .state_stack').html(tagList(stateStack.map(e => e.id), 'td'));
 					$('#lr1parse .parse_step_info').html('');
 				}
 				async function displayParseTree() {
@@ -502,12 +493,8 @@ function initTabs() {
 	document.getElementsByClassName('tablinks')[0].click();
 }
 
-function TD(e) {
-	return '<td>' + e + '</td>';
-}
-
-function TDs(eArr) {
-	return eArr.map(TD).join('');
+function tagList(eArr, tagName) {
+	return eArr.map(e => `<${tagName}>${e}</${tagName}>`).join('');
 }
 
 function openTab(tabname) {
