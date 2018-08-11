@@ -98,10 +98,10 @@ add_op -> -
 			});
 			it('- correct (verified)', function() {
 				let expected = new Set([		// verified
-					"statement_tail",
-					"id_tail",
-					"expr_tail",
-					"primary_tail",
+					'statement_tail',
+					'id_tail',
+					'expr_tail',
+					'primary_tail',
 				].map(e => result.vocabularyNameMap.get(e)));
 				assert(_ext.equals(result.nullableSymbols, expected));
 			});
@@ -113,24 +113,25 @@ add_op -> -
 			it('- correct (verified)', function() {
 				let expected = new Map(			// verified
 					[
-						["program",			["begin"]],
-						["statement_list",	["ID", "read", "write"]],
-						["statement_tail",	["ID", "read", "write", GSymbol.LAMBDA.name]],
-						["statement",		["ID", "read", "write"]],
-						["id_list",			["ID"]],
-						["id_tail",			[",", GSymbol.LAMBDA.name]],
-						["expr_list",		["(", "ID", "INTLIT"]],
-						["expr_tail",		[",", GSymbol.LAMBDA.name]],
-						["expression",		["(", "ID", "INTLIT"]],
-						["primary_tail",	["+", "-", GSymbol.LAMBDA.name]],
-						["primary",			["(", "ID", "INTLIT"]],
-						["add_op",			["+", "-"]],
-						[GSymbol.SYSTEM_GOAL.name,		["begin"]],
-					].concat(result.grammar.terminals.map(t => [t.name, [t.name]]))
-					.map(([k, v]) => [
-						result.vocabularyNameMap.get(k),
-						new Set(v.map(e => result.vocabularyNameMap.get(e)))
-					])
+						['program',			['begin']],
+						['statement_list',	['ID', 'read', 'write']],
+						['statement_tail',	['ID', 'read', 'write', GSymbol.LAMBDA.name]],
+						['statement',		['ID', 'read', 'write']],
+						['id_list',			['ID']],
+						['id_tail',			[',', GSymbol.LAMBDA.name]],
+						['expr_list',		['(', 'ID', 'INTLIT']],
+						['expr_tail',		[',', GSymbol.LAMBDA.name]],
+						['expression',		['(', 'ID', 'INTLIT']],
+						['primary_tail',	['+', '-', GSymbol.LAMBDA.name]],
+						['primary',			['(', 'ID', 'INTLIT']],
+						['add_op',			['+', '-']],
+						[GSymbol.SYSTEM_GOAL.name,		['begin']],
+					]
+						.concat(result.grammar.terminals.map(t => [t.name, [t.name]]))
+						.map(([k, v]) => [
+							result.vocabularyNameMap.get(k),
+							new Set(v.map(e => result.vocabularyNameMap.get(e)))
+						])
 				);
 				assert(_ext.equals(result.firstSetTable, expected));
 			});
@@ -142,18 +143,18 @@ add_op -> -
 			it('- correct (verified)', function() {
 				let expected = new Map(			// verified
 					[
-						["program",			[GSymbol.EOI.name]],
-						["statement_list",	["end"]],
-						["statement_tail",	["end"]],
-						["statement",		["ID", "read", "write", "end"]],
-						["id_list",			[")"]],
-						["id_tail",			[")"]],
-						["expr_list",		[")"]],
-						["expr_tail",		[")"]],
-						["expression",		[";", ",", ")"]],
-						["primary_tail",	[";", ",", ")"]],
-						["primary",			["+", "-", ";", "," , ")"]],
-						["add_op",			["(", "ID", "INTLIT"]],
+						['program',			[GSymbol.EOI.name]],
+						['statement_list',	['end']],
+						['statement_tail',	['end']],
+						['statement',		['ID', 'read', 'write', 'end']],
+						['id_list',			[')']],
+						['id_tail',			[')']],
+						['expr_list',		[')']],
+						['expr_tail',		[')']],
+						['expression',		[';', ',', ')']],
+						['primary_tail',	[';', ',', ')']],
+						['primary',			['+', '-', ';', ',' , ')']],
+						['add_op',			['(', 'ID', 'INTLIT']],
 						[GSymbol.SYSTEM_GOAL.name,		[GSymbol.LAMBDA.name]],
 					].map(([k, v]) => [
 						result.vocabularyNameMap.get(k),
@@ -170,28 +171,28 @@ add_op -> -
 			it('- correct (verified)', function() {
 				let expected = new Map(			// verified
 					[
-						["begin"],
-						["begin"],
-						["ID", "read", "write"],
-						["ID", "read", "write"],
-						["end"],
-						["ID"],
-						["read"],
-						["write"],
-						["ID"],
-						[","],
-						[")"],
-						["(", "ID", "INTLIT"],
-						[","],
-						[")"],
-						["(", "ID", "INTLIT"],
-						["+", "-"],
-						[";", ",", ")"],
-						["("],
-						["ID"],
-						["INTLIT"],
-						["+"],
-						["-"],
+						['begin'],
+						['begin'],
+						['ID', 'read', 'write'],
+						['ID', 'read', 'write'],
+						['end'],
+						['ID'],
+						['read'],
+						['write'],
+						['ID'],
+						[','],
+						[')'],
+						['(', 'ID', 'INTLIT'],
+						[','],
+						[')'],
+						['(', 'ID', 'INTLIT'],
+						['+', '-'],
+						[';', ',', ')'],
+						['('],
+						['ID'],
+						['INTLIT'],
+						['+'],
+						['-'],
 					].map((tSetRaw,pNo) => [
 						result.grammar.productions[pNo],
 						new Set(tSetRaw.map(t => result.vocabularyNameMap.get(t)))
@@ -208,63 +209,63 @@ add_op -> -
 				let expected = new Map(			// verified
 					[
 						[GSymbol.SYSTEM_GOAL.name, [
-							["begin", [0]]
+							['begin', [0]]
 						]],
-						["program", [
-							["begin", [1]]
+						['program', [
+							['begin', [1]]
 						]],
-						["statement_list", [
-							["ID", [2]],
-							["read", [2]],
-							["write", [2]]
+						['statement_list', [
+							['ID', [2]],
+							['read', [2]],
+							['write', [2]]
 						]],
-						["statement_tail", [
-							["ID", [3]],
-							["read", [3]],
-							["write", [3]],
-							["end", [4]]
+						['statement_tail', [
+							['ID', [3]],
+							['read', [3]],
+							['write', [3]],
+							['end', [4]]
 						]],
-						["statement", [
-							["ID", [5]],
-							["read", [6]],
-							["write", [7]]
+						['statement', [
+							['ID', [5]],
+							['read', [6]],
+							['write', [7]]
 						]],
-						["id_list", [
-							["ID", [8]]
+						['id_list', [
+							['ID', [8]]
 						]],
-						["id_tail", [
-							[",", [9]],
-							[")", [10]]
+						['id_tail', [
+							[',', [9]],
+							[')', [10]]
 						]],
-						["expr_list", [
-							["(", [11]],
-							["ID", [11]],
-							["INTLIT", [11]]
+						['expr_list', [
+							['(', [11]],
+							['ID', [11]],
+							['INTLIT', [11]]
 						]],
-						["expr_tail", [
-							[",", [12]],
-							[")", [13]]
+						['expr_tail', [
+							[',', [12]],
+							[')', [13]]
 						]],
-						["expression", [
-							["(", [14]],
-							["ID", [14]],
-							["INTLIT", [14]]
+						['expression', [
+							['(', [14]],
+							['ID', [14]],
+							['INTLIT', [14]]
 						]],
-						["primary_tail", [
-							["+", [15]],
-							["-", [15]],
-							[";", [16]],
-							[",", [16]],
-							[")", [16]]
+						['primary_tail', [
+							['+', [15]],
+							['-', [15]],
+							[';', [16]],
+							[',', [16]],
+							[')', [16]]
 						]],
-						["primary", [
-							["(", [17]],
-							["ID", [18]],
-							["INTLIT", [19]]
+						['primary', [
+							['(', [17]],
+							['ID', [18]],
+							['INTLIT', [19]]
 						]],
-						["add_op", [
-							["+", [20]],
-							["-", [21]]
+						['add_op', [
+							['+', [20]],
+							['-', [21]]
 						]]
 					].map(([ntName, tMapRaw]) => [
 						result.vocabularyNameMap.get(ntName),
@@ -280,7 +281,7 @@ add_op -> -
 			});
 			it('should build LR(0) FSM', function() {
 				expect(
-					result.lr0FSM = ParserBase.buildLR0FSM(result.grammar)
+					result.lr0FSM = LR0FSM.from(result.grammar)
 				).to.exist;
 			});
 			it.skip('should build LR(0) GotoAction Table', function() {
@@ -289,7 +290,7 @@ add_op -> -
 			});
 			it('should build LR(1) FSM', function() {
 				expect(
-					result.lr1FSM = ParserBase.buildLR1FSM(result.grammar, result.firstSetTable)
+					result.lr1FSM = LR1FSM.from(result.grammar, result.firstSetTable)
 				).to.exist;
 			});
 			it('should build LR(1) GotoAction Table', function() {
@@ -302,321 +303,321 @@ add_op -> -
 				let expected = new Map(
 					[
 						[0, [
-							["program", ["→1"]],
-							["begin", ["S→2"]]
+							['program', ['→1']],
+							['begin', ['S→2']]
 						]],
 						[1, [
-							[GSymbol.EOI.name, ["A"]]
+							[GSymbol.EOI.name, ['A']]
 						]],
 						[2, [
-							["statement_list", ["→4"]],
-							["statement", ["→5"]],
-							["ID", ["S→6"]],
-							["read", ["S→7"]],
-							["write", ["S→8"]]
+							['statement_list', ['→4']],
+							['statement', ['→5']],
+							['ID', ['S→6']],
+							['read', ['S→7']],
+							['write', ['S→8']]
 						]],
 						[3, [
 						]],
 						[4, [
-							["end", ["S→9"]]
+							['end', ['S→9']]
 						]],
 						[5, [
-							["statement_tail", ["→10"]],
-							["statement", ["→11"]],
-							["ID", ["S→6"]],
-							["read", ["S→7"]],
-							["write", ["S→8"]],
-							["end", ["R(4)"]]
+							['statement_tail', ['→10']],
+							['statement', ['→11']],
+							['ID', ['S→6']],
+							['read', ['S→7']],
+							['write', ['S→8']],
+							['end', ['R(4)']]
 						]],
 						[6, [
-							[":=", ["S→12"]]
+							[':=', ['S→12']]
 						]],
 						[7, [
-							["(", ["S→13"]]
+							['(', ['S→13']]
 						]],
 						[8, [
-							["(", ["S→14"]]
+							['(', ['S→14']]
 						]],
 						[9, [
-							[GSymbol.EOI.name, ["R(1)"]]
+							[GSymbol.EOI.name, ['R(1)']]
 						]],
 						[10, [
-							["end", ["R(2)"]]
+							['end', ['R(2)']]
 						]],
 						[11, [
-							["statement_tail", ["→15"]],
-							["statement", ["→11"]],
-							["ID", ["S→6"]],
-							["read", ["S→7"]],
-							["write", ["S→8"]],
-							["end", ["R(4)"]]
+							['statement_tail', ['→15']],
+							['statement', ['→11']],
+							['ID', ['S→6']],
+							['read', ['S→7']],
+							['write', ['S→8']],
+							['end', ['R(4)']]
 						]],
 						[12, [
-							["expression", ["→16"]],
-							["primary", ["→17"]],
-							["(", ["S→18"]],
-							["ID", ["S→19"]],
-							["INTLIT", ["S→20"]]
+							['expression', ['→16']],
+							['primary', ['→17']],
+							['(', ['S→18']],
+							['ID', ['S→19']],
+							['INTLIT', ['S→20']]
 						]],
 						[13, [
-							["id_list", ["→21"]],
-							["ID", ["S→22"]]
+							['id_list', ['→21']],
+							['ID', ['S→22']]
 						]],
 						[14, [
-							["expr_list", ["→23"]],
-							["expression", ["→24"]],
-							["primary", ["→25"]],
-							["(", ["S→26"]],
-							["ID", ["S→27"]],
-							["INTLIT", ["S→28"]]
+							['expr_list', ['→23']],
+							['expression', ['→24']],
+							['primary', ['→25']],
+							['(', ['S→26']],
+							['ID', ['S→27']],
+							['INTLIT', ['S→28']]
 						]],
 						[15, [
-							["end", ["R(3)"]]
+							['end', ['R(3)']]
 						]],
 						[16, [
-							[";", ["S→29"]]
+							[';', ['S→29']]
 						]],
 						[17, [
-							["primary_tail", ["→30"]],
-							["add_op", ["→31"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[";", ["R(16)"]]
+							['primary_tail', ['→30']],
+							['add_op', ['→31']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[';', ['R(16)']]
 						]],
 						[18, [
-							["expression", ["→34"]],
-							["primary", ["→35"]],
-							["(", ["S→36"]],
-							["ID", ["S→37"]],
-							["INTLIT", ["S→38"]]
+							['expression', ['→34']],
+							['primary', ['→35']],
+							['(', ['S→36']],
+							['ID', ['S→37']],
+							['INTLIT', ['S→38']]
 						]],
 						[19, [
-							["+", ["R(18)"]],
-							["-", ["R(18)"]],
-							[";", ["R(18)"]]
+							['+', ['R(18)']],
+							['-', ['R(18)']],
+							[';', ['R(18)']]
 						]],
 						[20, [
-							["+", ["R(19)"]],
-							["-", ["R(19)"]],
-							[";", ["R(19)"]]
+							['+', ['R(19)']],
+							['-', ['R(19)']],
+							[';', ['R(19)']]
 						]],
 						[21, [
-							[")", ["S→39"]]
+							[')', ['S→39']]
 						]],
 						[22, [
-							["id_tail", ["→40"]],
-							[",", ["S→41"]],
-							[")", ["R(10)"]]
+							['id_tail', ['→40']],
+							[',', ['S→41']],
+							[')', ['R(10)']]
 						]],
 						[23, [
-							[")", ["S→42"]]
+							[')', ['S→42']]
 						]],
 						[24, [
-							["expr_tail", ["→43"]],
-							[",", ["S→44"]],
-							[")", ["R(13)"]]
+							['expr_tail', ['→43']],
+							[',', ['S→44']],
+							[')', ['R(13)']]
 						]],
 						[25, [
-							["primary_tail", ["→45"]],
-							["add_op", ["→46"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[",", ["R(16)"]],
-							[")", ["R(16)"]]
+							['primary_tail', ['→45']],
+							['add_op', ['→46']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[',', ['R(16)']],
+							[')', ['R(16)']]
 						]],
 						[26, [
-							["expression", ["→47"]],
-							["primary", ["→35"]],
-							["(", ["S→36"]],
-							["ID", ["S→37"]],
-							["INTLIT", ["S→38"]]
+							['expression', ['→47']],
+							['primary', ['→35']],
+							['(', ['S→36']],
+							['ID', ['S→37']],
+							['INTLIT', ['S→38']]
 						]],
 						[27, [
-							["+", ["R(18)"]],
-							["-", ["R(18)"]],
-							[",", ["R(18)"]],
-							[")", ["R(18)"]]
+							['+', ['R(18)']],
+							['-', ['R(18)']],
+							[',', ['R(18)']],
+							[')', ['R(18)']]
 						]],
 						[28, [
-							["+", ["R(19)"]],
-							["-", ["R(19)"]],
-							[",", ["R(19)"]],
-							[")", ["R(19)"]]
+							['+', ['R(19)']],
+							['-', ['R(19)']],
+							[',', ['R(19)']],
+							[')', ['R(19)']]
 						]],
 						[29, [
-							["ID", ["R(5)"]],
-							["read", ["R(5)"]],
-							["write", ["R(5)"]],
-							["end", ["R(5)"]]
+							['ID', ['R(5)']],
+							['read', ['R(5)']],
+							['write', ['R(5)']],
+							['end', ['R(5)']]
 						]],
 						[30, [
-							[";", ["R(14)"]]
+							[';', ['R(14)']]
 						]],
 						[31, [
-							["primary", ["→48"]],
-							["(", ["S→18"]],
-							["ID", ["S→19"]],
-							["INTLIT", ["S→20"]]
+							['primary', ['→48']],
+							['(', ['S→18']],
+							['ID', ['S→19']],
+							['INTLIT', ['S→20']]
 						]],
 						[32, [
-							["(", ["R(20)"]],
-							["ID", ["R(20)"]],
-							["INTLIT", ["R(20)"]]
+							['(', ['R(20)']],
+							['ID', ['R(20)']],
+							['INTLIT', ['R(20)']]
 						]],
 						[33, [
-							["(", ["R(21)"]],
-							["ID", ["R(21)"]],
-							["INTLIT", ["R(21)"]]
+							['(', ['R(21)']],
+							['ID', ['R(21)']],
+							['INTLIT', ['R(21)']]
 						]],
 						[34, [
-							[")", ["S→49"]]
+							[')', ['S→49']]
 						]],
 						[35, [
-							["primary_tail", ["→50"]],
-							["add_op", ["→51"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[")", ["R(16)"]]
+							['primary_tail', ['→50']],
+							['add_op', ['→51']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[')', ['R(16)']]
 						]],
 						[36, [
-							["expression", ["→52"]],
-							["primary", ["→35"]],
-							["(", ["S→36"]],
-							["ID", ["S→37"]],
-							["INTLIT", ["S→38"]]
+							['expression', ['→52']],
+							['primary', ['→35']],
+							['(', ['S→36']],
+							['ID', ['S→37']],
+							['INTLIT', ['S→38']]
 						]],
 						[37, [
-							["+", ["R(18)"]],
-							["-", ["R(18)"]],
-							[")", ["R(18)"]]
+							['+', ['R(18)']],
+							['-', ['R(18)']],
+							[')', ['R(18)']]
 						]],
 						[38, [
-							["+", ["R(19)"]],
-							["-", ["R(19)"]],
-							[")", ["R(19)"]]
+							['+', ['R(19)']],
+							['-', ['R(19)']],
+							[')', ['R(19)']]
 						]],
 						[39, [
-							[";", ["S→53"]]
+							[';', ['S→53']]
 						]],
 						[40, [
-							[")", ["R(8)"]]
+							[')', ['R(8)']]
 						]],
 						[41, [
-							["ID", ["S→54"]]
+							['ID', ['S→54']]
 						]],
 						[42, [
-							[";", ["S→55"]]
+							[';', ['S→55']]
 						]],
 						[43, [
-							[")", ["R(11)"]]
+							[')', ['R(11)']]
 						]],
 						[44, [
-							["expression", ["→56"]],
-							["primary", ["→25"]],
-							["(", ["S→26"]],
-							["ID", ["S→27"]],
-							["INTLIT", ["S→28"]]
+							['expression', ['→56']],
+							['primary', ['→25']],
+							['(', ['S→26']],
+							['ID', ['S→27']],
+							['INTLIT', ['S→28']]
 						]],
 						[45, [
-							[",", ["R(14)"]],
-							[")", ["R(14)"]]
+							[',', ['R(14)']],
+							[')', ['R(14)']]
 						]],
 						[46, [
-							["primary", ["→57"]],
-							["(", ["S→26"]],
-							["ID", ["S→27"]],
-							["INTLIT", ["S→28"]]
+							['primary', ['→57']],
+							['(', ['S→26']],
+							['ID', ['S→27']],
+							['INTLIT', ['S→28']]
 						]],
 						[47, [
-							[")", ["S→58"]]
+							[')', ['S→58']]
 						]],
 						[48, [
-							["primary_tail", ["→59"]],
-							["add_op", ["→31"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[";", ["R(16)"]]
+							['primary_tail', ['→59']],
+							['add_op', ['→31']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[';', ['R(16)']]
 						]],
 						[49, [
-							["+", ["R(17)"]],
-							["-", ["R(17)"]],
-							[";", ["R(17)"]]
+							['+', ['R(17)']],
+							['-', ['R(17)']],
+							[';', ['R(17)']]
 						]],
 						[50, [
-							[")", ["R(14)"]]
+							[')', ['R(14)']]
 						]],
 						[51, [
-							["primary", ["→60"]],
-							["(", ["S→36"]],
-							["ID", ["S→37"]],
-							["INTLIT", ["S→38"]]
+							['primary', ['→60']],
+							['(', ['S→36']],
+							['ID', ['S→37']],
+							['INTLIT', ['S→38']]
 						]],
 						[52, [
-							[")", ["S→61"]]
+							[')', ['S→61']]
 						]],
 						[53, [
-							["ID", ["R(6)"]],
-							["read", ["R(6)"]],
-							["write", ["R(6)"]],
-							["end", ["R(6)"]]
+							['ID', ['R(6)']],
+							['read', ['R(6)']],
+							['write', ['R(6)']],
+							['end', ['R(6)']]
 						]],
 						[54, [
-							["id_tail", ["→62"]],
-							[",", ["S→41"]],
-							[")", ["R(10)"]]
+							['id_tail', ['→62']],
+							[',', ['S→41']],
+							[')', ['R(10)']]
 						]],
 						[55, [
-							["ID", ["R(7)"]],
-							["read", ["R(7)"]],
-							["write", ["R(7)"]],
-							["end", ["R(7)"]]
+							['ID', ['R(7)']],
+							['read', ['R(7)']],
+							['write', ['R(7)']],
+							['end', ['R(7)']]
 						]],
 						[56, [
-							["expr_tail", ["→63"]],
-							[",", ["S→44"]],
-							[")", ["R(13)"]]
+							['expr_tail', ['→63']],
+							[',', ['S→44']],
+							[')', ['R(13)']]
 						]],
 						[57, [
-							["primary_tail", ["→64"]],
-							["add_op", ["→46"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[",", ["R(16)"]],
-							[")", ["R(16)"]]
+							['primary_tail', ['→64']],
+							['add_op', ['→46']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[',', ['R(16)']],
+							[')', ['R(16)']]
 						]],
 						[58, [
-							["+", ["R(17)"]],
-							["-", ["R(17)"]],
-							[",", ["R(17)"]],
-							[")", ["R(17)"]]
+							['+', ['R(17)']],
+							['-', ['R(17)']],
+							[',', ['R(17)']],
+							[')', ['R(17)']]
 						]],
 						[59, [
-							[";", ["R(15)"]]
+							[';', ['R(15)']]
 						]],
 						[60, [
-							["primary_tail", ["→65"]],
-							["add_op", ["→51"]],
-							["+", ["S→32"]],
-							["-", ["S→33"]],
-							[")", ["R(16)"]]
+							['primary_tail', ['→65']],
+							['add_op', ['→51']],
+							['+', ['S→32']],
+							['-', ['S→33']],
+							[')', ['R(16)']]
 						]],
 						[61, [
-							["+", ["R(17)"]],
-							["-", ["R(17)"]],
-							[")", ["R(17)"]]
+							['+', ['R(17)']],
+							['-', ['R(17)']],
+							[')', ['R(17)']]
 						]],
 						[62, [
-							[")", ["R(9)"]]
+							[')', ['R(9)']]
 						]],
 						[63, [
-							[")", ["R(12)"]]
+							[')', ['R(12)']]
 						]],
 						[64, [
-							[",", ["R(15)"]],
-							[")", ["R(15)"]]
+							[',', ['R(15)']],
+							[')', ['R(15)']]
 						]],
 						[65, [
-							[")", ["R(15)"]]
+							[')', ['R(15)']]
 						]]
 					].map(([sId, gMapRaw]) => [
 						sid2state[sId],

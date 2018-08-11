@@ -9,8 +9,8 @@ import {
 	// Grammar,
 	// LR0Configuration,
 	// LR1Configuration,
-	// LR0FSM,
-	// LR1FSM,
+	LR0FSM,
+	LR1FSM,
 	LL1Parse,
 	LR1Parse,
 } from './ParserBase.classes';
@@ -69,8 +69,8 @@ $(document).ready(function() {
 		let followSetTable = ParserBase.buildFollowSetTable(grammar, firstSetTable);
 		let predictSetTable = ParserBase.buildPredictSetTable(grammar, firstSetTable, followSetTable);
 		let ll1PredictTable = ParserBase.buildLL1PredictTable(grammar, predictSetTable);
-		let lr0FSM = ParserBase.buildLR0FSM(grammar);
-		let lr1FSM = ParserBase.buildLR1FSM(grammar, firstSetTable);
+		let lr0FSM = LR0FSM.from(grammar);
+		let lr1FSM = LR1FSM.from(grammar, firstSetTable);
 		// let lr0FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr0FSM));
 		// let lr1FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr1FSM));
 		let lr1GotoActionTable = ParserBase.buildLR1GotoActionTable(grammar, lr1FSM);
@@ -146,7 +146,7 @@ $(document).ready(function() {
 			$('#first').html('<table class="compact-table hoverable">' +
 				'<tr><th>NonTerminal</th><th>FirstSet</th></tr>' +
 				Array.from(firstSetTable.entries())
-					.filter(function([symbol, firstSet]) {
+					.filter(function([symbol, _firstSet]) {
 						return (symbol instanceof NonTerminal);
 					}).map(function([symbol, firstSet]) {
 						return {
