@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import * as ParserBase from './ParserBase';
+
 import {
 	GSymbol,
 	// Terminal,
@@ -13,8 +13,26 @@ import {
 	LR1FSM,
 	LL1Parse,
 	LR1Parse,
-} from './ParserBase.classes';
+
+	computeUnreachableSymbols,
+	computeUnreducibleSymbols,
+	computeNullableSymbols,
+	buildFirstSetTable,
+	buildFollowSetTable,
+	buildPredictSetTable,
+	buildLL1PredictTable,
+	buildLR1GotoActionTable,
+	newLL1Parse,
+	newLR1Parse,
+} from '../ParserBase';
+
+import Viz from 'viz.js';
+import { Module, render } from 'viz.js/full.render';
+import canvg from 'canvg-browser';
+
 import {
+	buildGrammar,
+	buildVocabularyNameMap,
 	processGrammarInput,
 	processParseInput,
 } from './main_functions';
@@ -22,14 +40,12 @@ import {
 	buildDotSourceOfCFSM,
 	buildDotSourceOfParseTrees,
 } from './graphviz_functions';
-import Viz from 'viz.js';
-import { Module, render } from 'viz.js/full.render';
-import canvg from 'canvg-browser';
+
 import './main_util';
 
 const viz = new Viz({ Module, render });
 
-let COMMA_SEPERATOR = '<span class="comma"> , </span>';
+let COMMA_SEPARATOR = '<span class="comma"> , </span>';
 
 window.onerror = function(message, file, lineNumber) {
 	window.alert(`${message}\n\nat ${file}:${lineNumber}`);
@@ -60,20 +76,18 @@ $(document).ready(function() {
 			$('.source_input').val(rawGrammar.extraResult.parseExample);
 		}
 
-		let grammar = ParserBase.buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
-		let vocabularyNameMap = grammar.buildVocabularyNameMap();
-		let unreachableSymbols = ParserBase.computeUnreachableSymbols(grammar);
-		let unreducibleSymbols = ParserBase.computeUnreducibleSymbols(grammar);
-		let nullableSymbols = ParserBase.computeNullableSymbols(grammar);
-		let firstSetTable = ParserBase.buildFirstSetTable(grammar, nullableSymbols);
-		let followSetTable = ParserBase.buildFollowSetTable(grammar, firstSetTable);
-		let predictSetTable = ParserBase.buildPredictSetTable(grammar, firstSetTable, followSetTable);
-		let ll1PredictTable = ParserBase.buildLL1PredictTable(grammar, predictSetTable);
+		let grammar = buildGrammar(Array.from(rawGrammar.terminals), Array.from(rawGrammar.nonTerminals), rawGrammar.startSymbol, rawGrammar.productions);
+		let vocabularyNameMap = buildVocabularyNameMap(grammar);
+		let unreachableSymbols = computeUnreachableSymbols(grammar);
+		let unreducibleSymbols = computeUnreducibleSymbols(grammar);
+		let nullableSymbols = computeNullableSymbols(grammar);
+		let firstSetTable = buildFirstSetTable(grammar, nullableSymbols);
+		let followSetTable = buildFollowSetTable(grammar, firstSetTable);
+		let predictSetTable = buildPredictSetTable(grammar, firstSetTable, followSetTable);
+		let ll1PredictTable = buildLL1PredictTable(grammar, predictSetTable);
 		let lr0FSM = LR0FSM.from(grammar);
 		let lr1FSM = LR1FSM.from(grammar, firstSetTable);
-		// let lr0FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr0FSM));
-		// let lr1FSM_Viz = await viz.renderString(buildDotSourceOfCFSM(lr1FSM));
-		let lr1GotoActionTable = ParserBase.buildLR1GotoActionTable(grammar, lr1FSM);
+		let lr1GotoActionTable = buildLR1GotoActionTable(grammar, lr1FSM);
 
 		let terminalsList = Array.from(grammar.terminals);
 		let nonTerminalsList = Array.from(grammar.nonTerminals);
@@ -146,7 +160,7 @@ $(document).ready(function() {
 			$('#first').html('<table class="compact-table hoverable">' +
 				'<tr><th>NonTerminal</th><th>FirstSet</th></tr>' +
 				Array.from(firstSetTable.entries())
-					.filter(function([symbol, _firstSet]) {
+					.filter(function([symbol, /*_firstSet*/]) {
 						return (symbol instanceof NonTerminal);
 					}).map(function([symbol, firstSet]) {
 						return {
@@ -156,7 +170,7 @@ $(document).ready(function() {
 					}).map(function({symbol, firstSet}) {
 						return ('<tr>' +
 							'<td>' + symbol + '</td>' +
-							'<td>' + firstSet.join(COMMA_SEPERATOR) + '</td>' +
+							'<td>' + firstSet.join(COMMA_SEPARATOR) + '</td>' +
 						'</tr>');
 					}).join('') +
 			'</table>');
@@ -173,7 +187,7 @@ $(document).ready(function() {
 					}).map(function({symbol, followSet}) {
 						return ('<tr>' +
 							'<td>' + symbol + '</td>' +
-							'<td>' + followSet.join(COMMA_SEPERATOR) + '</td>' +
+							'<td>' + followSet.join(COMMA_SEPARATOR) + '</td>' +
 						'</tr>');
 					}).join('') +
 			'</table>');
@@ -194,7 +208,7 @@ $(document).ready(function() {
 								production.lhs,
 								' → ',
 								(production.rhs.length !== 0 ? production.rhs.join(' ') : GSymbol.LAMBDA),
-								predictSet.join(COMMA_SEPERATOR)
+								predictSet.join(COMMA_SEPARATOR)
 							], 'td') +
 						'</tr>');
 					}).join('') +
@@ -269,7 +283,7 @@ $(document).ready(function() {
 			$('#ll1parse .view_parse_tree').off('click');
 			$('#ll1parse .start_parse').on('click', function() {
 				let inputTokens = processParseInput($('#ll1parse .source_input').val(), vocabularyNameMap);
-				let currentParse = ParserBase.newLL1Parse(grammar, ll1PredictTable, inputTokens);
+				let currentParse = newLL1Parse(grammar, ll1PredictTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseTree = currentParse.parseTree;
 				let rhsStack = currentParse.rhsStack;
@@ -372,7 +386,7 @@ $(document).ready(function() {
 			$('#lr1parse .view_parse_tree').off('click');
 			$('#lr1parse .start_parse').on('click', function() {
 				let inputTokens = processParseInput($('#lr1parse .source_input').val(), vocabularyNameMap);
-				let currentParse = ParserBase.newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
+				let currentParse = newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 				let parseStack = currentParse.parseStack;
 				let parseForest = currentParse.parseForest;
 				let stateStack = currentParse.stateStack;
@@ -484,10 +498,10 @@ function initTabs() {
 		lr1table_tab: 'LR(1) Table',
 		lr1parse_tab: 'LR(1) Parse',
 	};
-	for(let tabname in tablis) {
+	for(let tabName in tablis) {
 		$('#tab_ul').append(
-			$(`<li><a name="${tabname}" href="javascript:void(0);" class="tablinks">${tablis[tabname]}</a></li>`)
-				.on('click', () => openTab(tabname))
+			$(`<li><a name="${tabName}" href="javascript:void(0);" class="tablinks">${tablis[tabName]}</a></li>`)
+				.on('click', () => openTab(tabName))
 		);
 	}
 	document.getElementsByClassName('tablinks')[0].click();
@@ -497,9 +511,9 @@ function tagList(eArr, tagName) {
 	return eArr.map(e => `<${tagName}>${e}</${tagName}>`).join('');
 }
 
-function openTab(tabname) {
+function openTab(tabName) {
 	$('.tabcontent').css('display', 'none');
 	$('.tablinks').removeClass('active');
-	$('#'+tabname).css('display', 'block');
-	$('#tab_ul').find('[name='+tabname+']').addClass('active');
+	$('#'+tabName).css('display', 'block');
+	$('#tab_ul').find('[name='+tabName+']').addClass('active');
 }

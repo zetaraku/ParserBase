@@ -1,11 +1,13 @@
+
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	entry: './src/index.js',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: 'bundle.js'
+		filename: 'bundle.js',
+		sourceMapFilename: '[file].map'
 	},
 	mode: 'development',
 	node: {
@@ -37,11 +39,11 @@ module.exports = {
 			{
 				test: /\.scss$/,
 				use: [
-					{ loader: "style-loader" },
-					{ loader: "css-loader", options: {
+					{ loader: 'style-loader' },
+					{ loader: 'css-loader', options: {
 						sourceMap: true
 					}},
-					{ loader: "sass-loader", options: {
+					{ loader: 'sass-loader', options: {
 						sourceMap: true
 					}},
 				]
@@ -59,8 +61,8 @@ module.exports = {
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
-			template:'src/pug/index.pug',
-			filename:'index.html',
+			template: 'src/pug/index.pug',
+			filename: 'index.html',
 		}),
 	],
 	resolve: {

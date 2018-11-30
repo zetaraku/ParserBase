@@ -19,11 +19,33 @@
 		],
 		"quotes": [
 			"error",
-			"single"
+			"single",
+			{ "avoidEscape": true }
 		],
 		"semi": [
 			"error",
 			"always"
 		]
-	}
+	},
+	"overrides": [
+		{
+			"files": ["test/**/*.test.js"],
+			"env": {
+				"node": true,
+				"mocha": true
+			},
+			"rules": {
+
+			}
+		},
+		{
+			"files": ["webpack.config.js"],
+			"env": {
+				"node": true
+			},
+			"rules": {
+
+			}
+		}
+	]
 }

@@ -43,11 +43,16 @@ If you want to modify it, you must have installed [Node.js](https://nodejs.org/)
 
 Then in the project directory,
 
-1. use `npm install` *once* to install all dependencies.
+use `npm install` *once* to install all dependencies.
 
-2. use `npx webpack` to generate the target files (into `./dist/`).
+Developing
+----------------
 
-	* You can use the option `--watch` to watch for changes in files.
+1. Use `npm run wp-devs` to start the webpack-dev-server for development.
+
+webpack-dev-server will watch your files and reload the page automatically.
+
+2. Before you deploy, use `npx run wp` to generate the target files (into `./dist/`).
 
 License
 -------

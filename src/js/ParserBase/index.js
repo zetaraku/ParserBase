@@ -11,42 +11,10 @@ import {
 	LR1FSM,
 	LL1Parse,
 	LR1Parse,
-} from './ParserBase.classes';
-import _ext from './_ext';
+} from './_classes';
+import _ext from '../_ext';
 
-export function buildGrammar(terminalNames, nonTerminalNames, startSymbolName, rawProductions) {
-	Production.serialNo = 0;
-
-	let vocabularyNameMap = new Map();
-	for(let name of terminalNames) {
-		if(vocabularyNameMap.has(name))
-			throw new Error(`Error: Vocabulary name '${name}' declared more than once!`);
-		vocabularyNameMap.set(name, new Terminal(name));
-	}
-	for(let name of nonTerminalNames) {
-		if(vocabularyNameMap.has(name))
-			throw new Error(`Error: Vocabulary name '${name}' declared more than once!`);
-		vocabularyNameMap.set(name, new NonTerminal(name));
-	}
-
-	let terminals = [...terminalNames.map(name => vocabularyNameMap.get(name)), GSymbol.EOI];
-	let nonTerminals = [...nonTerminalNames.map(name => vocabularyNameMap.get(name)), GSymbol.SYSTEM_GOAL];
-
-	let startSymbol = vocabularyNameMap.get(startSymbolName);
-	if(!startSymbol)
-		throw new Error(`start symbol '${startSymbolName}' no found`);
-
-	let augmentingProduction = new Production(GSymbol.SYSTEM_GOAL, [startSymbol, GSymbol.EOI]);
-
-	let productions = [augmentingProduction, ...rawProductions.map(function([lhsName, ...rhsNames]) {
-		let lhs = vocabularyNameMap.get(lhsName);
-		let rhs = rhsNames.map(name => vocabularyNameMap.get(name));
-		return new Production(lhs, rhs);
-	})];
-
-	return new Grammar(terminals, nonTerminals, startSymbol, productions);
-}
-export function computeUnreachableSymbols(grammar) {
+function computeUnreachableSymbols(grammar) {
 	let reachableVocabularies = new Set([GSymbol.SYSTEM_GOAL]);
 
 	let processingQueue = [GSymbol.SYSTEM_GOAL];
@@ -70,15 +38,15 @@ export function computeUnreachableSymbols(grammar) {
 
 	return unreachableSymbols;
 }
-export function computeUnreducibleSymbols(grammar) {
+function computeUnreducibleSymbols(grammar) {
 	let reducibleVocabularies = new Set(grammar.terminals);
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
 	while(processingMap.size !== 0 && needUpdate) {
 		needUpdate = false;
 		for(let nt of processingMap.keys()) {
-			let processingProdutions = processingMap.get(nt);
-			for(let production of processingProdutions) {
+			let processingProductions = processingMap.get(nt);
+			for(let production of processingProductions) {
 				let { lhs, rhs } = production;
 				let isReducible = true;
 				for(let v of rhs) {
@@ -102,15 +70,15 @@ export function computeUnreducibleSymbols(grammar) {
 
 	return unreducibleSymbols;
 }
-export function computeNullableSymbols(grammar) {
+function computeNullableSymbols(grammar) {
 	let nullableSymbols = new Set();
 	let processingMap = new Map(grammar.productionsMap);
 	let needUpdate = true;
 	while(processingMap.size !== 0 && needUpdate) {
 		needUpdate = false;
 		for(let key of processingMap.keys()) {
-			let processingProdutions = processingMap.get(key);
-			for(let production of processingProdutions) {
+			let processingProductions = processingMap.get(key);
+			for(let production of processingProductions) {
 				let { lhs, rhs } = production;
 				let isNullable = true;
 				for(let v of rhs) {
@@ -131,7 +99,7 @@ export function computeNullableSymbols(grammar) {
 
 	return nullableSymbols;
 }
-export function buildFirstSetTable(grammar, nullableSymbols) {
+function buildFirstSetTable(grammar, nullableSymbols) {
 	let firstSetTable = new Map();
 	for(let t of grammar.terminals)
 		firstSetTable.set(t, new Set([t]));
@@ -167,7 +135,7 @@ export function buildFirstSetTable(grammar, nullableSymbols) {
 
 	return firstSetTable;
 }
-export function buildFollowSetTable(grammar, firstSetTable) {
+function buildFollowSetTable(grammar, firstSetTable) {
 	let followSetTable = new Map();
 	let seeThroughTable = new Map();
 	for(let nt of grammar.nonTerminals) {
@@ -223,7 +191,7 @@ export function buildFollowSetTable(grammar, firstSetTable) {
 
 	return followSetTable;
 }
-export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
+function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 	let predictSetTable = new Map();
 	for(let production of grammar.productions) {
 		let { lhs, rhs } = production;
@@ -247,7 +215,7 @@ export function buildPredictSetTable(grammar, firstSetTable, followSetTable) {
 
 	return predictSetTable;
 }
-export function buildLL1PredictTable(grammar, predictSetTable) {
+function buildLL1PredictTable(grammar, predictSetTable) {
 	let ll1PredictTable = new Map();
 	for(let [nt, prods] of grammar.productionsMap) {
 		let ntPredictSet = new Map();
@@ -263,7 +231,7 @@ export function buildLL1PredictTable(grammar, predictSetTable) {
 
 	return ll1PredictTable;
 }
-export function buildLR1GotoActionTable(grammar, lr1fsm) {
+function buildLR1GotoActionTable(grammar, lr1fsm) {
 	let lr1GotoActionTable = new Map();
 	let globalActionMap = {
 		shift: new Map(Array.from(lr1fsm.states).map((s) => [s, new LR1Parse.Action.Shift(s)])),
@@ -309,9 +277,35 @@ export function buildLR1GotoActionTable(grammar, lr1fsm) {
 
 	return lr1GotoActionTable;
 }
-export function newLL1Parse(grammar, ll1PredictTable, inputTokens) {
+function newLL1Parse(grammar, ll1PredictTable, inputTokens) {
 	return new LL1Parse(grammar, ll1PredictTable, inputTokens);
 }
-export function newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
+function newLR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
 	return new LR1Parse(grammar, lr1FSM, lr1GotoActionTable, inputTokens);
 }
+
+export {
+	GSymbol,
+	Terminal,
+	NonTerminal,
+	ActionSymbol,
+	Production,
+	Grammar,
+	LR0Configuration,
+	LR1Configuration,
+	LR0FSM,
+	LR1FSM,
+	LL1Parse,
+	LR1Parse,
+
+	computeUnreachableSymbols,
+	computeUnreducibleSymbols,
+	computeNullableSymbols,
+	buildFirstSetTable,
+	buildFollowSetTable,
+	buildPredictSetTable,
+	buildLL1PredictTable,
+	buildLR1GotoActionTable,
+	newLL1Parse,
+	newLR1Parse,
+};

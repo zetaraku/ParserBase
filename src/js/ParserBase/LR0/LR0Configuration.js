@@ -1,5 +1,5 @@
-import { GSymbol } from './GSymbol';
-import Production from './Production';
+import { GSymbol } from '../base/symbols';
+import Production from '../base/Production';
 
 export default class LR0Configuration {
 	constructor(production, dotPos) {

@@ -1,4 +1,4 @@
-import _ext from './_ext';
+import _ext from '../_ext';
 import {
 	GSymbol,
 	Production,
@@ -7,7 +7,7 @@ import {
 	LR1FSM,
 	LL1Parse,
 	LR1Parse,
-} from './ParserBase.classes';
+} from '../ParserBase';
 
 
 function dotStringOf(self) {
@@ -37,7 +37,7 @@ function dotStringOf(self) {
 		return (dotStringOf(self.lhs) + ' → ' +
 			(self.rhs.length !== 0 ? self.rhs.map(e => dotStringOf(e)).join(' ') : dotStringOf(GSymbol.LAMBDA)));
 	} else {
-		console.error(self);
+		throw new Error(`${self} has no dotString representation.`);
 	}
 }
 
@@ -46,22 +46,26 @@ export function buildDotSourceOfCFSM(cfsm) {
 		digraph CFSM {
 			rankdir = "LR";
 			node [shape = rect];
-			start -> ${cfsm.startState.id};\n`;
+			start -> ${cfsm.startState.id};
+		`;
 	for(let state of cfsm.states) {
 		dotFileSrc += `\
 			${state.id} [
 				label = "State ${state.id}\\n${dotStringOf(state)}"
-			];\n`;
+			];
+		`;
 		for(let [symbol, nextState] of state.transitionMap) {
 			dotFileSrc += `\
 				${state.id} -> ${nextState.id} [
 					label = "${dotStringOf(symbol)}"
 					style = solid
-				];\n`;
+				];
+			`;
 		}
 	}
 	dotFileSrc += `\
-		}\n`;
+		}
+	`;
 
 	return dotFileSrc;
 }
@@ -70,25 +74,28 @@ export function buildDotSourceOfParseTrees(parseTrees) {
 		digraph ParseTree {
 			rankdir = "UD";
 			node [shape = ellipse]\n`;
-	{
-		for(let parseTree of parseTrees)
-			traverseNode(parseTree);
-	}
+
+	for(let parseTree of parseTrees)
+		traverseNode(parseTree);
+
 	dotFileSrc += `\
-		}\n`;
+		}
+	`;
 
 	return dotFileSrc;
 
 	function traverseNode(node) {
 		dotFileSrc += `\
-			${node.id} [label = "${dotStringOf(node)}"];\n`;
+			${node.id} [label = "${dotStringOf(node)}"];
+		`;
 
 		if(node.childNodes === undefined)
 			return;
 
 		for(let childNode of node.childNodes)
 			dotFileSrc += `\
-				${node.id} -> ${childNode.id};\n`;
+				${node.id} -> ${childNode.id};
+			`;
 		for(let childNode of node.childNodes)
 			traverseNode(childNode);
 	}

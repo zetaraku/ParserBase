@@ -1,4 +1,4 @@
-import { GSymbol } from './GSymbol';
+import { GSymbol } from './symbols';
 
 export default class Production {
 	constructor(lhs, rhs) {
@@ -7,8 +7,8 @@ export default class Production {
 		this.rhs = rhs;
 	}
 	toString() {
-		return (this.lhs + ' ' + Production.ARROW + ' ' +
-			(this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA));
+		let rhs = this.rhs.length !== 0 ? this.rhs.join(' ') : GSymbol.LAMBDA;
+		return `${this.lhs} ${Production.ARROW} ${rhs}`;
 	}
 } {
 	Production.serialNo = 0;

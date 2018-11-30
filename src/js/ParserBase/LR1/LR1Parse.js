@@ -1,14 +1,17 @@
-import { GSymbol } from './GSymbol';
-import Production from './Production';
-import _ext from '../_ext';
+import { GSymbol } from '../base/symbols';
+import Production from '../base/Production';
+import _ext from '../../_ext';
 
 export default class LR1Parse {
 	constructor(grammar, lr1FSM, lr1GotoActionTable, inputTokens) {
 		LR1Parse.TreeNode.serialNo = 1;
+
 		const parseForest = this.parseForest = [];
 		const parseStack = this.parseStack = [];
 		const stateStack = this.stateStack = [lr1FSM.startState];
+
 		inputTokens.push({terminalType: GSymbol.EOI});
+
 		this.step = (function*() {
 			while(inputTokens.length !== 0) {
 				let currentState = stateStack.slice(-1)[0];
@@ -22,6 +25,7 @@ export default class LR1Parse {
 				}
 
 				let action = selectedActions[0];
+
 				if(action instanceof LR1Parse.Action.Shift) {
 					/* shift */ {
 						// parse stack
@@ -52,6 +56,7 @@ export default class LR1Parse {
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
 						stateStack.push(nonterminalShiftAction.nextState);
+
 						// parse tree
 						parseForest.push(reducedNode);
 					}
@@ -61,6 +66,7 @@ export default class LR1Parse {
 						// parse stack
 						parseStack.push(nextInput.terminalType);
 						stateStack.push(action.nextState);
+
 						// parse tree
 						parseForest.push(new LR1Parse.TreeNode(nextInput.terminalType));
 
@@ -81,6 +87,7 @@ export default class LR1Parse {
 						// parse stack
 						parseStack.push(action.reducingProduction.lhs);
 						stateStack.pop();
+
 						// parse tree
 						parseForest.push(reducedNode);
 					}

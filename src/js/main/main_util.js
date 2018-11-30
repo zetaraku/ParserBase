@@ -3,7 +3,7 @@ import {
 	Terminal,
 	// NonTerminal,
 	Production,
-} from './ParserBase.classes';
+} from '../ParserBase';
 
 // set display of parser components
 GSymbol.prototype.toString = function() {

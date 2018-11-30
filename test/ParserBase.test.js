@@ -1,22 +1,40 @@
 const chai = require('chai');
-const ParserBase = require('../src/js/app/ParserBase');
 const {
 	GSymbol,
-	Terminal,
-	NonTerminal,
-	ActionSymbol,
-	Production,
-	Grammar,
-	LR0Configuration,
-	LR1Configuration,
+	// Terminal,
+	// NonTerminal,
+	// ActionSymbol,
+	// Production,
+	// Grammar,
+	// LR0Configuration,
+	// LR1Configuration,
 	LR0FSM,
 	LR1FSM,
-	LL1Parse,
+	// LL1Parse,
 	LR1Parse,
-} = require('../src/js/app/ParserBase.classes');
-const main_functions = require('../src/js/app/main_functions');
-const graphviz_functions = require('../src/js/app/graphviz_functions');
-const _ext = require('../src/js/app/_ext').default;
+
+	computeUnreachableSymbols,
+	computeUnreducibleSymbols,
+	computeNullableSymbols,
+	buildFirstSetTable,
+	buildFollowSetTable,
+	buildPredictSetTable,
+	buildLL1PredictTable,
+	buildLR1GotoActionTable,
+	newLL1Parse,
+	newLR1Parse,
+} = require('../src/js/ParserBase');
+const {
+	buildGrammar,
+	buildVocabularyNameMap,
+	processGrammarInput,
+	processParseInput,
+} = require('../src/js/main/main_functions');
+const {
+	buildDotSourceOfCFSM,
+	buildDotSourceOfParseTrees,
+} = require('../src/js/main/graphviz_functions');
+const _ext = require('../src/js/_ext').default;
 
 let expect = chai.expect;
 // let should = chai.should();
@@ -25,9 +43,6 @@ let assert = chai.assert;
 {
 	describe('module ParserBase', function() {
 		let result = {};
-		it('should exist', function() {
-			expect(ParserBase).to.exist;
-		});
 		describe('grammar check', function() {
 			it('should build Grammar', function() {
 				let $inputGrammarText = (`
@@ -58,9 +73,9 @@ primary -> INTLIT
 add_op -> +
 add_op -> -
 				`);
-				let rawGrammar = main_functions.processGrammarInput($inputGrammarText);
+				let rawGrammar = processGrammarInput($inputGrammarText);
 				expect(
-					result.grammar = ParserBase.buildGrammar(
+					result.grammar = buildGrammar(
 						Array.from(rawGrammar.terminals),
 						Array.from(rawGrammar.nonTerminals),
 						rawGrammar.startSymbol,
@@ -70,12 +85,12 @@ add_op -> -
 			});
 			it('should build NameMap of vocabularies', function() {
 				expect(
-					result.vocabularyNameMap = result.grammar.buildVocabularyNameMap()
+					result.vocabularyNameMap = buildVocabularyNameMap(result.grammar)
 				).to.exist;
 			});
 			it('should check Unreachable symbols', function() {
 				expect(
-					result.unreachableSymbols = ParserBase.computeUnreachableSymbols(result.grammar)
+					result.unreachableSymbols = computeUnreachableSymbols(result.grammar)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -83,7 +98,7 @@ add_op -> -
 			});
 			it('should check Unreducible symbols', function() {
 				expect(
-					result.unreducibleSymbols = ParserBase.computeUnreducibleSymbols(result.grammar)
+					result.unreducibleSymbols = computeUnreducibleSymbols(result.grammar)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -93,7 +108,7 @@ add_op -> -
 		describe('functionality', function() {
 			it('should compute Nullable symbols', function() {
 				expect(
-					result.nullableSymbols = ParserBase.computeNullableSymbols(result.grammar)
+					result.nullableSymbols = computeNullableSymbols(result.grammar)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -107,7 +122,7 @@ add_op -> -
 			});
 			it('should build FirstSet(1) Table', function() {
 				expect(
-					result.firstSetTable = ParserBase.buildFirstSetTable(result.grammar, result.nullableSymbols)
+					result.firstSetTable = buildFirstSetTable(result.grammar, result.nullableSymbols)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -137,7 +152,7 @@ add_op -> -
 			});
 			it('should build FollowSet(1) Table', function() {
 				expect(
-					result.followSetTable = ParserBase.buildFollowSetTable(result.grammar, result.firstSetTable)
+					result.followSetTable = buildFollowSetTable(result.grammar, result.firstSetTable)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -165,7 +180,7 @@ add_op -> -
 			});
 			it('should build PredictSet(1) Table', function() {
 				expect(
-					result.predictSetTable = ParserBase.buildPredictSetTable(result.grammar, result.firstSetTable, result.followSetTable)
+					result.predictSetTable = buildPredictSetTable(result.grammar, result.firstSetTable, result.followSetTable)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -202,7 +217,7 @@ add_op -> -
 			});
 			it('should build LL(1) Predict Table', function() {
 				expect(
-					result.ll1PredictTable = ParserBase.buildLL1PredictTable(result.grammar, result.predictSetTable)
+					result.ll1PredictTable = buildLL1PredictTable(result.grammar, result.predictSetTable)
 				).to.exist;
 			});
 			it('- correct (verified)', function() {
@@ -295,7 +310,7 @@ add_op -> -
 			});
 			it('should build LR(1) GotoAction Table', function() {
 				expect(
-					result.lr1GotoActionTable = ParserBase.buildLR1GotoActionTable(result.grammar, result.lr1FSM)
+					result.lr1GotoActionTable = buildLR1GotoActionTable(result.grammar, result.lr1FSM)
 				).to.exist;
 			});
 			it('- correct', function() {
@@ -646,10 +661,10 @@ add_op -> -
 			});
 		});
 		describe('parsing', function() {
-			let $inputTokensText = `begin ID := INTLIT ; read ( ID ) ; end`;
+			let $inputTokensText = 'begin ID := INTLIT ; read ( ID ) ; end';
 			it('should finish LL(1) Parse without error', function() {
-				let inputTokens = main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
-				let currentParse = ParserBase.newLL1Parse(result.grammar, result.ll1PredictTable, inputTokens);
+				let inputTokens = processParseInput($inputTokensText, result.vocabularyNameMap);
+				let currentParse = newLL1Parse(result.grammar, result.ll1PredictTable, inputTokens);
 				let r;
 				do {
 					r = currentParse.step.next();
@@ -658,8 +673,8 @@ add_op -> -
 				result.ll1Parse = currentParse;
 			});
 			it('should finish LR(1) Parse without error', function() {
-				let inputTokens = main_functions.processParseInput($inputTokensText, result.vocabularyNameMap);
-				let currentParse = ParserBase.newLR1Parse(result.grammar, result.lr1FSM, result.lr1GotoActionTable, inputTokens);
+				let inputTokens = processParseInput($inputTokensText, result.vocabularyNameMap);
+				let currentParse = newLR1Parse(result.grammar, result.lr1FSM, result.lr1GotoActionTable, inputTokens);
 				let r;
 				do {
 					r = currentParse.step.next();
@@ -671,22 +686,22 @@ add_op -> -
 		describe('dot source generation', function() {
 			it('should generate dot source for LL(1) ParseTree', function() {
 				expect(
-					result.ll1ParseTree_Viz = graphviz_functions.buildDotSourceOfParseTrees([result.ll1Parse.parseTree])
+					result.ll1ParseTree_Viz = buildDotSourceOfParseTrees([result.ll1Parse.parseTree])
 				).to.exist;
 			});
 			it('should generate dot source for LR(1) ParseTree', function() {
 				expect(
-					result.lr1ParseTree_Viz = graphviz_functions.buildDotSourceOfParseTrees(result.lr1Parse.parseForest)
+					result.lr1ParseTree_Viz = buildDotSourceOfParseTrees(result.lr1Parse.parseForest)
 				).to.exist;
 			});
 			it('should generate dot source for LR(0) FSM', function() {
 				expect(
-					result.lr0FSM_Viz = graphviz_functions.buildDotSourceOfCFSM(result.lr0FSM)
+					result.lr0FSM_Viz = buildDotSourceOfCFSM(result.lr0FSM)
 				).to.exist;
 			});
 			it('should generate dot source for LR(1) FSM', function() {
 				expect(
-					result.lr1FSM_Viz = graphviz_functions.buildDotSourceOfCFSM(result.lr1FSM)
+					result.lr1FSM_Viz = buildDotSourceOfCFSM(result.lr1FSM)
 				).to.exist;
 			});
 		});

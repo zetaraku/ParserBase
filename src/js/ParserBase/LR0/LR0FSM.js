@@ -1,6 +1,6 @@
-import { NonTerminal } from './GSymbol';
+import { NonTerminal } from '../base/symbols';
 import LR0Configuration from './LR0Configuration';
-import _ext from '../_ext';
+import _ext from '../../_ext';
 
 export default class LR0FSM {
 	constructor(startState) {
