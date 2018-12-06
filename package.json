@@ -43,7 +43,7 @@
     "babel-runtime": "^6.26.0",
     "canvg-browser": "^1.0.0",
     "jquery": "^3.3.1",
-    "viz.js": "^2.0.0"
+    "viz.js": "^2.1.2-pre.1"
   },
   "bugs": {
     "url": "https://github.com/zetaraku/ParserBase/issues"

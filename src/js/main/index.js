@@ -27,7 +27,7 @@ import {
 } from '../ParserBase';
 
 import Viz from 'viz.js';
-import { Module, render } from 'viz.js/full.render';
+import vizjsWorkerURL from 'file-loader!viz.js/full.render.js';
 import canvg from 'canvg-browser';
 
 import {
@@ -43,7 +43,7 @@ import {
 
 import './main_util';
 
-const viz = new Viz({ Module, render });
+const viz = new Viz({ workerURL: vizjsWorkerURL });
 
 let COMMA_SEPARATOR = '<span class="comma"> , </span>';
 
