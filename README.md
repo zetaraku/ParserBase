@@ -10,27 +10,22 @@ Parser Base
 
 This is a **demonstrative parser** with a **webpage user interface**.
 
-It can:
+It can build and display:
 
-* build First Set (1) Table
-* build Follow Set (1) Table
-* build Predict Set (1) Table
-* build LL(1) Predict Table
-* build LR(0) FSM
-* build LR(1) FSM
-* build LR(1) Goto/Action Table
+* First Set (1) Table
+* Follow Set (1) Table
+* Predict Set (1) Table
+* LL(1) Predict Table
+* LR(0) FSM
+* LR(1) FSM
+* LR(1) Goto/Action Table
 
 and do demonstration of:
 
 * LL(1) parse
 * LR(1) parse
 
-and generate visualization of:
-
-* LR(0) FSM
-* LR(1) FSM
-* LL(1) Parse Tree
-* LR(1) Parse Tree
+and display their parse trees.
 
 Before you start
 ----------------
