@@ -1,4 +1,4 @@
-Parser Base
+ParserBase
 ===========
 [![Build Status](https://travis-ci.org/zetaraku/ParserBase.svg?branch=master)](https://travis-ci.org/zetaraku/ParserBase)
 [![Coverage Status](https://coveralls.io/repos/github/zetaraku/ParserBase/badge.svg?branch=master)](https://coveralls.io/github/zetaraku/ParserBase?branch=master)
