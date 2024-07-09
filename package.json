@@ -26,6 +26,7 @@
     "nyc": "^14.0.0",
     "pug": ">=3.0.1",
     "pug-html-loader": "^1.1.5",
+    "raw-loader": "^4.0.2",
     "sass": "^1.77.6",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.23.1",
