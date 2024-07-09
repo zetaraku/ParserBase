@@ -59,6 +59,9 @@ $(document).ready(function() {
 	let tmpCanvas = document.getElementById('tmpCanvas');
 	initTabs();
 
+	// insert sample input
+	$('#grammar_input').text(require('raw-loader!~/example-cfgs/Micro.txt').default);
+
 	// handle setup of grammar input
 	$('#grammar_form').on('submit', function() {
 		if(!editMode) {
